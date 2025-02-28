@@ -20,6 +20,10 @@ REPO_TO_PACKAGE = {
     "https://github.com/astral-sh/ruff-pre-commit": "ruff",
     "https://github.com/charliermarsh/ruff-pre-commit": "ruff",
     "https://github.com/pre-commit/mirrors-autopep8": "autopep8",
+    "https://github.com/pre-commit/mirrors-clang-format": "clang-format",
+    "https://github.com/pre-commit/mirrors-yapf": "yapf",
+    "https://github.com/pre-commit/mirrors-pylint": "pylint",
+    "https://github.com/pre-commit/mirrors-isort": "isort",
 }
 
 REPO_TO_VERSION_TEMPLATE = {
@@ -34,9 +38,9 @@ REPO_TO_VERSION_TEMPLATE = {
     "https://github.com/adamchainz/djade-pre-commit": "${rev}",
     "https://github.com/rtts/djhtml": "${rev}",
     "https://github.com/PyCQA/docformatter": "${rev}",
-    "https://github.com/pycqa/flake8": "${rev}",
+    "https://github.com/PyCQA/flake8": "${rev}",
     "https://github.com/flakeheaven/flakeheaven": "${rev}",
-    "https://github.com/pycqa/isort": "${rev}",
+    "https://github.com/PyCQA/isort": "${rev}",
     "https://github.com/pre-commit/mirrors-mypy": "v${rev}",
     "https://github.com/pdm-project/pdm": "${rev}",
     "https://github.com/python-poetry/poetry": "${rev}",
@@ -47,6 +51,10 @@ REPO_TO_VERSION_TEMPLATE = {
     "https://github.com/astral-sh/ruff-pre-commit": "v${rev}",
     "https://github.com/charliermarsh/ruff-pre-commit": "v${rev}",
     "https://github.com/adrienverge/yamllint": "v${rev}",
+    "https://github.com/pre-commit/mirrors-clang-format": "v${rev}",
+    "https://github.com/pre-commit/mirrors-yapf": "v${rev}",
+    "https://github.com/pre-commit/mirrors-pylint": "v${rev}",
+    "https://github.com/pre-commit/mirrors-isort": "v${rev}",
 }
 
 
