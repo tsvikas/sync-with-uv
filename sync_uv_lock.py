@@ -101,7 +101,7 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
                 "Processing {package} ({repo_url})", package=package, repo_url=repo_url
             )
             if not (package and package in uv_data):
-                logger.info("{}: NOT MANAGED", package)
+                logger.debug("{}: NOT MANAGED", package)
         elif (
             package and package in uv_data and (repo_rev := repo_rev_re.fullmatch(line))
         ):
@@ -113,7 +113,7 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
             line_fixed = line.replace(current_version, target_version)
             new_lines.append(line_fixed)
             if line == line_fixed:
-                logger.info("{}: NO CHANGE", package)
+                logger.debug("{}: NO CHANGE", package)
             else:
                 logger.info(
                     "{package}: {current_version} -> {target_version}",
