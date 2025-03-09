@@ -1,0 +1,47 @@
+enable-beta-ecosystems: true  # needed for uv support  {# TODO: remove when possible #}
+# see https://github.com/dependabot/dependabot-core/issues/10478#issuecomment-2691330949
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      git-submodules:
+        patterns:
+          - "*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      # python-security:
+      #   applies-to: "security-updates"
+      #   dependency-type: "production"
+      #   patterns:
+      #     - "*"
+      # python-production:
+      #   applies-to: "version-updates"
+      #   dependency-type: "production"
+      #   patterns:
+      #     - "*"
+      # python-development-major:
+      #   dependency-type: "development"
+      #   update-types: ["major"]
+      #   patterns:
+      #     - "*"
+      # python-development:
+      #   dependency-type: "development"
+      #   patterns:
+      #     - "*"
+      python-packages:
+        patterns:
+          - "*"
