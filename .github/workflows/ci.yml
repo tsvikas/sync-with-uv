@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  black:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: psf/black@stable
+        with:
+          jupyter: false
+          version: "~=25.0"
+
+  ruff-check:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3
+
+  pre-commit:
+    if: ${{ always() }}
+    env:
+      COLUMNS: 120
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pre-commit/action@v3.0.1
+
+  mypy:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install packages
+        run: >-
+          uv sync
+          --all-extras
+          --no-default-groups
+          --group typing
+          --group test
+          --exact
+          --locked
+      - name: List packages
+        run: uv pip list
+      - name: Run mypy
+        run: uv run --no-sync mypy
+
+  test:
+    if: ${{ always() }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        resolution:
+          - "highest"
+        os:
+          - ubuntu-latest
+        python-version:
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "pypy3.11"
+        include:
+          # test with lowest resolution
+          - resolution: "lowest"
+            os: ubuntu-latest
+            python-version: "3.11"
+          - resolution: "lowest"
+            os: ubuntu-latest
+            python-version: "3.13"
+          # test on os
+          - resolution: "locked"
+            os: ubuntu-latest
+            python-version: "3.11"
+          - resolution: "locked"
+            os: macos-latest
+            python-version: "3.11"
+          - resolution: "locked"
+            os: windows-latest
+            python-version: "3.11"
+          # test on prerelease
+          - resolution: "prerelease"
+            os: ubuntu-latest
+            python-version: "3.13"
+          - resolution: "prerelease"
+            os: ubuntu-latest
+            python-version: "3.14"
+    continue-on-error: ${{ matrix.resolution == 'prerelease' || matrix.python-version == 'pypy3.11' }}
+    name: test-${{ matrix.python-version }}-${{ matrix.resolution }}-${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache-suffix: ${{ matrix.resolution }}
+      - name: Install packages
+        run: >-
+          uv sync
+          --all-extras
+          --no-default-groups
+          --group test
+          --exact
+          ${{ matrix.resolution == 'locked' && '--locked' ||
+              matrix.resolution == 'lowest' && '--upgrade --resolution lowest-direct' ||
+              matrix.resolution == 'highest' && '--upgrade --resolution highest' ||
+              matrix.resolution == 'prerelease' && '--upgrade --resolution highest --prerelease allow' ||
+              '--NON_RECOGNIZED_RESOLUTION'
+          }}
+      - name: List packages
+        run: uv pip list
+      - name: Run tests
+        run: uv run --no-sync pytest
+
+  pylint:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install packages
+        run: >-
+          uv sync
+          --all-extras
+          --no-default-groups
+          --exact
+          --locked
+      - name: List packages
+        run: uv pip list
+      - name: Run Pylint
+        run: uv run --no-sync --with pylint pylint src

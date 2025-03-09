@@ -1,0 +1,236 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+
+[project]
+dynamic = ["version"]
+name = "sync-with-uv"
+description = "Sync '.pre-commit-config.yaml' from 'uv.lock'."
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  {name = "Tsvika Shapira", email = "tsvikas@gmail.com"}
+]
+keywords = []
+classifiers = [
+  # TODO: remove when ready to upload to pypi
+  "Private :: Do Not Upload",
+  # TODO: choose more classifiers from the list in https://pypi.org/classifiers/
+  # i.e.: Environment, Framework, Intended Audience, Topic
+  # TODO: update the development status
+  "Development Status :: 1 - Planning",
+  # target os
+  "Operating System :: OS Independent",
+  # python versions
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+dependencies = [
+  "loguru >=0",
+  "typer >=0",
+]
+
+[project.optional-dependencies]
+# optional_name = ["some_package >=1.0"]
+
+[project.urls]
+# homepage = "https://sync-with-uv.readthedocs.io"
+source = "https://github.com/tsvikas/sync-with-uv"
+# changelog = "https://github.com/tsvikas/sync-with-uv/blob/master/CHANGELOG.md"
+# releasenotes = "https://github.com/tsvikas/sync-with-uv/releases"
+# documentation = "https://sync-with-uv.readthedocs.io"
+# issues = "https://github.com/tsvikas/sync-with-uv/issues"
+# funding = "https://github.com/sponsors/tsvikas"
+
+[project.scripts]
+sync-with-uv = "sync_with_uv.cli:app"
+
+[project.gui-scripts]
+# sync-with-uv = "sync_with_uv.gui:app.run"
+
+
+[tool.uv]
+required-version = "~=0.6.0"
+default-groups = ["dev", "test", "typing"]
+
+
+[dependency-groups]
+dev = [
+  ## used in the justfile
+  "rust-just ~=1.0",
+  "pre-commit ~=4.0",
+  "black ~=25.0",  # also update GHA version
+  "ruff ~=0.9.0",
+  ## can be used for debug
+  "icecream >=2",
+  "snoop >=0.3",
+  ## can be used for REPL
+  "ipython >=8",
+]
+test = [
+  "pytest ~=8.0",
+  ## running
+  "pytest-reverse ~=1.0",
+  "pytest-xdist[psutil] ~=3.0",
+  ## reporting
+  "pytest-clarity ~=1.0",
+  ## extras
+  "pytest-benchmark ~=5.0",
+  "pytest-cov ~=6.0",
+  ## fixtures
+  "pytest-loguru >=0",
+  # "freezegun ~=1.0",
+  # "hypothesis ~=6.0",
+  # "pytest-datadir ~=1.0",
+  # "pytest-mock ~=3.0",
+  # "pytest-regressions ~=2.0",
+]
+# docs = []
+typing = [
+  "mypy ~=1.15.0",
+  # add "*-stubs" and "types-*" packages here (">=0")
+]
+
+
+[tool.hatch]
+version.source = "vcs"
+build.hooks.vcs.version-file = "src/sync_with_uv/_version.py"
+
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+  ## testing
+  "--doctest-modules",
+  "--strict-markers",
+  "--strict-config",
+  ## reporting
+  "-ra",
+  ## addons
+  "--benchmark-disable",  # pytest-benchmark
+  "--cov=src/sync_with_uv",  # pytest-cov
+  "--reverse",  # pytest-reverse
+  "--numprocesses=auto",  # pytest-xdist
+]
+xfail_strict = true
+# CHECK those options:
+filterwarnings = [
+  "error",
+  "default::DeprecationWarning",
+  "error::DeprecationWarning:sync_with_uv",
+]
+log_cli_level = "INFO"
+
+
+[tool.coverage]
+run.omit = [
+  "src/sync_with_uv/__main__.py",
+  "src/sync_with_uv/_version.py",
+]
+
+
+[tool.mypy]
+files = ["src", "tests"]
+mypy_path = "stubs"
+# verify the config file
+warn_unused_configs = true
+# set the platform
+python_version = "3.11"
+# enable checks [last updated: mypy 1.15]
+strict = true
+disallow_any_explicit = true
+disallow_any_unimported = true
+warn_unreachable = true
+#strict_bytes = true  # TODO: enable me when validate-pyproject updates
+enable_error_code = [
+  # from https://mypy.readthedocs.io/en/stable/error_code_list2.html
+  "redundant-self",
+  "deprecated",
+  "redundant-expr",
+  "possibly-undefined",
+  "truthy-bool",
+  "truthy-iterable",
+  "ignore-without-code",
+  "unused-awaitable",
+  "explicit-override",
+  "mutable-override",
+  "unimported-reveal",
+  "narrowed-type-not-subtype",
+]
+
+
+[tool.ruff.format]
+docstring-code-format = true
+
+
+[tool.ruff.lint]
+# Use google-style conventions for docstrings
+pydocstyle.convention = "google"
+select = [
+  "ALL",
+  # extend rules outside pydocstyle google convention
+  "D401",  # pydocstyle/non-imperative-mood
+  "D404",  # pydocstyle/docstring-starts-with-this
+]
+ignore = [
+  # needed only in large codebases
+  "TD002",    # flake8-todos/missing-todo-author
+  "TD003",    # flake8-todos/missing-todo-link
+  # incompatible with other rules
+  "COM812",   # flake8-commas/missing-trailing-comma (incompatible with black)
+  # disagree:
+  "PD010",    # pandas-vet/pandas-use-of-dot-pivot-or-unstack
+  "PD013",    # pandas-vet/pandas-use-of-dot-stack
+  # annoying:
+  "EM10",     # flake8-errmsg/*-in-exception
+  "RET504",   # flake8-return/unnecessary-assign
+  # ban something useful for a possibly good reason
+  #"C901",     # mccabe/complex-structure
+  #"S101",     # flake8-bandit/assert
+  #"PD901",    # pandas-vet/pandas-df-variable-name
+  #"FIX00",    # flake8-fixme/line-contains-*
+  #"ERA001",   # eradicate/commented-out-code
+  #"PLR091",   # PyLint-Refactor/too-many-*
+  #"TRY003",   # tryceratops/raise-vanilla-args
+]
+# objects that should be treated equivalently to a logging.Logger object.
+logger-objects = ["loguru.logger"]
+# allow the omission of a return type hint for __init__
+flake8-annotations.mypy-init-return = true
+# allow `dict(a=1, b=2)`
+flake8-comprehensions.allow-dict-calls-with-keyword-arguments = true
+
+# flag modules or module members that may not be imported or accessed
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"collections.namedtuple".msg = "Use typing.NamedTuple or @dataclasses.dataclass(frozen=True, slots=True)"
+
+[tool.ruff.lint.per-file-ignores]
+"src/sync_with_uv/cli.py" = [
+  "T20",      # flake8-print
+]
+"src/sync_with_uv/_version.py" = [
+  "ALL",
+]
+"!tests/test_*.py" = [
+  "PT",       # flake8-pytest-style
+]
+"tests/test_*.py" = [
+  "INP001",   # flake8-no-pep420/implicit-namespace-package
+  "PLR2004",  # PyLint-Refactor/magic-value-comparison
+  "S101",     # flake8-bandit/assert
+  "D1",       # pydocstyle/undocumented-*
+]
+
+
+[tool.pylint]
+py-version = "3.11"
+ignore-paths = [".*/_version.py"]
+reports.output-format = "colorized"

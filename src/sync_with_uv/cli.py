@@ -1,17 +1,21 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = ["typer", "loguru"]
-# ///
+"""CLI for sync_with_uv.
+
+Currently, a placeholder until the real CLI will be added.
+"""
 
 import re
 import tomllib
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 
 import typer
+from click.exceptions import UsageError
 from loguru import logger
 
+from . import __version__
+
 app = typer.Typer()
+
 
 REPO_TO_PACKAGE = {
     "https://github.com/adamchainz/djade-pre-commit": "djade",
@@ -70,11 +74,15 @@ def repo_to_package(repo_url: str) -> str | None:
     repo_url_re = re.compile(
         r"https?://(www\.)?github.com/(?P<user_name>[^/]*)/(?P<repo_name>[^/]*)/?"
     )
-    repo_url = repo_url_re.fullmatch(repo_url)
-    return repo_url and repo_url.group("repo_name")
+    repo_url_match = repo_url_re.fullmatch(repo_url)
+    if repo_url_match is None:
+        return None
+    repo_name = repo_url_match.group("repo_name")
+    assert isinstance(repo_name, str)
+    return repo_name
 
 
-def repo_to_version_template(repo_url: str) -> str:
+def repo_to_version_template(repo_url: str) -> str | None:
     if repo_url in REPO_TO_VERSION_TEMPLATE:
         return REPO_TO_VERSION_TEMPLATE[repo_url]
     for repo in REPO_TO_VERSION_TEMPLATE:
@@ -99,7 +107,7 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
     repo_rev_re = re.compile(r"\s*rev\s*:\s*(\S*)\s*")
     lines = precommit_text.splitlines()
     new_lines = []
-    repo_url = None
+    repo_url: str | None = None
     package = None
     for line in lines:
         if repo_header := repo_header_re.fullmatch(line):
@@ -113,6 +121,7 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
         elif (
             package and package in uv_data and (repo_rev := repo_rev_re.fullmatch(line))
         ):
+            assert repo_url is not None
             current_version = repo_rev.group(1)
             version_template = repo_to_version_template(repo_url)
             if version_template is None:
@@ -148,6 +157,12 @@ ExistingFile = Annotated[
 ]
 
 
+def _version_callback(value: bool) -> None:  # noqa: FBT001
+    if value:
+        print(f"sync-with-uv {__version__}")
+        raise typer.Exit(0)
+
+
 @app.command()
 def process_precommit(
     precommit_filename: Annotated[
@@ -175,6 +190,17 @@ def process_precommit(
         ),
     ] = Path("uv.lock"),
     write_output: Annotated[bool, typer.Option("-w")] = False,
+    *,
+    version: Annotated[  # noqa: ARG001
+        bool | None,
+        typer.Option(
+            "--version",
+            "-V",
+            callback=_version_callback,
+            is_eager=True,
+            help="Print version",
+        ),
+    ] = None,
 ) -> str:
     uv_data = load_uv_lock(uv_lock_filename)
     precommit_text = precommit_filename.read_text()
@@ -182,7 +208,3 @@ def process_precommit(
     if write_output:
         precommit_filename.write_text(fixed_text)
     return fixed_text
-
-
-if __name__ == "__main__":
-    app()
