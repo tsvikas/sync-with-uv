@@ -10,18 +10,6 @@ from .sync_with_uv import load_uv_lock, process_precommit_text
 
 app = typer.Typer()
 
-ExistingFile = Annotated[
-    Path,
-    typer.Option(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=False,
-        readable=True,
-        resolve_path=True,
-    ),
-]
-
 
 def _version_callback(value: bool) -> None:  # noqa: FBT001
     if value:
