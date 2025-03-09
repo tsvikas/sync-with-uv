@@ -27,9 +27,10 @@ def test_process_precommit_cli_no_write(
             str(sample_precommit_config),
             "-u",
             str(sample_uv_lock),
+            "--check",
         ],
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 1
 
     # Verify file wasn't modified
     content = sample_precommit_config.read_text()
