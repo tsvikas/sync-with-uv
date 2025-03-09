@@ -59,10 +59,10 @@ def process_precommit(
 ) -> None:
     """Sync the versions of a pre-commit-config file to a uv.lock file."""
     uv_data = load_uv_lock(uv_lock_filename)
-    precommit_text = precommit_filename.read_text()
+    precommit_text = precommit_filename.read_text(encoding="utf-8")
     fixed_text = process_precommit_text(precommit_text, uv_data)
     if write_output:
-        precommit_filename.write_text(fixed_text)
+        precommit_filename.write_text(fixed_text, encoding="utf-8")
     else:
         print(fixed_text)
     if check and fixed_text != precommit_text:
