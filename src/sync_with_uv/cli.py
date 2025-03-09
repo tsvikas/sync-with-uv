@@ -57,6 +57,7 @@ def process_precommit(
     ] = Path("uv.lock"),
     *,
     write_output: Annotated[bool, typer.Option("-w")] = False,
+    check: bool = False,
     version: Annotated[  # noqa: ARG001
         bool | None,
         typer.Option(
@@ -76,3 +77,5 @@ def process_precommit(
         precommit_filename.write_text(fixed_text)
     else:
         print(fixed_text)
+    if check and fixed_text != precommit_text:
+        raise typer.Exit(1)
