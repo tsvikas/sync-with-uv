@@ -757,7 +757,7 @@ typing = [
 [package.metadata]
 requires-dist = [
     { name = "loguru", specifier = ">=0" },
-    { name = "typer", specifier = ">=0" },
+    { name = "typer", specifier = ">=0.13" },
 ]
 
 [package.metadata.requires-dev]
