@@ -35,7 +35,7 @@ classifiers = [
 ]
 dependencies = [
   "loguru >=0",
-  "typer >=0",
+  "typer >=0.13",
 ]
 
 [project.optional-dependencies]
