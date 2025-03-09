@@ -189,6 +189,7 @@ ignore = [
   # disagree:
   "PD010",    # pandas-vet/pandas-use-of-dot-pivot-or-unstack
   "PD013",    # pandas-vet/pandas-use-of-dot-stack
+  "PLE1205",  # logging-too-many-args: incompatible with loguru
   # annoying:
   "EM10",     # flake8-errmsg/*-in-exception
   "RET504",   # flake8-return/unnecessary-assign

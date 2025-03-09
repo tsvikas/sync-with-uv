@@ -1,15 +1,11 @@
-"""CLI for sync_with_uv.
-
-Currently, a placeholder until the real CLI will be added.
-"""
+"""CLI for sync_with_uv."""
 
 import re
 import tomllib
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
-from click.exceptions import UsageError
 from loguru import logger
 
 from . import __version__
@@ -63,13 +59,14 @@ REPO_TO_VERSION_TEMPLATE = {
 
 
 def repo_to_package(repo_url: str) -> str | None:
+    """Convert a repo url to a python package name."""
     if repo_url == "local":
         return None
     if repo_url in REPO_TO_PACKAGE:
         return REPO_TO_PACKAGE[repo_url]
-    for repo in REPO_TO_PACKAGE:
+    for repo, package in REPO_TO_PACKAGE.items():
         if repo_url.startswith(repo + "/"):
-            return REPO_TO_PACKAGE[repo]
+            return package
     # find from regex
     repo_url_re = re.compile(
         r"https?://(www\.)?github.com/(?P<user_name>[^/]*)/(?P<repo_name>[^/]*)/?"
@@ -77,21 +74,22 @@ def repo_to_package(repo_url: str) -> str | None:
     repo_url_match = repo_url_re.fullmatch(repo_url)
     if repo_url_match is None:
         return None
-    repo_name = repo_url_match.group("repo_name")
-    assert isinstance(repo_name, str)
+    repo_name: str = repo_url_match.group("repo_name")
     return repo_name
 
 
 def repo_to_version_template(repo_url: str) -> str | None:
+    """Convert a repo url to a evrsion template."""
     if repo_url in REPO_TO_VERSION_TEMPLATE:
         return REPO_TO_VERSION_TEMPLATE[repo_url]
-    for repo in REPO_TO_VERSION_TEMPLATE:
+    for repo, version_template in REPO_TO_VERSION_TEMPLATE.items():
         if repo_url.startswith(repo + "/"):
-            return REPO_TO_VERSION_TEMPLATE[repo]
+            return version_template
     return None
 
 
 def load_uv_lock(filename: Path) -> dict[str, str]:
+    """Read 'uv.lock' and return a dict of package, version."""
     with filename.open("rb") as f:
         toml_data = tomllib.load(f)
     return {
@@ -102,6 +100,7 @@ def load_uv_lock(filename: Path) -> dict[str, str]:
 
 
 def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
+    """Read a pre-commit config file and return a fixed pre-commit config string."""
     # NOTE: this only works if the 'repo' is the first key of the element
     repo_header_re = re.compile(r"\s*-\s*repo\s*:\s*(\S*)\s*")
     repo_rev_re = re.compile(r"\s*rev\s*:\s*(\S*)\s*")
@@ -121,7 +120,7 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
         elif (
             package and package in uv_data and (repo_rev := repo_rev_re.fullmatch(line))
         ):
-            assert repo_url is not None
+            assert repo_url is not None  # noqa: S101
             current_version = repo_rev.group(1)
             version_template = repo_to_version_template(repo_url)
             if version_template is None:
@@ -189,8 +188,8 @@ def process_precommit(
             resolve_path=True,
         ),
     ] = Path("uv.lock"),
-    write_output: Annotated[bool, typer.Option("-w")] = False,
     *,
+    write_output: Annotated[bool, typer.Option("-w")] = False,
     version: Annotated[  # noqa: ARG001
         bool | None,
         typer.Option(
@@ -202,6 +201,7 @@ def process_precommit(
         ),
     ] = None,
 ) -> str:
+    """Sync the versions of a pre-commit-config file to a uv.lock file."""
     uv_data = load_uv_lock(uv_lock_filename)
     precommit_text = precommit_filename.read_text()
     fixed_text = process_precommit_text(precommit_text, uv_data)
