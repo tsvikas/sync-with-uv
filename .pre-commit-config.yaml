@@ -19,6 +19,10 @@ repos:
     hooks:
       - id: uv-lock
   # uv.lock -> .pre-commit-config.yaml
+  - repo: https://github.com/tsvikas/sync-with-uv
+    rev: v0.1.0
+    hooks:
+      - id: sync-with-uv
   # .pre-commit-config.yaml -> .pre-commit-config.yaml
   - repo: https://github.com/pre-commit/sync-pre-commit-deps
     rev: v0.0.3
@@ -135,7 +139,7 @@ repos:
         additional_dependencies:
           - black==25.1.0
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.9
+    rev: v0.9.10
     hooks:
       - id: ruff
         alias: ruff-isort
