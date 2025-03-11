@@ -57,4 +57,10 @@ pylint:
 
 # Run tests with pytest
 test:
-  uv run pytest
+  uv run --exact pytest
+
+# add a new version tag and push it
+tag version commit="HEAD": check
+  # TODO: check the commit and not the current state.
+  git tag -a v{{ version }} -m "Release v{{ version }}" {{ commit }}
+  git push --tags

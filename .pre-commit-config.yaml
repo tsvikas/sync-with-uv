@@ -1,4 +1,15 @@
-exclude: ^.copier-answers.yml$
+# exclude those files from pre-commit checks
+exclude: "\
+  ^.copier-answers.yml$|\
+  ^tests/test_\\w*/output/|\
+  ^$"
+
+# pre-commit.ci config
+ci:
+  autoupdate_commit_msg: "[pre-commit.ci] chore: update pre-commit hooks"
+  autofix_commit_msg: "[pre-commit.ci] style: pre-commit fixes"
+  skip: []
+  autoupdate_schedule: quarterly
 
 repos:
   # Python / pre-commit package versions
@@ -18,52 +29,57 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-      # filesystem
+      # Filesystem
       - id: check-illegal-windows-names
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
-      # git
+      # Git related
       - id: check-added-large-files
       - id: check-merge-conflict
-      # secrets
+      - id: check-vcs-permalinks
+      - id: forbid-submodules  # use subtree
+      # Security
       - id: detect-private-key
-      # text in files
+      # Text encoding/formatting
       - id: end-of-file-fixer
+      - id: fix-byte-order-marker
       - id: mixed-line-ending
-        args: ["--fix=lf"]
+        args: [--fix=lf]
       - id: trailing-whitespace
-      # python
+      # Python
       - id: check-ast
       - id: check-docstring-first
       - id: debug-statements
-      - id: requirements-txt-fixer
       - id: name-tests-test
-        args: ["--pytest-test-first"]
-      # filetypes
-      - id: check-json
-        exclude_types: [jupyter]
+        args: [--pytest-test-first]
+      - id: requirements-txt-fixer
+      # Symlinks
       - id: check-symlinks
+      - id: destroyed-symlinks
+      # File validation
+      - id: check-json
       - id: check-toml
-      - id: check-yaml
       - id: check-xml
+      - id: check-yaml
+      # File formatting
       - id: pretty-format-json
         exclude_types: [jupyter]
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
-      # python
+      # Python files
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
       - id: python-check-mock-methods
       - id: python-no-eval
       - id: python-no-log-warn
       - id: python-use-type-annotations
-      # rst
+      # reStructuredText files
       - id: rst-backticks
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
-      # text
+      # UTF-8 encoding
       - id: text-unicode-replacement-char
 
   # All files
@@ -73,7 +89,7 @@ repos:
       - id: editorconfig-checker
         exclude_types: [jupyter]
 
-  # Spell checks
+  # Spell checking
   - repo: https://github.com/crate-ci/typos
     rev: v1.30.1
     hooks:
@@ -124,7 +140,7 @@ repos:
       - id: ruff
         alias: ruff-isort
         name: ruff isort
-        args: ["--select", "I001", "--fix"]
+        args: [--select, I001, --fix]
       - id: ruff
         alias: ruff-check
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -132,12 +148,12 @@ repos:
     hooks:
       - id: mypy
         name: mypy (without imports)
-        args: ["--config-file", "", "--ignore-missing-imports"]
+        args: [--config-file, "", --ignore-missing-imports]
 
   # Jupyter Notebook files
   - repo: local
     hooks:
-      - id: forbid-ipynb
+      - id: forbid-ipynb  # use jupytext
         name: forbid ipynb
         entry: filenames must not end in .ipynb
         language: fail
@@ -170,15 +186,13 @@ repos:
     hooks:
       - id: actionlint
 
-  # bash/sh shell scripts
+  # Shell scripts
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
     hooks:
       - id: shellcheck
-
-# pre-commit.ci config
-ci:
-  autoupdate_commit_msg: "chore: update pre-commit hooks"
-  autofix_commit_msg: "style: pre-commit fixes"
-  skip: []
-  autoupdate_schedule: quarterly
+  - repo: https://github.com/hugoh/pre-commit-fish
+    rev: v1.2
+    hooks:
+      - id: fish_syntax
+      - id: fish_indent
