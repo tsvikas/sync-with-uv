@@ -16,21 +16,17 @@ authors = [
 ]
 keywords = []
 classifiers = [
-  # TODO: remove when ready to upload to pypi
-  "Private :: Do Not Upload",
-  # TODO: choose more classifiers from the list in https://pypi.org/classifiers/
-  # i.e.: Environment, Framework, Intended Audience, Topic
-  # TODO: update the development status
-  "Development Status :: 1 - Planning",
-  # target os
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
   "Operating System :: OS Independent",
-  # python versions
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Quality Assurance",
   "Typing :: Typed",
 ]
 dependencies = [
