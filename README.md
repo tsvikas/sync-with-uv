@@ -20,9 +20,20 @@ Sync '.pre-commit-config.yaml' from 'uv.lock'.
 
 ## Usage
 
+### As a pre-commit hook
+
+Add to your `.pre-commit-config.yaml` file:
+
+```yaml
+- repo: https://github.com/tsvikas/sync-with-uv
+  rev: v0.1.0  # Use the version you want
+  hooks:
+    - id: sync-with-uv
+```
+
 ### Command Line
 
-Install the package using pip, or with a dependency manager like uv:
+Install the tool using pipx or uv:
 
 ```bash
 pipx install sync-with-uv
@@ -39,17 +50,6 @@ sync-with-uv -w
 
 # Use custom file paths
 sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
-```
-
-### As a pre-commit hook
-
-Add to your `.pre-commit-config.yaml` file:
-
-```yaml
-- repo: https://github.com/tsvikas/sync-with-uv
-  rev: v0.1.0  # Use the version you want
-  hooks:
-    - id: sync-with-uv
 ```
 
 ## Development
