@@ -16,7 +16,16 @@
 
 ## Overview
 
-Sync '.pre-commit-config.yaml' from 'uv.lock'.
+[PEP 735](https://peps.python.org/pep-0735/) introduces dependency groups in `pyproject.toml`,
+allowing tools like black, ruff, and mypy to be managed centrally.
+However, when these tools are also used in pre-commit hooks,
+keeping versions in sync between `uv.lock` and `.pre-commit-config.yaml` can be tedious.
+
+This package automatically updates the versions of dependencies in `.pre-commit-config.yaml` to match their versions in `uv.lock`,
+ensuring everything stays aligned and is managed from a single source.
+Any tool not specified in `uv.lock` remains managed by `.pre-commit-config.yaml`.
+
+Simply add this pre-commit hook to your setup and enjoy consistent dependency management.
 
 ## Usage
 
@@ -26,7 +35,7 @@ Add to your `.pre-commit-config.yaml` file:
 
 ```yaml
 - repo: https://github.com/tsvikas/sync-with-uv
-  rev: v0.1.0  # Use the version you want
+  rev: v0.1.0  # choose the latest version
   hooks:
     - id: sync-with-uv
 ```
