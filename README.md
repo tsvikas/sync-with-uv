@@ -1,10 +1,10 @@
 # sync-with-uv
 
 [![Tests][tests-badge]][tests-link]
-[![Documentation Status][rtd-badge]][rtd-link]
 [![uv][uv-badge]][uv-link]
 [![Ruff][ruff-badge]][ruff-link]
 [![Black][black-badge]][black-link]
+[![codecov][codecov-badge]][codecov-link]
 \
 [![PyPI version][pypi-version-badge]][pypi-link]
 [![PyPI platforms][pypi-platforms-badge]][pypi-link]
@@ -77,8 +77,18 @@ sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 - use `uv run just check` to run all the checks (format, lint, test, and pre-commit).
 - Run a specific tool directly, with `uv run pytest`/`ruff`/`mypy`/`black`/...
 
+<!---
+Badges to add, when needed:
+[![Documentation Status][rtd-badge]][rtd-link]
+
+[rtd-badge]: https://readthedocs.org/projects/sync-with-uv/badge/?version=latest
+[rtd-link]: https://sync-with-uv.readthedocs.io/en/latest/?badge=latest
+-->
+
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/psf/black
+[codecov-badge]: https://codecov.io/gh/tsvikas/sync-with-uv/graph/badge.svg
+[codecov-link]: https://codecov.io/gh/tsvikas/sync-with-uv
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
 [github-discussions-link]: https://github.com/tsvikas/sync-with-uv/discussions
 [install-git]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
@@ -90,8 +100,6 @@ sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 [pypi-link]: https://pypi.org/project/sync-with-uv/
 [pypi-platforms-badge]: https://img.shields.io/pypi/pyversions/sync-with-uv
 [pypi-version-badge]: https://img.shields.io/pypi/v/sync-with-uv
-[rtd-badge]: https://readthedocs.org/projects/sync-with-uv/badge/?version=latest
-[rtd-link]: https://sync-with-uv.readthedocs.io/en/latest/?badge=latest
 [ruff-badge]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
 [ruff-link]: https://github.com/astral-sh/ruff
 [template-badge]: https://img.shields.io/badge/%F0%9F%9A%80_Made_Using-tsvikas%2Fpython--template-gold
