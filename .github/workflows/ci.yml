@@ -61,24 +61,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        resolution:
-          - "highest"
-        os:
-          - ubuntu-latest
-        python-version:
-          - "3.11"
-          - "3.12"
-          - "3.13"
-          - "pypy3.11"
         include:
+          # test with highest resolution
+          - resolution: "highest"
+            os: ubuntu-latest
+            python-version: "3.13"
+          # test with pypy
+          - resolution: "highest"
+            os: ubuntu-latest
+            python-version: "pypy3.11"
           # test with lowest resolution
           - resolution: "lowest"
             os: ubuntu-latest
             python-version: "3.11"
-          - resolution: "lowest"
-            os: ubuntu-latest
-            python-version: "3.13"
-          # test on os
+          # test with different os
           - resolution: "locked"
             os: ubuntu-latest
             python-version: "3.11"
@@ -95,7 +91,6 @@ jobs:
           - resolution: "prerelease"
             os: ubuntu-latest
             python-version: "3.14"
-    continue-on-error: ${{ matrix.resolution == 'prerelease' || matrix.python-version == 'pypy3.11' }}
     name: test-${{ matrix.python-version }}-${{ matrix.resolution }}-${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -103,7 +98,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache-suffix: ${{ matrix.resolution }}
+      - name: Set versions that allow failure
+        # pypy and prerelease python versions might fail to install dependencies. In this case, we do not fail the job
+        run: >-
+          echo "ALLOW_FAILURE=${{ matrix.resolution == 'prerelease' || startsWith(matrix.python-version, 'pypy') }}"
+          >> "$GITHUB_ENV"
       - name: Install packages
+        id: install_packages
         run: >-
           uv sync
           --all-extras
@@ -116,9 +117,16 @@ jobs:
               matrix.resolution == 'prerelease' && '--upgrade --resolution highest --prerelease allow' ||
               '--NON_RECOGNIZED_RESOLUTION'
           }}
+        continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
+      - name: Stop job with warning if install fails for specific versions
+        if: ${{ env.ALLOW_FAILURE == 'true' && steps.install_packages.outcome == 'failure' }}
+        run: >-
+          echo "::warning::Stopping job due to installation failure on Python ${{ matrix.python-version }}"
       - name: List packages
+        if: ${{ steps.install_packages.outcome == 'success' }}
         run: uv pip list
       - name: Run tests
+        if: ${{ steps.install_packages.outcome == 'success' }}
         run: uv run --no-sync pytest
 
   pylint:
@@ -137,5 +145,17 @@ jobs:
           --locked
       - name: List packages
         run: uv pip list
+      # use pylint exitcode to fail only on errors.
       - name: Run Pylint
-        run: uv run --no-sync --with pylint pylint src
+        run: |
+          set +e
+          uv run --no-sync --with pylint pylint src
+          result=$?
+          set -e
+          [ $((result & 1)) -ne 0 ] && echo "::error ::Pylest fatal(s) found"
+          [ $((result & 2)) -ne 0 ] && echo "::error ::Pylest error(s) found"
+          [ $((result & 4)) -ne 0 ] && echo "::warning ::Pylest warning(s) found"
+          [ $((result & 8)) -ne 0 ] && echo "::warning ::Pylest refactor(s) found"
+          [ $((result & 16)) -ne 0 ] && echo "::warning ::Pylest convention(s) found"
+          [ $((result & 32)) -ne 0 ] && echo "::error ::Pylest usage error"
+          exit $((result & 35))

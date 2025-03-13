@@ -1,16 +1,22 @@
 list-tasks:
   @just --list
 
+alias t := test
+alias c := check
+alias cp := check-and-push
+alias fc := format-and-check
+alias f := format
+
 # Initialize a new project
 init:
   git init
   git commit --allow-empty -m "Initial commit"
   git add --all
   git commit -m "🚀 Initialized project using https://github.com/tsvikas/python-template"
-  @just update-deps
+  just update-deps
   git add --all
   git commit -m "⬆️ Updated project dependencies"
-  @just prepare
+  just prepare
 
 # Update all dependencies
 update-deps:
@@ -22,16 +28,16 @@ prepare:
   uv run pre-commit install
 
 check-and-push:
-  @just check
-  git push
+  just check
+  git push --follow-tags
 
 format-and-check:
-  @just format
-  @just check
+  just format
+  just check
 
 # Run all code quality checks and tests, except pylint
 check:
-  uv run pytest
+  just test
   uv run mypy
   uv run pre-commit run --all-files --show-diff-on-failure
 
@@ -59,8 +65,20 @@ pylint:
 test:
   uv run --exact pytest
 
-# add a new version tag and push it
-tag version commit="HEAD": check
-  # TODO: check the commit and not the current state.
+# add a new version tag
+tag version commit="HEAD": (_assert-legal-version version)
+  just check-at-commit {{ commit }}
+  just tag-skip-check {{ version }} {{ commit }}
+
+_assert-legal-version version:
+  @echo "{{ version }}" | grep -q '^[0-9]' || ( echo "Error: version name should start with a digit" && false )
+
+tmp_rc_dir := '/tmp/rc/' + file_name(justfile_directory()) + '/' + datetime('%s')
+
+check-at-commit commit:
+  git worktree add {{ tmp_rc_dir }} --detach {{ commit }}
+  just -f {{ tmp_rc_dir }}/justfile check || ( git worktree remove -f {{ tmp_rc_dir }} && false )
+  git worktree remove {{ tmp_rc_dir }}
+
+tag-skip-check version commit: (_assert-legal-version version)
   git tag -a v{{ version }} -m "Release v{{ version }}" {{ commit }}
-  git push --tags
