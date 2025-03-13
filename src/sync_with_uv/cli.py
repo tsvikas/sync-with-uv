@@ -1,13 +1,17 @@
 """CLI for sync_with_uv."""
 
+import sys
 from pathlib import Path
 from typing import Annotated
 
 import typer
+from loguru import logger
 
 from . import __version__
 from .sync_with_uv import load_uv_lock, process_precommit_text
 
+logger.remove()
+logger.add(sys.stderr, level="INFO", format="<level>{message}</level>")
 app = typer.Typer()
 
 
