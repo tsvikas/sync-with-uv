@@ -95,7 +95,7 @@ repos:
 
   # Spell checking
   - repo: https://github.com/crate-ci/typos
-    rev: v1
+    rev: v1.31.1
     hooks:
       - id: typos
   - repo: https://github.com/codespell-project/codespell
