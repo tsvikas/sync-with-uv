@@ -15,12 +15,12 @@ repos:
   # Sync Python and  pre-commit package versions
   # pyproject.toml -> uv.lock
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.4
+    rev: 0.6.12
     hooks:
       - id: uv-lock
   # uv.lock -> .pre-commit-config.yaml
   - repo: https://github.com/tsvikas/sync-with-uv
-    rev: v0.1.0
+    rev: v0.1.2
     hooks:
       - id: sync-with-uv
   # .pre-commit-config.yaml -> .pre-commit-config.yaml
@@ -88,14 +88,14 @@ repos:
 
   # All files
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 3.2.0
+    rev: 3.2.1
     hooks:
       - id: editorconfig-checker
         exclude_types: [jupyter]
 
   # Spell checking
   - repo: https://github.com/crate-ci/typos
-    rev: v1.30.1
+    rev: v1.31.1
     hooks:
       - id: typos
   - repo: https://github.com/codespell-project/codespell
@@ -165,7 +165,7 @@ repos:
 
   # pyproject.toml
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.23
+    rev: v0.24.1
     hooks:
       - id: validate-pyproject
         additional_dependencies:
@@ -173,13 +173,13 @@ repos:
 
   # YAML files
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.35.1
+    rev: v1.37.0
     hooks:
       - id: yamllint
 
   # GitHub files
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.2
+    rev: 0.32.1
     hooks:
       - id: check-dependabot
       - id: check-github-actions
