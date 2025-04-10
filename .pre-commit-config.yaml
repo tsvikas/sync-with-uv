@@ -15,7 +15,7 @@ repos:
   # Sync Python and  pre-commit package versions
   # pyproject.toml -> uv.lock
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.12
+    rev: 0.6.14
     hooks:
       - id: uv-lock
   # uv.lock -> .pre-commit-config.yaml
@@ -139,7 +139,7 @@ repos:
         additional_dependencies:
           - black==25.1.0
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.4
+    rev: v0.11.5
     hooks:
       - id: ruff
         alias: ruff-isort
