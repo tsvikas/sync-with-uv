@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
       - name: Install packages
         run: >-
           uv sync
@@ -95,7 +95,7 @@ jobs:
     name: test-${{ matrix.python-version }}-${{ matrix.resolution }}-${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache-suffix: ${{ matrix.resolution }}
@@ -141,7 +141,7 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
       - name: Install packages
         run: >-
           uv sync
