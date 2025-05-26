@@ -2,7 +2,15 @@ import subprocess
 import textwrap
 from pathlib import Path
 
-GIT_BIN = "/usr/bin/git"
+for GIT_BIN in [
+    Path("/usr/bin/git"),
+    Path(r"C:\Program Files\Git\bin\git.exe"),
+    Path(r"C:\Program Files\Git\cmd\git.exe"),
+]:
+    if GIT_BIN.exists():
+        break
+else:
+    raise RuntimeError("Could not find git binary")  # noqa: TRY003
 
 
 def test_precommit_hook(datadir: Path) -> None:
