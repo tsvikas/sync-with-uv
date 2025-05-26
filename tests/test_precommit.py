@@ -20,10 +20,9 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # stage and commit without sync-with-uv
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
-    commit_process1 = subprocess.run(
-        [GIT_BIN, "commit", "-m", "old hooks"], cwd=repo_dir
+    subprocess.run(
+        [GIT_BIN, "commit", "-m", "old hooks"], cwd=repo_dir, check=True
     )
-    assert commit_process1.returncode == 0
 
     # add sync-with-uv
     hook_config = textwrap.dedent(
@@ -41,14 +40,14 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # commit and fail
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    commit_process2 = subprocess.run(
+    commit_process = subprocess.run(  # noqa: PLW1510
         [GIT_BIN, "commit", "-m", "failing commit"],
         cwd=repo_dir,
         capture_output=True,
         text=True,
     )
-    assert commit_process2.returncode == 1
-    assert ".....Failed" in commit_process2.stderr
+    assert commit_process.returncode == 1
+    assert ".....Failed" in commit_process.stderr
 
     # check the updated .pre-commit-config.yaml
     updated_config_path = repo_dir / ".pre-commit-config.yaml"
@@ -66,7 +65,6 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # commit and succeed
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
-    commit_process3 = subprocess.run(
-        [GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir
+    subprocess.run(
+        [GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir, check=True
     )
-    assert commit_process3.returncode == 0
