@@ -66,7 +66,9 @@ sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 ### Getting started
 
 - install [git][install-git], [uv][install-uv].
-- git clone this repo: `git clone tsvikas/sync-with-uv.git`
+- git clone this repo:
+  `git clone https://github.com/tsvikas/sync-with-uv.git`
+  or `gh repo clone tsvikas/sync-with-uv.git`
 - run `uv run just prepare`
 
 ### Tests and code quality
@@ -75,10 +77,10 @@ sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 - use `uv run just lint` to see linting errors.
 - use `uv run just test` to run tests.
 - use `uv run just check` to run all the checks (format, lint, test, and pre-commit).
-- Run a specific tool directly, with `uv run pytest`/`ruff`/`mypy`/`black`/...
+- Run a specific tool directly, with
+  `uv run pytest`/`ruff`/`mypy`/`black`/`pre-commit`/...
 
-<!---
-Badges to add, when needed:
+<!--- Badges to add after adding RTD documentation
 [![Documentation Status][rtd-badge]][rtd-link]
 
 [rtd-badge]: https://readthedocs.org/projects/sync-with-uv/badge/?version=latest

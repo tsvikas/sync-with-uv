@@ -54,7 +54,7 @@ sync-with-uv = "sync_with_uv.cli:app"
 
 
 [tool.uv]
-required-version = ">=0.6.0"
+required-version = ">=0.5.19"
 default-groups = ["dev", "test", "typing"]
 
 
@@ -115,10 +115,11 @@ addopts = [
   "--benchmark-disable",  # pytest-benchmark
   "--cov=src/sync_with_uv",  # pytest-cov
   "--reverse",  # pytest-reverse
-  "--numprocesses=auto",  # pytest-xdist
+  # Uncomment to enable pytest-xdist for parallel execution,
+  # but note that it hides filenames in output.
+  # "--numprocesses=auto",  # pytest-xdist
 ]
 xfail_strict = true
-# CHECK those options:
 filterwarnings = [
   "error",
   "default::DeprecationWarning",

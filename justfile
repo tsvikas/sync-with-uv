@@ -15,13 +15,15 @@ init:
   git commit -m "🚀 Initialized project using https://github.com/tsvikas/python-template"
   just update-deps
   git add --all
-  git commit -m "⬆️ Updated project dependencies"
+  [ -z "$(git status --porcelain)" ] || git commit -m "⬆️ Updated project dependencies"
   just prepare
 
 # Update all dependencies
 update-deps:
   uv sync --upgrade
-  uv run pre-commit autoupdate -j "$(nproc)"
+  uv run pre-commit autoupdate -j "$( (uname -s | grep -q Linux && nproc) || (uname -s | grep -q Darwin && sysctl -n hw.ncpu) || echo 1 )"
+  uvx sync-with-uv -w
+  uv run pre-commit run -a sync-pre-commit-deps
 
 # Setup the project. Needed after cloning
 prepare:
