@@ -4,10 +4,6 @@ from pathlib import Path
 
 
 def test_precommit_hook(datadir: Path) -> None:
-    """
-    Tests that the pre-commit hook runs successfully, updates versions,
-    and the commit proceeds.
-    """
     repo_dir = datadir
 
     # initialize git repo
@@ -28,9 +24,9 @@ def test_precommit_hook(datadir: Path) -> None:
     # add sync-with-uv
     hook_config = textwrap.dedent(
         """\
-      - repo: local
-        hooks:
-      """
+        - repo: local
+          hooks:
+        """
     )
     hook_config += textwrap.indent(
         Path(__file__).parents[1].joinpath(".pre-commit-hooks.yaml").read_text(), "  "
