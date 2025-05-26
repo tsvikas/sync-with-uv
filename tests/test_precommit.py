@@ -2,8 +2,6 @@ import subprocess
 import textwrap
 from pathlib import Path
 
-import yaml
-
 
 def test_precommit_hook(datadir: Path) -> None:
     """
@@ -26,8 +24,8 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # stage and commit without sync-with-uv
     subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    commit_process = subprocess.run(["git", "commit", "-m", "old hooks"], cwd=repo_dir)
-    assert commit_process.returncode == 0
+    commit_process1 = subprocess.run(["git", "commit", "-m", "old hooks"], cwd=repo_dir)
+    assert commit_process1.returncode == 0
 
     # add sync-with-uv
     hook_config = textwrap.dedent(
@@ -45,14 +43,14 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # commit and fail
     subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    commit_process = subprocess.run(
+    commit_process2 = subprocess.run(
         ["git", "commit", "-m", "failing commit"],
         cwd=repo_dir,
         capture_output=True,
         text=True,
     )
-    assert commit_process.returncode == 1
-    assert ".....Failed" in commit_process.stderr
+    assert commit_process2.returncode == 1
+    assert ".....Failed" in commit_process2.stderr
 
     # check the updated .pre-commit-config.yaml
     updated_config_path = repo_dir / ".pre-commit-config.yaml"
@@ -70,5 +68,5 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # commit and succeed
     subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
-    commit_process = subprocess.run(["git", "commit", "-m", "new hooks"], cwd=repo_dir)
-    assert commit_process.returncode == 0
+    commit_process3 = subprocess.run(["git", "commit", "-m", "new hooks"], cwd=repo_dir)
+    assert commit_process3.returncode == 0
