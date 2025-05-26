@@ -83,11 +83,12 @@ test = [
   "pytest-cov ~=6.0",
   ## fixtures
   "pytest-loguru >=0",
+  "pytest-datadir ~=1.0",
   # "freezegun ~=1.0",
   # "hypothesis ~=6.0",
-  # "pytest-datadir ~=1.0",
   # "pytest-mock ~=3.3",
   # "pytest-regressions ~=2.0",
+  "pre-commit >=4.0",
 ]
 # docs = []
 typing = [
@@ -224,6 +225,7 @@ flake8-comprehensions.allow-dict-calls-with-keyword-arguments = true
   "PLR2004",  # PyLint-Refactor/magic-value-comparison
   "S101",     # flake8-bandit/assert
   "D1",       # pydocstyle/undocumented-*
+  "S603",     # flake8-bandit/subprocess-without-shell-equals-true
 ]
 
 

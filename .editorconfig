@@ -53,3 +53,6 @@ insert_final_newline = false
 # Project exceptions
 [tests/test_sync.py]
 indent_size = 2
+
+[tests/test_precommit.py]
+indent_size = 2

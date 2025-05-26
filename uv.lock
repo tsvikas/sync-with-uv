@@ -550,6 +550,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-datadir"
+version = "1.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bb/0e/63301415b9233f0131339799d49ce0c0e8804d82f3f12615056a70e563c5/pytest_datadir-1.6.1.tar.gz", hash = "sha256:4d204cf93cfe62ddc37b19922df6c8c0f133c2899c224bd339b24920e84e7fd3", size = 9391, upload-time = "2025-02-07T18:29:55.226Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/55/f1/5e4d95ce96c03332726d7fd87b7b500f178994b638ca6a88b4ed3ca64438/pytest_datadir-1.6.1-py3-none-any.whl", hash = "sha256:aa427f6218d3fc7481129d59c892bd7adfb8822613a2726ffc97f51968879cdb", size = 5156, upload-time = "2025-02-07T18:29:53.788Z" },
+]
+
+[[package]]
 name = "pytest-loguru"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -743,10 +755,12 @@ dev = [
     { name = "snoop" },
 ]
 test = [
+    { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-benchmark" },
     { name = "pytest-clarity" },
     { name = "pytest-cov" },
+    { name = "pytest-datadir" },
     { name = "pytest-loguru" },
     { name = "pytest-reverse" },
     { name = "pytest-xdist", extra = ["psutil"] },
@@ -772,10 +786,12 @@ dev = [
     { name = "snoop", specifier = ">=0.3" },
 ]
 test = [
+    { name = "pre-commit", specifier = ">=4.0" },
     { name = "pytest", specifier = "~=8.0" },
     { name = "pytest-benchmark", specifier = "~=5.0" },
     { name = "pytest-clarity", specifier = "~=1.0" },
     { name = "pytest-cov", specifier = "~=6.0" },
+    { name = "pytest-datadir", specifier = "~=1.0" },
     { name = "pytest-loguru", specifier = ">=0" },
     { name = "pytest-reverse", specifier = "~=1.0" },
     { name = "pytest-xdist", extras = ["psutil"], specifier = "~=3.0" },

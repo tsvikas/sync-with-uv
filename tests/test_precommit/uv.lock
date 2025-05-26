@@ -1,0 +1,5 @@
+version = 2
+requires = []
+[[package]]
+name = "ruff"
+version = "0.1.0"
