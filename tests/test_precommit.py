@@ -1,8 +1,11 @@
 import subprocess
+import sys
 import textwrap
 from pathlib import Path
 
-GIT_BIN = "/usr/bin/git"
+GIT_BIN = (
+    "/usr/bin/git" if sys.platform != "win32" else r"C:\Program Files\Git\cmd\git.exe"
+)
 
 
 def test_precommit_hook(datadir: Path) -> None:
