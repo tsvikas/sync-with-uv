@@ -16,13 +16,11 @@ def test_precommit_hook(datadir: Path) -> None:
     subprocess.run(
         [GIT_BIN, "config", "user.email", "test@example.com"], cwd=repo_dir, check=True
     )
-    subprocess.run(["pre-commit", "install"], cwd=repo_dir, check=True)
+    subprocess.run(["pre-commit", "install"], cwd=repo_dir, check=True)  # noqa: S607
 
     # stage and commit without sync-with-uv
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
-    subprocess.run(
-        [GIT_BIN, "commit", "-m", "old hooks"], cwd=repo_dir, check=True
-    )
+    subprocess.run([GIT_BIN, "commit", "-m", "old hooks"], cwd=repo_dir, check=True)
 
     # add sync-with-uv
     hook_config = textwrap.dedent(
@@ -65,6 +63,4 @@ def test_precommit_hook(datadir: Path) -> None:
 
     # commit and succeed
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
-    subprocess.run(
-        [GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir, check=True
-    )
+    subprocess.run([GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir, check=True)
