@@ -88,6 +88,7 @@ test = [
   # "hypothesis ~=6.0",
   # "pytest-mock ~=3.3",
   # "pytest-regressions ~=2.0",
+  "pre-commit >=4.0",
 ]
 # docs = []
 typing = [
