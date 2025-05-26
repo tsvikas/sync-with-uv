@@ -2,23 +2,27 @@ import subprocess
 import textwrap
 from pathlib import Path
 
+GIT_BIN = "/usr/bin/git"
+
 
 def test_precommit_hook(datadir: Path) -> None:
     repo_dir = datadir
 
     # initialize git repo
-    subprocess.run(["git", "init"], cwd=repo_dir, check=True)
+    subprocess.run([GIT_BIN, "init"], cwd=repo_dir, check=True)
     subprocess.run(
-        ["git", "config", "user.name", "Test User"], cwd=repo_dir, check=True
+        [GIT_BIN, "config", "user.name", "Test User"], cwd=repo_dir, check=True
     )
     subprocess.run(
-        ["git", "config", "user.email", "test@example.com"], cwd=repo_dir, check=True
+        [GIT_BIN, "config", "user.email", "test@example.com"], cwd=repo_dir, check=True
     )
     subprocess.run(["pre-commit", "install"], cwd=repo_dir, check=True)
 
     # stage and commit without sync-with-uv
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True)
-    commit_process1 = subprocess.run(["git", "commit", "-m", "old hooks"], cwd=repo_dir)
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
+    commit_process1 = subprocess.run(
+        [GIT_BIN, "commit", "-m", "old hooks"], cwd=repo_dir
+    )
     assert commit_process1.returncode == 0
 
     # add sync-with-uv
@@ -36,9 +40,9 @@ def test_precommit_hook(datadir: Path) -> None:
         f.write(hook_config)
 
     # commit and fail
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True, capture_output=True)
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True, capture_output=True)
     commit_process2 = subprocess.run(
-        ["git", "commit", "-m", "failing commit"],
+        [GIT_BIN, "commit", "-m", "failing commit"],
         cwd=repo_dir,
         capture_output=True,
         text=True,
@@ -61,6 +65,8 @@ def test_precommit_hook(datadir: Path) -> None:
     assert expected_config in updated_config
 
     # commit and succeed
-    subprocess.run(["git", "add", "."], cwd=repo_dir, check=True)
-    commit_process3 = subprocess.run(["git", "commit", "-m", "new hooks"], cwd=repo_dir)
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
+    commit_process3 = subprocess.run(
+        [GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir
+    )
     assert commit_process3.returncode == 0
