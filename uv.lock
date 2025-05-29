@@ -821,7 +821,7 @@ source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "loguru" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "tomli" },
     { name = "typer" },
 ]
 
@@ -855,7 +855,7 @@ typing = [
 requires-dist = [
     { name = "click", specifier = ">=8.2" },
     { name = "loguru", specifier = ">=0.4" },
-    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2" },
+    { name = "tomli", specifier = ">=2" },
     { name = "typer", specifier = ">=0.13" },
 ]
 

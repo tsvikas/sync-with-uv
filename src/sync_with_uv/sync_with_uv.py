@@ -1,23 +1,18 @@
 """sync-with-uv: Sync '.pre-commit-config.yaml' from 'uv.lock'."""
 
 import re
-import sys
 from pathlib import Path
 
+import tomli
 from loguru import logger
 
 from sync_with_uv.repo_data import repo_to_package, repo_to_version_template
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 
 def load_uv_lock(filename: Path) -> dict[str, str]:
     """Read 'uv.lock' and return a dict of package, version."""
     with filename.open("rb") as f:
-        toml_data = tomllib.load(f)
+        toml_data = tomli.load(f)
     return (
         {
             package["name"]: package["version"]
