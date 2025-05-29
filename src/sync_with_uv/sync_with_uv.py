@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 
 import tomli
-from loguru import logger
 
 from sync_with_uv.repo_data import repo_to_package, repo_to_version_template
 
@@ -40,9 +39,6 @@ def process_precommit_text(
         if repo_header := repo_header_re.fullmatch(line):
             repo_url = repo_header.group(1)
             package = repo_to_package(repo_url)
-            logger.debug(
-                "Processing {package} ({repo_url})", package=package, repo_url=repo_url
-            )
             if package and package not in uv_data:
                 changes[package] = False
         elif (

@@ -820,7 +820,6 @@ name = "sync-with-uv"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
-    { name = "loguru" },
     { name = "tomli" },
     { name = "typer" },
 ]
@@ -854,7 +853,6 @@ typing = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.2" },
-    { name = "loguru", specifier = ">=0.4" },
     { name = "tomli", specifier = ">=2" },
     { name = "typer", specifier = ">=0.13" },
 ]
