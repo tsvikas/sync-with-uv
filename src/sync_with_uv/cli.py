@@ -62,11 +62,15 @@ def process_precommit(  # noqa: PLR0913
 ) -> None:
     """Sync the versions of a pre-commit-config file to a uv.lock file."""
     logger.remove()
-    if verbose == 1:
-        logger.add(sys.stderr, level="INFO", format="{level}: <level>{message}</level>")
-    elif verbose >= 2:  # noqa: PLR2004
+    if verbose >= 2:  # noqa: PLR2004
         logger.add(
             sys.stderr, level="DEBUG", format="{level}: <level>{message}</level>"
+        )
+    elif verbose == 1:
+        logger.add(sys.stderr, level="INFO", format="{level}: <level>{message}</level>")
+    else:
+        logger.add(
+            sys.stderr, level="ERROR", format="{level}: <level>{message}</level>"
         )
 
     uv_data = load_uv_lock(uv_lock_filename)
