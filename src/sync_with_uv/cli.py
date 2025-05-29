@@ -10,8 +10,6 @@ from loguru import logger
 from . import __version__
 from .sync_with_uv import load_uv_lock, process_precommit_text
 
-logger.remove()
-logger.add(sys.stderr, level="INFO", format="<level>{message}</level>")
 app = typer.Typer()
 
 
@@ -50,6 +48,7 @@ def process_precommit(
     *,
     write_output: Annotated[bool, typer.Option("-w")] = False,
     check: bool = False,
+    verbose: Annotated[int, typer.Option("-v", count=True)] = 0,
     version: Annotated[  # noqa: ARG001
         bool | None,
         typer.Option(
@@ -62,6 +61,13 @@ def process_precommit(
     ] = None,
 ) -> None:
     """Sync the versions of a pre-commit-config file to a uv.lock file."""
+    logger.remove()
+    if verbose == 1:
+        logger.add(sys.stderr, level="INFO", format="<level>{message}</level>")
+    elif verbose >= 2:
+        logger.add(sys.stderr, level="DEBUG", format="<level>{message}</level>")
+    # If verbose is 0, no logger is added, effectively silencing output.
+
     uv_data = load_uv_lock(uv_lock_filename)
     precommit_text = precommit_filename.read_text(encoding="utf-8")
     fixed_text = process_precommit_text(precommit_text, uv_data)
