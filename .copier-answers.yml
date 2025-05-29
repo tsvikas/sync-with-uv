@@ -10,7 +10,7 @@ license: MIT
 package_description: Sync '.pre-commit-config.yaml' from 'uv.lock'.
 package_name: sync_with_uv
 project_name: sync-with-uv
-python_min: 11
+python_min: 10
 user_email: tsvikas@gmail.com
 user_name: Tsvika Shapira
 year: 2025
