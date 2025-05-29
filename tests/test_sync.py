@@ -128,8 +128,9 @@ def test_process_precommit_text(
 ) -> None:
     precommit_text = sample_precommit_config.read_text()
     uv_data = load_uv_lock(sample_uv_lock)
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
     assert result == FIXED_PRECOMMIT_CONTENT
+    assert changes == {"black": ("23.9.1", "23.11.0"), "ruff": ("v0.0.292", "v0.1.5")}
 
 
 def test_process_precommit_text_empty() -> None:
@@ -137,8 +138,9 @@ def test_process_precommit_text_empty() -> None:
     precommit_text = ""
     uv_data = {"black": "23.11.0"}
 
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
     assert result == ""
+    assert changes == {}
 
 
 def test_process_precommit_text_no_changes_needed() -> None:
@@ -154,9 +156,10 @@ def test_process_precommit_text_no_changes_needed() -> None:
     )
     uv_data = {"black": "23.11.0"}
 
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
     # Should be identical
     assert result == precommit_text
+    assert changes == {"black": True}
 
 
 def test_process_precommit_text_complex() -> None:
@@ -209,7 +212,7 @@ def test_process_precommit_text_complex() -> None:
         "repo": "3.2.1",
     }
 
-    result = process_precommit_text(precommit_text, uv_data)
+    result, _changes = process_precommit_text(precommit_text, uv_data)
 
     # Check that versions were updated
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in result
