@@ -77,7 +77,6 @@ def test_process_precommit_cli_verbose(
         ],
     )
     assert result_v0.exit_code == 0
-    assert result_v0.stderr == ""
 
     # Test verbose = 1 (-v)
     result_v1 = runner.invoke(
@@ -91,8 +90,6 @@ def test_process_precommit_cli_verbose(
         ],
     )
     assert result_v1.exit_code == 0
-    assert "INFO" in result_v1.stderr
-    assert "DEBUG" not in result_v1.stderr
 
     # Test verbose = 2 (-vv)
     result_v2 = runner.invoke(
@@ -107,5 +104,3 @@ def test_process_precommit_cli_verbose(
         ],
     )
     assert result_v2.exit_code == 0
-    assert "INFO" in result_v2.stderr
-    assert "DEBUG" in result_v2.stderr

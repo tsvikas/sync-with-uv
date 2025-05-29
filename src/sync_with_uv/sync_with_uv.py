@@ -24,7 +24,9 @@ def load_uv_lock(filename: Path) -> dict[str, str]:
     )
 
 
-def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
+def process_precommit_text(
+    precommit_text: str, uv_data: dict[str, str]
+) -> tuple[str, dict[str, bool | tuple[str, str]]]:
     """Read a pre-commit config file and return a fixed pre-commit config string."""
     # NOTE: this only works if the 'repo' is the first key of the element
     repo_header_re = re.compile(r"\s*-\s*repo\s*:\s*(\S*).*")
@@ -33,6 +35,7 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
     new_lines = []
     repo_url: str | None = None
     package = None
+    changes: dict[str, bool | tuple[str, str]] = {}
     for line in lines:
         if repo_header := repo_header_re.fullmatch(line):
             repo_url = repo_header.group(1)
@@ -40,8 +43,8 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
             logger.debug(
                 "Processing {package} ({repo_url})", package=package, repo_url=repo_url
             )
-            if not (package and package in uv_data):
-                logger.debug("{}: NOT MANAGED", package)
+            if package and package not in uv_data:
+                changes[package] = False
         elif (
             package and package in uv_data and (repo_rev := repo_rev_re.fullmatch(line))
         ):
@@ -53,16 +56,11 @@ def process_precommit_text(precommit_text: str, uv_data: dict[str, str]) -> str:
             target_version = version_template.replace("${rev}", uv_data[package])
             line_fixed = line.replace(current_version, target_version)
             new_lines.append(line_fixed)
-            if line == line_fixed:
-                logger.debug("{}: NO CHANGE", package)
-            else:
-                logger.info(
-                    "{package}: {current_version} -> {target_version}",
-                    current_version=current_version,
-                    target_version=target_version,
-                    package=package,
-                )
+            changes[package] = current_version == target_version or (
+                current_version,
+                target_version,
+            )
             continue  # don't add the line twice
         new_lines.append(line)
 
-    return "\n".join(new_lines)
+    return "\n".join(new_lines), changes
