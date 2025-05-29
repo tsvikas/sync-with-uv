@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pytest
 from typer.testing import CliRunner
 
 from sync_with_uv import __version__
@@ -8,7 +7,7 @@ from sync_with_uv.cli import app
 
 from .test_sync import sample_precommit_config, sample_uv_lock  # noqa: F401
 
-runner = CliRunner()
+runner = CliRunner(mix_stderr=False)
 
 
 def test_app_version() -> None:
@@ -64,7 +63,6 @@ def test_process_precommit_cli_with_write(
 def test_process_precommit_cli_verbose(
     sample_uv_lock: Path,  # noqa: F811
     sample_precommit_config: Path,  # noqa: F811
-    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Test the CLI with different verbosity levels."""
     # Test verbose = 0 (no verbose flag)
@@ -78,9 +76,8 @@ def test_process_precommit_cli_verbose(
             # No -w to avoid modifying the file, focus on logs
         ],
     )
-    assert result_v0.exit_code == 0  # Expect success, just printing to stdout
-    captured_v0 = capsys.readouterr()
-    assert captured_v0.err == ""  # No log output to stderr
+    assert result_v0.exit_code == 0
+    assert result_v0.stderr == ""
 
     # Test verbose = 1 (-v)
     result_v1 = runner.invoke(
@@ -94,9 +91,8 @@ def test_process_precommit_cli_verbose(
         ],
     )
     assert result_v1.exit_code == 0
-    captured_v1 = capsys.readouterr()
-    assert "<INFO>" in captured_v1.err
-    assert "<DEBUG>" not in captured_v1.err
+    assert "INFO" in result_v1.stderr
+    assert "DEBUG" not in result_v1.stderr
 
     # Test verbose = 2 (-vv)
     result_v2 = runner.invoke(
@@ -111,6 +107,5 @@ def test_process_precommit_cli_verbose(
         ],
     )
     assert result_v2.exit_code == 0
-    captured_v2 = capsys.readouterr()
-    assert "<INFO>" in captured_v2.err  # DEBUG also implies INFO
-    assert "<DEBUG>" in captured_v2.err
+    assert "INFO" in result_v2.stderr
+    assert "DEBUG" in result_v2.stderr

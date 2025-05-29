@@ -63,10 +63,11 @@ def process_precommit(
     """Sync the versions of a pre-commit-config file to a uv.lock file."""
     logger.remove()
     if verbose == 1:
-        logger.add(sys.stderr, level="INFO", format="<level>{message}</level>")
+        logger.add(sys.stderr, level="INFO", format="{level}: <level>{message}</level>")
     elif verbose >= 2:
-        logger.add(sys.stderr, level="DEBUG", format="<level>{message}</level>")
-    # If verbose is 0, no logger is added, effectively silencing output.
+        logger.add(
+            sys.stderr, level="DEBUG", format="{level}: <level>{message}</level>"
+        )
 
     uv_data = load_uv_lock(uv_lock_filename)
     precommit_text = precommit_filename.read_text(encoding="utf-8")
