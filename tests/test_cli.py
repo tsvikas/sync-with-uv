@@ -58,3 +58,54 @@ def test_process_precommit_cli_with_write(
     content = sample_precommit_config.read_text()
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in content
     assert "ruff-pre-commit\n  rev: v0.1.5" in content
+
+
+def test_process_precommit_cli_verbose(
+    sample_uv_lock: Path,  # noqa: F811
+    sample_precommit_config: Path,  # noqa: F811
+) -> None:
+    """Test the CLI with different verbosity levels."""
+    # Test verbose = 0 (no verbose flag)
+    result_v0 = runner.invoke(
+        app,
+        [
+            "-p",
+            str(sample_precommit_config),
+            "-u",
+            str(sample_uv_lock),
+            # No -w to avoid modifying the file, focus on logs
+        ],
+    )
+    assert result_v0.exit_code == 0
+    assert result_v0.stderr == ""
+
+    # Test verbose = 1 (-v)
+    result_v1 = runner.invoke(
+        app,
+        [
+            "-p",
+            str(sample_precommit_config),
+            "-u",
+            str(sample_uv_lock),
+            "-v",
+        ],
+    )
+    assert result_v1.exit_code == 0
+    assert "INFO" in result_v1.stderr
+    assert "DEBUG" not in result_v1.stderr
+
+    # Test verbose = 2 (-vv)
+    result_v2 = runner.invoke(
+        app,
+        [
+            "-p",
+            str(sample_precommit_config),
+            "-u",
+            str(sample_uv_lock),
+            "-v",
+            "-v",
+        ],
+    )
+    assert result_v2.exit_code == 0
+    assert "INFO" in result_v2.stderr
+    assert "DEBUG" in result_v2.stderr

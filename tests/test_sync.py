@@ -1,18 +1,13 @@
-import sys
 import textwrap
 from pathlib import Path
 
 import pytest
+import tomli
 
 from sync_with_uv.sync_with_uv import (
     load_uv_lock,
     process_precommit_text,
 )
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 
 @pytest.fixture
@@ -54,7 +49,7 @@ def test_load_uv_lock_malformed(tmp_path: Path) -> None:
     uv_lock_file = tmp_path / "malformed.lock"
     uv_lock_file.write_text("This is not valid TOML")
 
-    with pytest.raises(tomllib.TOMLDecodeError):
+    with pytest.raises(tomli.TOMLDecodeError):
         load_uv_lock(uv_lock_file)
 
 
