@@ -20,7 +20,7 @@ def _version_callback(value: bool) -> None:  # noqa: FBT001
 
 
 @app.command()
-def process_precommit(
+def process_precommit(  # noqa: PLR0913
     precommit_filename: Annotated[
         Path,
         typer.Option(
@@ -64,7 +64,7 @@ def process_precommit(
     logger.remove()
     if verbose == 1:
         logger.add(sys.stderr, level="INFO", format="{level}: <level>{message}</level>")
-    elif verbose >= 2:
+    elif verbose >= 2:  # noqa: PLR2004
         logger.add(
             sys.stderr, level="DEBUG", format="{level}: <level>{message}</level>"
         )
