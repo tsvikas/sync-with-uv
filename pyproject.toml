@@ -33,6 +33,7 @@ classifiers = [
 dependencies = [
   "loguru >=0.4",
   "typer >=0.13",
+  "tomli >= 2; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]

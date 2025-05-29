@@ -820,6 +820,7 @@ name = "sync-with-uv"
 source = { editable = "." }
 dependencies = [
     { name = "loguru" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typer" },
 ]
 
@@ -852,6 +853,7 @@ typing = [
 [package.metadata]
 requires-dist = [
     { name = "loguru", specifier = ">=0.4" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2" },
     { name = "typer", specifier = ">=0.13" },
 ]
 
