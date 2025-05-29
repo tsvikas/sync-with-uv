@@ -7,7 +7,7 @@ from sync_with_uv.cli import app
 
 from .test_sync import sample_precommit_config, sample_uv_lock  # noqa: F401
 
-runner = CliRunner(mix_stderr=False)
+runner = CliRunner()
 
 
 def test_app_version() -> None:
