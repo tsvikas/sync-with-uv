@@ -31,7 +31,6 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "loguru >=0.4",
   "typer >=0.13",
   "click >= 8.2",
   "tomli >= 2",
