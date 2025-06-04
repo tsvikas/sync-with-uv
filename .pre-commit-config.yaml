@@ -141,7 +141,7 @@ repos:
         additional_dependencies:
           - black==25.1.0
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.5
+    rev: v0.11.12
     hooks:
       - id: ruff
         alias: ruff-isort
