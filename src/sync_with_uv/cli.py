@@ -35,7 +35,7 @@ def _version_callback(value: bool) -> None:  # noqa: FBT001
 
 
 @app.command()
-def process_precommit(  # noqa: PLR0913
+def process_precommit(  # noqa: C901, PLR0912, PLR0913
     precommit_filename: Annotated[
         Path,
         typer.Option(
