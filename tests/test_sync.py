@@ -31,6 +31,11 @@ def sample_uv_lock(tmp_path: Path) -> Path:
         name = "ruff"
         version = "0.1.5"
         requires-python = ">=3.7"
+
+        [[package]]
+        name = "unchanged-package"
+        version = "1.2.3"
+        requires-python = ">=3.7"
         """
     )
     uv_lock_file = tmp_path / "uv.lock"
@@ -41,7 +46,11 @@ def sample_uv_lock(tmp_path: Path) -> Path:
 def test_load_uv_lock(sample_uv_lock: Path) -> None:
     """Test loading a uv.lock file."""
     result = load_uv_lock(sample_uv_lock)
-    assert result == {"black": "23.11.0", "ruff": "0.1.5"}
+    assert result == {
+        "black": "23.11.0",
+        "ruff": "0.1.5",
+        "unchanged-package": "1.2.3",
+    }
 
 
 def test_load_uv_lock_malformed(tmp_path: Path) -> None:
@@ -95,6 +104,14 @@ def sample_precommit_config(tmp_path: Path) -> Path:
           rev: v0.0.292
           hooks:
             - id: ruff
+        - repo: https://github.com/example/unchanged-package
+          rev: v1.2.3
+          hooks:
+            - id: something
+        - repo: https://github.com/example/another-package
+          rev: v2.3
+          hooks:
+            - id: something-else
         - repo: local
           hooks:
             - id: local-hook
@@ -116,6 +133,14 @@ FIXED_PRECOMMIT_CONTENT = textwrap.dedent(
       rev: v0.1.5
       hooks:
         - id: ruff
+    - repo: https://github.com/example/unchanged-package
+      rev: v1.2.3
+      hooks:
+        - id: something
+    - repo: https://github.com/example/another-package
+      rev: v2.3
+      hooks:
+        - id: something-else
     - repo: local
       hooks:
         - id: local-hook
@@ -128,8 +153,14 @@ def test_process_precommit_text(
 ) -> None:
     precommit_text = sample_precommit_config.read_text()
     uv_data = load_uv_lock(sample_uv_lock)
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
     assert result == FIXED_PRECOMMIT_CONTENT
+    assert changes == {
+        "black": ("23.9.1", "23.11.0"),
+        "ruff": ("v0.0.292", "v0.1.5"),
+        "unchanged-package": True,
+        "another-package": False,
+    }
 
 
 def test_process_precommit_text_empty() -> None:
@@ -137,8 +168,9 @@ def test_process_precommit_text_empty() -> None:
     precommit_text = ""
     uv_data = {"black": "23.11.0"}
 
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
     assert result == ""
+    assert changes == {}
 
 
 def test_process_precommit_text_no_changes_needed() -> None:
@@ -154,9 +186,10 @@ def test_process_precommit_text_no_changes_needed() -> None:
     )
     uv_data = {"black": "23.11.0"}
 
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
     # Should be identical
     assert result == precommit_text
+    assert changes == {"black": True}
 
 
 def test_process_precommit_text_complex() -> None:
@@ -209,7 +242,7 @@ def test_process_precommit_text_complex() -> None:
         "repo": "3.2.1",
     }
 
-    result = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
 
     # Check that versions were updated
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in result
@@ -220,3 +253,12 @@ def test_process_precommit_text_complex() -> None:
     # Check that non-matched repos weren't changed
     assert "pre-commit-hooks\n  rev: v4.4.0" in result
     assert "/non/url/repo\n  rev: v3" in result
+
+    assert changes == {
+        "pre-commit-hooks": False,
+        "black": ("23.9.1", "23.11.0"),
+        "ruff": ("v0.0.292", "v0.1.5"),
+        "mypy": ("v1.5.1", "v1.6.0"),
+        "repo": ("v2", "v3.2.1"),
+        "/non/url/repo": False,
+    }
