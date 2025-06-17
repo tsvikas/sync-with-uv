@@ -51,11 +51,11 @@ pipx install sync-with-uv
 And run the tool directly from the command line:
 
 ```bash
-# Print updated file to stdout
-sync-with-uv
+# Print diff to stdout
+sync-with-uv --diff
 
 # Write changes back to the .pre-commit-config.yaml file
-sync-with-uv -w
+sync-with-uv
 
 # Use custom file paths
 sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
