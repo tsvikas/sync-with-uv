@@ -34,7 +34,7 @@ def test_process_precommit_cli_check(
     assert result.exit_code == 1
     assert result.stdout == (
         "All done!\n"
-        "2 package would be changed, 0 packages would be left unchanged.\n"
+        "2 package would be changed, 2 packages would be left unchanged.\n"
     )
     assert result.stderr == ""
 
@@ -88,9 +88,11 @@ def test_process_precommit_cli_check_v(
     assert result.stdout == (
         "black: 23.9.1 -> 23.11.0\n"
         "ruff: v0.0.292 -> v0.1.5\n"
+        "unchanged-package: unchanged\n"
+        "another-package: not managed in uv\n"
         "\n"
         "All done!\n"
-        "2 package would be changed, 0 packages would be left unchanged.\n"
+        "2 package would be changed, 2 packages would be left unchanged.\n"
     )
     assert result.stderr == ""
 
@@ -122,7 +124,7 @@ def test_process_precommit_cli_diff(
     assert "-  rev: 23.9.1  # a comment" in result.stdout
     assert "+  rev: 23.11.0  # a comment" in result.stdout
     assert (
-        "All done!\n2 package would be changed, 0 packages would be left unchanged."
+        "All done!\n2 package would be changed, 2 packages would be left unchanged."
         in result.stdout
     )
     assert result.stderr == ""
@@ -148,7 +150,7 @@ def test_process_precommit_cli_with_write(
     )
     assert result.exit_code == 0
     assert result.stdout == (
-        "All done!\n2 package changed, 0 packages left unchanged.\n"
+        "All done!\n2 package changed, 2 packages left unchanged.\n"
     )
     assert result.stderr == ""
 

@@ -31,6 +31,11 @@ def sample_uv_lock(tmp_path: Path) -> Path:
         name = "ruff"
         version = "0.1.5"
         requires-python = ">=3.7"
+
+        [[package]]
+        name = "unchanged-package"
+        version = "1.2.3"
+        requires-python = ">=3.7"
         """
     )
     uv_lock_file = tmp_path / "uv.lock"
@@ -41,7 +46,11 @@ def sample_uv_lock(tmp_path: Path) -> Path:
 def test_load_uv_lock(sample_uv_lock: Path) -> None:
     """Test loading a uv.lock file."""
     result = load_uv_lock(sample_uv_lock)
-    assert result == {"black": "23.11.0", "ruff": "0.1.5"}
+    assert result == {
+        "black": "23.11.0",
+        "ruff": "0.1.5",
+        "unchanged-package": "1.2.3",
+    }
 
 
 def test_load_uv_lock_malformed(tmp_path: Path) -> None:
@@ -95,6 +104,14 @@ def sample_precommit_config(tmp_path: Path) -> Path:
           rev: v0.0.292
           hooks:
             - id: ruff
+        - repo: https://github.com/example/unchanged-package
+          rev: v1.2.3
+          hooks:
+            - id: something
+        - repo: https://github.com/example/another-package
+          rev: v2.3
+          hooks:
+            - id: something-else
         - repo: local
           hooks:
             - id: local-hook
@@ -116,6 +133,14 @@ FIXED_PRECOMMIT_CONTENT = textwrap.dedent(
       rev: v0.1.5
       hooks:
         - id: ruff
+    - repo: https://github.com/example/unchanged-package
+      rev: v1.2.3
+      hooks:
+        - id: something
+    - repo: https://github.com/example/another-package
+      rev: v2.3
+      hooks:
+        - id: something-else
     - repo: local
       hooks:
         - id: local-hook
@@ -130,7 +155,12 @@ def test_process_precommit_text(
     uv_data = load_uv_lock(sample_uv_lock)
     result, changes = process_precommit_text(precommit_text, uv_data)
     assert result == FIXED_PRECOMMIT_CONTENT
-    assert changes == {"black": ("23.9.1", "23.11.0"), "ruff": ("v0.0.292", "v0.1.5")}
+    assert changes == {
+        "black": ("23.9.1", "23.11.0"),
+        "ruff": ("v0.0.292", "v0.1.5"),
+        "unchanged-package": True,
+        "another-package": False,
+    }
 
 
 def test_process_precommit_text_empty() -> None:
