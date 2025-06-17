@@ -40,32 +40,74 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         Path,
         typer.Option(
             "-p",
+            "--pre-commit-config",
             exists=True,
             file_okay=True,
             dir_okay=False,
             writable=False,
             readable=True,
             resolve_path=True,
+            help="pre-commit file to update",
         ),
     ] = Path(".pre-commit-config.yaml"),
     uv_lock_filename: Annotated[
         Path,
         typer.Option(
             "-u",
+            "--uv-lock",
             exists=True,
             file_okay=True,
             dir_okay=False,
             writable=False,
             readable=True,
             resolve_path=True,
+            help="lock file to use",
         ),
     ] = Path("uv.lock"),
     *,
-    check: Annotated[bool, typer.Option("--check")] = False,
-    diff: Annotated[bool, typer.Option("--diff")] = False,
-    color: bool = False,
-    quiet: Annotated[bool, typer.Option("-q", "--quiet")] = False,
-    verbose: Annotated[bool, typer.Option("-v", "--verbose")] = False,
+    check: Annotated[
+        bool,
+        typer.Option(
+            "--check",
+            help="Don't write the files back, just return the status. "
+            "Return code 0 means nothing would change. "
+            "Return code 1 means some files would be reformatted. "
+            "Return code 123 means there was an internal error.",
+        ),
+    ] = False,
+    diff: Annotated[
+        bool,
+        typer.Option(
+            "--diff",
+            help="Don't write the files back, "
+            "just output a diff to indicate what changes would've made.",
+        ),
+    ] = False,
+    color: Annotated[
+        bool,
+        typer.Option(
+            help="Show (or do not show) colored diff. "
+            "Only applies when --diff is given."
+        ),
+    ] = False,
+    quiet: Annotated[
+        bool,
+        typer.Option(
+            "-q",
+            "--quiet",
+            help="Stop emitting all non-critical output. "
+            "Error messages will still be emitted.",
+        ),
+    ] = False,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "-v",
+            "--verbose",
+            help="Emit messages about files that were not changed "
+            "or were ignored due to exclusion patterns.",
+        ),
+    ] = False,
     version: Annotated[  # noqa: ARG001
         bool | None,
         typer.Option(
@@ -73,7 +115,7 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
             "-V",
             callback=_version_callback,
             is_eager=True,
-            help="Print version",
+            help="Show the version and exit.",
         ),
     ] = None,
 ) -> None:
