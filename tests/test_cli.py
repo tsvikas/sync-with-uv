@@ -17,7 +17,7 @@ def test_app_version() -> None:
 
 
 def test_process_precommit_cli_check(
-    sample_uv_lock: Path, sample_precommit_config: Path  # noqa: F811
+    sample_uv_lock: Path, sample_precommit_config: Path
 ) -> None:
     """Test the CLI without writing changes."""
     result = runner.invoke(
@@ -44,7 +44,7 @@ def test_process_precommit_cli_check(
 
 
 def test_process_precommit_cli_check_q(
-    sample_uv_lock: Path, sample_precommit_config: Path  # noqa: F811
+    sample_uv_lock: Path, sample_precommit_config: Path
 ) -> None:
     """Test the CLI without writing changes."""
     result = runner.invoke(
@@ -69,7 +69,7 @@ def test_process_precommit_cli_check_q(
 
 
 def test_process_precommit_cli_check_v(
-    sample_uv_lock: Path, sample_precommit_config: Path  # noqa: F811
+    sample_uv_lock: Path, sample_precommit_config: Path
 ) -> None:
     """Test the CLI without writing changes."""
     result = runner.invoke(
@@ -100,7 +100,7 @@ def test_process_precommit_cli_check_v(
 
 
 def test_process_precommit_cli_diff(
-    sample_uv_lock: Path, sample_precommit_config: Path  # noqa: F811
+    sample_uv_lock: Path, sample_precommit_config: Path
 ) -> None:
     """Test the CLI with diff."""
     result = runner.invoke(
@@ -129,7 +129,7 @@ def test_process_precommit_cli_diff(
 
 
 def test_process_precommit_cli_with_write(
-    sample_uv_lock: Path, sample_precommit_config: Path  # noqa: F811
+    sample_uv_lock: Path, sample_precommit_config: Path
 ) -> None:
     """Test the CLI with writing changes."""
     result = runner.invoke(
