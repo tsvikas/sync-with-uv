@@ -39,7 +39,10 @@ def process_precommit_text(
         if repo_header := repo_header_re.fullmatch(line):
             repo_url = repo_header.group(1)
             package = repo_to_package(repo_url)
-            if package and package not in uv_data:
+            if not package:
+                if repo_url != "local":
+                    changes[repo_url] = False
+            elif package not in uv_data:
                 changes[package] = False
         elif (
             package and package in uv_data and (repo_rev := repo_rev_re.fullmatch(line))
