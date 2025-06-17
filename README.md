@@ -35,7 +35,7 @@ Add to your `.pre-commit-config.yaml` file:
 
 ```yaml
 - repo: https://github.com/tsvikas/sync-with-uv
-  rev: v0.1.0  # choose the latest version
+  rev: v0.2.0  # choose the latest version
   hooks:
     - id: sync-with-uv
 ```
