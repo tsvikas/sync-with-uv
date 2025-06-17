@@ -128,6 +128,10 @@ def test_process_precommit_cli_diff(
         in result.stdout
     )
     assert result.stderr == ""
+    if color:
+        assert "\033[0m" in result.stdout
+    else:
+        assert "\033[0m" not in result.stdout
 
     # Verify file wasn't modified
     content = sample_precommit_config.read_text()
