@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.0
+
+- support python 3.10
+- change CLI flags to mimic Black flags, with quiet/verbose/diff/color/check.
+
 ## v0.1.2
 
 - hotfix for hook not running at all
