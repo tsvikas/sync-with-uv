@@ -242,7 +242,7 @@ def test_process_precommit_text_complex() -> None:
         "repo": "3.2.1",
     }
 
-    result, _changes = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_precommit_text(precommit_text, uv_data)
 
     # Check that versions were updated
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in result
@@ -253,3 +253,12 @@ def test_process_precommit_text_complex() -> None:
     # Check that non-matched repos weren't changed
     assert "pre-commit-hooks\n  rev: v4.4.0" in result
     assert "/non/url/repo\n  rev: v3" in result
+
+    assert changes == {
+        "pre-commit-hooks": False,
+        "black": ("23.9.1", "23.11.0"),
+        "ruff": ("v0.0.292", "v0.1.5"),
+        "mypy": ("v1.5.1", "v1.6.0"),
+        "repo": ("v2", "v3.2.1"),
+        "/non/url/repo": False,
+    }
