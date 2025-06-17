@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from sync_with_uv import __version__
@@ -99,8 +100,11 @@ def test_process_precommit_cli_check_v(
     assert "ruff-pre-commit\n  rev: v0.0.292" in content
 
 
+@pytest.mark.parametrize("color", [False, True])
 def test_process_precommit_cli_diff(
-    sample_uv_lock: Path, sample_precommit_config: Path
+    sample_uv_lock: Path,
+    sample_precommit_config: Path,
+    color: bool,  # noqa: FBT001
 ) -> None:
     """Test the CLI with diff."""
     result = runner.invoke(
@@ -111,6 +115,7 @@ def test_process_precommit_cli_diff(
             "-u",
             str(sample_uv_lock),
             "--diff",
+            "--color" if color else "--no-color",
         ],
     )
     assert result.exit_code == 0
