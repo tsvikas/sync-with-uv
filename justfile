@@ -22,7 +22,7 @@ init:
 update-deps:
   uv sync --upgrade
   uv run pre-commit autoupdate -j "$( (uname -s | grep -q Linux && nproc) || (uname -s | grep -q Darwin && sysctl -n hw.ncpu) || echo 1 )"
-  uvx sync-with-uv -w
+  uvx sync-with-uv
   uv run pre-commit run -a sync-pre-commit-deps
 
 # Setup the project. Needed after cloning
@@ -30,6 +30,7 @@ prepare:
   uv run pre-commit install
 
 check-and-push:
+  [ -n "$(git status --porcelain)" ]
   just check
   git push --follow-tags
 
