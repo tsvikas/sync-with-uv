@@ -30,7 +30,7 @@ prepare:
   uv run pre-commit install
 
 check-and-push:
-  [ -n "$(git status --porcelain)" ]
+  [ -z "$(git status --porcelain)" ]
   just check
   git push --follow-tags
 
