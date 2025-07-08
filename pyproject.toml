@@ -149,7 +149,7 @@ strict = true
 disallow_any_explicit = true
 disallow_any_unimported = true
 warn_unreachable = true
-#strict_bytes = true  # TODO: enable me when validate-pyproject updates
+strict_bytes = true
 enable_error_code = [
   # from https://mypy.readthedocs.io/en/stable/error_code_list2.html
   "redundant-self",

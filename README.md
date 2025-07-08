@@ -80,13 +80,6 @@ sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 - Run a specific tool directly, with
   `uv run pytest`/`ruff`/`mypy`/`black`/`pre-commit`/...
 
-<!--- Badges to add after adding RTD documentation
-[![Documentation Status][rtd-badge]][rtd-link]
-
-[rtd-badge]: https://readthedocs.org/projects/sync-with-uv/badge/?version=latest
-[rtd-link]: https://sync-with-uv.readthedocs.io/en/latest/?badge=latest
--->
-
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/psf/black
 [codecov-badge]: https://codecov.io/gh/tsvikas/sync-with-uv/graph/badge.svg
