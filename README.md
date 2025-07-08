@@ -42,7 +42,7 @@ Add to your `.pre-commit-config.yaml` file:
 
 ### Command Line
 
-Install the tool using pipx or uv:
+Install the tool using pipx (or uv):
 
 ```bash
 pipx install sync-with-uv
@@ -60,6 +60,8 @@ sync-with-uv
 # Use custom file paths
 sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 ```
+
+Use `sync-with-uv --help` to learn more.
 
 ## Development
 
