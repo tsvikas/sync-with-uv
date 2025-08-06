@@ -3,6 +3,6 @@
   description: Syncs the versions in .pre-commit-config.yaml with those in uv.lock
   entry: sync-with-uv
   language: python
-  language_version: python3.12
+  language_version: python3
   files: '^(uv\.lock|\.pre-commit-config\.yaml)$'
   pass_filenames: false
