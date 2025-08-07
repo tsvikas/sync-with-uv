@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1
+
+- change hook back to the system python
+
 ## v0.2.0
 
 - support python 3.10
