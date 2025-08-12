@@ -15,7 +15,7 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: psf/black@stable
@@ -27,7 +27,7 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: astral-sh/ruff-action@v3
@@ -38,7 +38,7 @@ jobs:
       COLUMNS: 120
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: pre-commit/action@v3.0.1
@@ -47,7 +47,7 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
@@ -106,7 +106,9 @@ jobs:
       fail-fast: false
     name: test-${{ matrix.python-version }}-${{ matrix.resolution }}-${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
@@ -152,7 +154,9 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v6
       - name: Install packages
         run: >-
@@ -170,10 +174,10 @@ jobs:
           uv run --no-sync --with pylint pylint src --output-format=github
           result=$?
           set -e
-          [ $((result & 1)) -ne 0 ] && echo "::error ::Pylest fatal(s) found"
-          [ $((result & 2)) -ne 0 ] && echo "::error ::Pylest error(s) found"
-          [ $((result & 4)) -ne 0 ] && echo "::warning ::Pylest warning(s) found"
-          [ $((result & 8)) -ne 0 ] && echo "::warning ::Pylest refactor(s) found"
-          [ $((result & 16)) -ne 0 ] && echo "::warning ::Pylest convention(s) found"
-          [ $((result & 32)) -ne 0 ] && echo "::error ::Pylest usage error"
+          [ $((result & 1)) -ne 0 ] && echo "::error ::Pylint fatal(s) found"
+          [ $((result & 2)) -ne 0 ] && echo "::error ::Pylint error(s) found"
+          [ $((result & 4)) -ne 0 ] && echo "::warning ::Pylint warning(s) found"
+          [ $((result & 8)) -ne 0 ] && echo "::warning ::Pylint refactor(s) found"
+          [ $((result & 16)) -ne 0 ] && echo "::warning ::Pylint convention(s) found"
+          [ $((result & 32)) -ne 0 ] && echo "::error ::Pylint usage error"
           exit $((result & 35))

@@ -94,7 +94,7 @@ test = [
 ]
 # docs = []
 typing = [
-  "mypy ~=1.16.0",
+  "mypy ~=1.17.0",
   # add "*-stubs" and "types-*" packages here (">=0")
 ]
 
@@ -140,16 +140,13 @@ run.omit = [
 [tool.mypy]
 files = ["src", "tests"]
 mypy_path = "stubs"
-# verify the config file
-warn_unused_configs = true
 # set the platform
 python_version = "3.10"
-# enable checks [last updated: mypy 1.16]
+# enable checks [last updated: mypy 1.17]
 strict = true
-disallow_any_explicit = true
 disallow_any_unimported = true
 warn_unreachable = true
-strict_bytes = true
+disallow_any_explicit = true
 enable_error_code = [
   # from https://mypy.readthedocs.io/en/stable/error_code_list2.html
   "redundant-self",
@@ -163,7 +160,7 @@ enable_error_code = [
   "explicit-override",
   "mutable-override",
   "unimported-reveal",
-  "narrowed-type-not-subtype",
+  "exhaustive-match",
 ]
 
 

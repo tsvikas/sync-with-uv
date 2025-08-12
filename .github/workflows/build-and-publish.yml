@@ -12,10 +12,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v6
       - name: Build package
         run: uv build
       - name: Upload package distributions
@@ -23,24 +23,6 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-
-  publish-to-pypi:
-    if: github.event_name == 'release'
-    needs: [build]
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/sync-with-uv
-    permissions:
-      id-token: write
-    steps:
-      - name: Download package distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
-      - name: Publish distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
 
   publish-to-testpypi:
     if: github.event_name == 'push'
@@ -53,7 +35,7 @@ jobs:
       id-token: write
     steps:
       - name: Download package distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: python-package-distributions
           path: dist/
@@ -61,3 +43,21 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+
+  publish-to-pypi:
+    if: github.event_name == 'release'
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/sync-with-uv
+    permissions:
+      id-token: write
+    steps:
+      - name: Download package distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
