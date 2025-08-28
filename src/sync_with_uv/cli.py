@@ -8,6 +8,7 @@ from typing import Annotated
 import typer
 
 from . import __version__
+from .repo_data import load_user_mappings
 from .sync_with_uv import load_uv_lock, process_precommit_text
 
 app = typer.Typer()
@@ -121,9 +122,12 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
 ) -> None:
     """Sync the versions of a pre-commit-config file to a uv.lock file."""
     try:
+        user_repo_mappings, user_version_mappings = load_user_mappings()
         uv_data = load_uv_lock(uv_lock_filename)
         precommit_text = precommit_filename.read_text(encoding="utf-8")
-        fixed_text, changes = process_precommit_text(precommit_text, uv_data)
+        fixed_text, changes = process_precommit_text(
+            precommit_text, uv_data, user_repo_mappings, user_version_mappings
+        )
     except Exception as e:
         print("Error:", e, file=sys.stderr)
         raise typer.Exit(123) from e

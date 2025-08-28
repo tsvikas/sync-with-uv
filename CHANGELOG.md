@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add user-configurable repository mappings via pyproject.toml
+
 ## v0.2.1
 
 - change hook back to the system python

@@ -1,6 +1,10 @@
 """Maps repo urls to package names and version templates."""
 
 import re
+from collections import ChainMap
+from pathlib import Path
+
+import tomli
 
 REPO_TO_PACKAGE = {
     "https://github.com/adamchainz/djade-pre-commit": "djade",
@@ -46,31 +50,90 @@ REPO_TO_VERSION_TEMPLATE = {
 }
 
 
-def repo_to_package(repo_url: str) -> str | None:
-    """Convert a repo url to a python package name."""
+def load_user_mappings(
+    pyproject_path: Path | None = None,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Load user-defined mappings from pyproject.toml.
+
+    Args:
+        pyproject_path: Path to pyproject.toml file. If None, looks for it in cwd.
+
+    Returns:
+        Tuple of (repo_to_package, repo_to_version_template) user mappings.
+    """
+    if pyproject_path is None:
+        pyproject_path = Path.cwd() / "pyproject.toml"
+
+    if not pyproject_path.exists():
+        return {}, {}
+
+    with pyproject_path.open("rb") as f:
+        toml_data = tomli.load(f)
+
+    tool_config = toml_data.get("tool", {}).get("sync-with-uv", {})
+    user_repo_to_package = tool_config.get("repo-to-package", {})
+    user_repo_to_version_template = tool_config.get("repo-to-version-template", {})
+
+    return user_repo_to_package, user_repo_to_version_template
+
+
+def repo_to_package(
+    repo_url: str, user_mappings: dict[str, str] | None = None
+) -> str | None:
+    """Convert a repo url to a python package name.
+
+    Args:
+        repo_url: The repository URL to lookup.
+        user_mappings: Optional user-defined repo-to-package mappings.
+
+    Returns:
+        The package name, or None if no mapping is found.
+    """
     if repo_url == "local":
         return None
-    if repo_url in REPO_TO_PACKAGE:
-        return REPO_TO_PACKAGE[repo_url]
-    for repo, package in REPO_TO_PACKAGE.items():
+
+    # Use ChainMap to prioritize user mappings over built-in ones
+    combined_mappings = ChainMap(user_mappings or {}, REPO_TO_PACKAGE)
+
+    # Check exact match first
+    if repo_url in combined_mappings:
+        return combined_mappings[repo_url]
+
+    # Check prefix matches (for repos with sub-paths)
+    for repo, package in combined_mappings.items():
         if repo_url.startswith(repo + "/"):
             return package
-    # find from regex
+
+    # Extract from regex as fallback
     repo_url_re = re.compile(
         r"https?://(www\.)?github.com/(?P<user_name>[^/]*)/(?P<repo_name>[^/]*)/?"
     )
     repo_url_match = repo_url_re.fullmatch(repo_url)
-    if repo_url_match is None:
-        return None
-    repo_name: str = repo_url_match.group("repo_name")
-    return repo_name
+    return repo_url_match.group("repo_name") if repo_url_match else None
 
 
-def repo_to_version_template(repo_url: str) -> str | None:
-    """Convert a repo url to a evrsion template."""
-    if repo_url in REPO_TO_VERSION_TEMPLATE:
-        return REPO_TO_VERSION_TEMPLATE[repo_url]
-    for repo, version_template in REPO_TO_VERSION_TEMPLATE.items():
+def repo_to_version_template(
+    repo_url: str, user_mappings: dict[str, str] | None = None
+) -> str | None:
+    """Convert a repo url to a version template.
+
+    Args:
+        repo_url: The repository URL to lookup.
+        user_mappings: Optional user-defined repo-to-version-template mappings.
+
+    Returns:
+        The version template, or None if no mapping is found.
+    """
+    # Use ChainMap to prioritize user mappings over built-in ones
+    combined_mappings = ChainMap(user_mappings or {}, REPO_TO_VERSION_TEMPLATE)
+
+    # Check exact match first
+    if repo_url in combined_mappings:
+        return combined_mappings[repo_url]
+
+    # Check prefix matches (for repos with sub-paths)
+    for repo, version_template in combined_mappings.items():
         if repo_url.startswith(repo + "/"):
             return version_template
+
     return None

@@ -63,6 +63,30 @@ sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
 
 Use `sync-with-uv --help` to learn more.
 
+## Configuration
+
+### Custom Repository Mappings
+
+You can define custom repository-to-package mappings and version templates in your `pyproject.toml`:
+
+```toml
+# Map repository URLs to package names
+[tool.sync-with-uv.repo-to-package]
+"https://github.com/myorg/my-awesome-linter" = "awesome-linter"
+
+# Define custom version templates (optional)
+[tool.sync-with-uv.repo-to-version-template]
+"https://github.com/myorg/my-awesome-linter" = "v${rev}"
+```
+
+This allows you to use tools that aren't in the built-in mapping table. User-defined mappings take precedence over built-in ones.
+
+**Example:**
+
+- Your `.pre-commit-config.yaml` has: `repo: https://github.com/myorg/my-awesome-linter` with `rev: 1.2.0`
+- Your `uv.lock` contains: `awesome-linter = "1.5.0"`
+- With the mapping above, sync-with-uv will update the pre-commit version to `v1.5.0`
+
 ## Development
 
 ### Getting started

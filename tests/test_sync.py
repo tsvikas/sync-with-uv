@@ -262,3 +262,42 @@ def test_process_precommit_text_complex() -> None:
         "repo": ("v2", "v3.2.1"),
         "/non/url/repo": False,
     }
+
+
+def test_process_precommit_text_with_user_mappings() -> None:
+    """Test processing pre-commit config with user-defined mappings."""
+    precommit_text = textwrap.dedent(
+        """\
+        repos:
+        - repo: https://github.com/example/custom-tool
+          rev: v1.0.0
+          hooks:
+            - id: custom
+        - repo: https://github.com/psf/black-pre-commit-mirror
+          rev: 23.9.1
+          hooks:
+            - id: black
+        """
+    )
+
+    uv_data = {
+        "custom-tool": "2.1.0",
+        "black": "23.11.0",
+    }
+
+    user_repo_mappings = {"https://github.com/example/custom-tool": "custom-tool"}
+
+    user_version_mappings = {"https://github.com/example/custom-tool": "v${rev}"}
+
+    result, changes = process_precommit_text(
+        precommit_text, uv_data, user_repo_mappings, user_version_mappings
+    )
+
+    # Check that user mappings were applied
+    assert "custom-tool\n  rev: v2.1.0" in result
+    assert "black-pre-commit-mirror\n  rev: 23.11.0" in result
+
+    assert changes == {
+        "custom-tool": ("v1.0.0", "v2.1.0"),
+        "black": ("23.9.1", "23.11.0"),
+    }

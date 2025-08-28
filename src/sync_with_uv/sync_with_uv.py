@@ -24,7 +24,10 @@ def load_uv_lock(filename: Path) -> dict[str, str]:
 
 
 def process_precommit_text(
-    precommit_text: str, uv_data: dict[str, str]
+    precommit_text: str,
+    uv_data: dict[str, str],
+    user_repo_mappings: dict[str, str] | None = None,
+    user_version_mappings: dict[str, str] | None = None,
 ) -> tuple[str, dict[str, bool | tuple[str, str]]]:
     """Read a pre-commit config file and return a fixed pre-commit config string."""
     # NOTE: this only works if the 'repo' is the first key of the element
@@ -38,7 +41,7 @@ def process_precommit_text(
     for line in lines:
         if repo_header := repo_header_re.fullmatch(line):
             repo_url = repo_header.group(1)
-            package = repo_to_package(repo_url)
+            package = repo_to_package(repo_url, user_repo_mappings)
             if not package:
                 if repo_url != "local":
                     changes[repo_url] = False
@@ -49,7 +52,7 @@ def process_precommit_text(
         ):
             assert repo_url is not None  # noqa: S101
             current_version = repo_rev.group(1)
-            version_template = repo_to_version_template(repo_url)
+            version_template = repo_to_version_template(repo_url, user_version_mappings)
             if version_template is None:
                 version_template = "v${rev}" if current_version[0] == "v" else "${rev}"
             target_version = version_template.replace("${rev}", uv_data[package])
