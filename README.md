@@ -29,9 +29,9 @@ Simply add this pre-commit hook to your setup and enjoy consistent dependency ma
 
 ## Usage
 
-### As a pre-commit hook
+**Recommended: Use as a pre-commit hook**
 
-Add to your `.pre-commit-config.yaml` file:
+Simply add these lines to your `.pre-commit-config.yaml` file:
 
 ```yaml
 - repo: https://github.com/tsvikas/sync-with-uv
@@ -40,34 +40,32 @@ Add to your `.pre-commit-config.yaml` file:
     - id: sync-with-uv
 ```
 
-### Command Line
+That's it! The hook will automatically keep your pre-commit versions in sync with `uv.lock`.
 
-Install the tool using pipx (or uv):
+### Alternative: Command Line Interface
+
+For manual usage or CI/CD integration, install and run directly:
 
 ```bash
 pipx install sync-with-uv
-```
 
-And run the tool directly from the command line:
-
-```bash
-# Print diff to stdout
-sync-with-uv --diff
-
-# Write changes back to the .pre-commit-config.yaml file
+# Update .pre-commit-config.yaml
 sync-with-uv
 
-# Use custom file paths
-sync-with-uv -p path/to/.pre-commit-config.yaml -u path/to/uv.lock
+# Preview changes only
+sync-with-uv --diff
+
+# Custom file paths
+sync-with-uv -p custom-precommit.yaml -u custom-lock.toml
 ```
 
-Use `sync-with-uv --help` to learn more.
+## Advanced Configuration
 
-## Configuration
+Most users don't need this section - the tool works out of the box with popular tools like black, ruff, and mypy.
 
 ### Custom Repository Mappings
 
-You can define custom repository-to-package mappings and version templates in your `pyproject.toml`:
+For tools not included in the built-in mapping, you can add custom mappings in your `pyproject.toml`:
 
 ```toml
 # Map repository URLs to package names
@@ -76,35 +74,18 @@ You can define custom repository-to-package mappings and version templates in yo
 
 # Define custom version templates (optional)
 [tool.sync-with-uv.repo-to-version-template]
-"https://github.com/myorg/my-awesome-linter" = "v${rev}"
+"https://github.com/myorg/my-awesome-linter" = "ver_${rev}"
 ```
 
-This allows you to use tools that aren't in the built-in mapping table. User-defined mappings take precedence over built-in ones.
-
-**Example:**
+**Example scenario:**
 
 - Your `.pre-commit-config.yaml` has: `repo: https://github.com/myorg/my-awesome-linter` with `rev: 1.2.0`
 - Your `uv.lock` contains: `awesome-linter = "1.5.0"`
-- With the mapping above, sync-with-uv will update the pre-commit version to `v1.5.0`
+- With the mapping above, sync-with-uv will update the pre-commit version to `ver_1.5.0`
 
-## Development
+## Contributing
 
-### Getting started
-
-- install [git][install-git], [uv][install-uv].
-- git clone this repo:
-  `git clone https://github.com/tsvikas/sync-with-uv.git`
-  or `gh repo clone tsvikas/sync-with-uv.git`
-- run `uv run just prepare`
-
-### Tests and code quality
-
-- use `uv run just format` to format the code.
-- use `uv run just lint` to see linting errors.
-- use `uv run just test` to run tests.
-- use `uv run just check` to run all the checks (format, lint, test, and pre-commit).
-- Run a specific tool directly, with
-  `uv run pytest`/`ruff`/`mypy`/`black`/`pre-commit`/...
+Interested in contributing? See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/psf/black
@@ -112,8 +93,6 @@ This allows you to use tools that aren't in the built-in mapping table. User-def
 [codecov-link]: https://codecov.io/gh/tsvikas/sync-with-uv
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
 [github-discussions-link]: https://github.com/tsvikas/sync-with-uv/discussions
-[install-git]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
-[install-uv]: https://docs.astral.sh/uv/getting-started/installation/
 [pepy-badge]: https://img.shields.io/pepy/dt/sync-with-uv
 [pepy-link]: https://pepy.tech/project/sync-with-uv
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
