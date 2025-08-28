@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.3.0
+
 - Add user-configurable repository mappings via pyproject.toml
 
 ## v0.2.1
