@@ -15,15 +15,6 @@ indent_size = 2
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-# Markdown files
-# Those are managed with mdformat
-[*.md]
-indent_size = 1
-
-# LICENSE files
-[*LICENSE*]
-indent_size = 1
-
 # 4-space, traditionally compiled without bytecode or JIT --
 #   Julia, Rust, D, C++, Objective-C, C, Fortran, and Assembly
 # We exclude Fortran fixed-form (e.g. .f/.ftn); these have weird indentation rules
@@ -54,6 +45,15 @@ indent_style = tab
 indent_style = tab
 trim_trailing_whitespace = false
 insert_final_newline = false
+
+# Markdown files
+# Those are formatted with mdformat
+[*.md]
+indent_size = 1
+
+# LICENSE files
+[LICENSE]
+indent_size = 1
 
 # Project exceptions
 [tests/test_sync.py]

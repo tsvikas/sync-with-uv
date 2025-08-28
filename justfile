@@ -27,7 +27,7 @@ update-deps:
 
 # Setup the project. Needed after cloning
 prepare:
-  uv run pre-commit install
+  uv run pre-commit install --install-hooks
 
 check-and-push:
   [ -z "$(git status --porcelain)" ]

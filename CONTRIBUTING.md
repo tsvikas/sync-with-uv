@@ -16,7 +16,7 @@ Have questions or ideas? Join the conversation in [GitHub Discussions](https://g
 
 We welcome pull requests!
 
-If you're new to contributing to open source, check out [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/).
+If you're new to contributing to open source, check out [How to Contribute to Open Source][how-to-contribute].
 
 Ready to get started? Follow the development setup below.
 
@@ -25,6 +25,7 @@ Ready to get started? Follow the development setup below.
 ### Prerequisites
 
 - Install [git][install-git] and [uv][install-uv]
+- **Optional**: install [just][install-just] to use `just` instead of `uv run just`
 
 ### Setup
 
@@ -32,8 +33,6 @@ Ready to get started? Follow the development setup below.
 
    ```bash
    git clone https://github.com/tsvikas/sync-with-uv.git
-   # or
-   gh repo clone tsvikas/sync-with-uv.git
    ```
 
 1. Set up the development environment:
@@ -47,9 +46,10 @@ Ready to get started? Follow the development setup below.
 
 ### Code Quality Tools
 
-- **Format code**: `uv run just format`
-- **Lint code**: `uv run just lint`
-- **Run tests**: `uv run just test`
+- **Format code**: `uv run just format` (runs `black`)
+- **Lint code**: `uv run just lint` (runs `ruff check` and `mypy`)
+- **Run tests**: `uv run just test` (runs `pytest`)
+- **Run pre-commit tests**: `uv run pre-commit run` (this also runs on each commit)
 - **Run all checks**: `uv run just check` (lint, test, and pre-commit)
 
 ### Running Individual Tools
@@ -57,12 +57,14 @@ Ready to get started? Follow the development setup below.
 You can run specific tools directly:
 
 ```bash
-uv run pytest
+uv run black
 uv run ruff
 uv run mypy
-uv run black
+uv run pytest
 uv run pre-commit
 ```
 
+[how-to-contribute]: https://opensource.guide/how-to-contribute/
 [install-git]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+[install-just]: https://just.systems/man/en/
 [install-uv]: https://docs.astral.sh/uv/getting-started/installation/

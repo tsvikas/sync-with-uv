@@ -85,7 +85,8 @@ For tools not included in the built-in mapping, you can add custom mappings in y
 
 ## Contributing
 
-Interested in contributing? See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+Interested in contributing?
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guideline.
 
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/psf/black
@@ -96,7 +97,7 @@ Interested in contributing? See [CONTRIBUTING.md](CONTRIBUTING.md) for developme
 [pepy-badge]: https://img.shields.io/pepy/dt/sync-with-uv
 [pepy-link]: https://pepy.tech/project/sync-with-uv
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
-[prs-welcome-link]: http://makeapullrequest.com
+[prs-welcome-link]: https://opensource.guide/how-to-contribute/
 [pypi-link]: https://pypi.org/project/sync-with-uv/
 [pypi-platforms-badge]: https://img.shields.io/pypi/pyversions/sync-with-uv
 [pypi-version-badge]: https://img.shields.io/pypi/v/sync-with-uv
