@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add keywords to pyproject.toml for better package discoverability
 - Improve README clarity and add CONTRIBUTING.md
 
 ## v0.3.0

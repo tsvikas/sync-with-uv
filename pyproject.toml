@@ -14,7 +14,7 @@ requires-python = ">=3.10"
 authors = [
   {name = "Tsvika Shapira", email = "tsvikas@gmail.com"}
 ]
-keywords = []
+keywords = ["pre-commit", "uv", "dependency-management", "version-sync", "automation", "python-packaging", "developer-tools"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
