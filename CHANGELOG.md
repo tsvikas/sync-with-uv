@@ -11,22 +11,24 @@
 
 ## v0.2.1
 
-- change hook back to the system python
+- Remove Python version constraint from pre-commit hook, and use system Python
 
 ## v0.2.0
 
-- support python 3.10
-- change CLI flags to mimic Black flags, with quiet/verbose/diff/color/check.
+- Add support for Python 3.10 (previously required Python 3.11+)
+- Change CLI flags to mimic Black's interface: `--quiet`, `--verbose`, `--diff`, `--color`, and `--check`
+- Add CLI help text
+- Add hooks without corresponding package to the "unchanged" report
 
 ## v0.1.2
 
-- hotfix for hook not running at all
-- less verbose output, hide debug messages and timestamps
+- Fix pre-commit hook not running at all
+- Reduce output verbosity by hiding debug messages and timestamps
 
 ## v0.1.1
 
-- fix hook not running when the system python version is < 3.11
+- Fix hook failing on systems with default Python version below 3.11
 
 ## v0.1.0
 
-- Initial release
+- Initial release with core functionality to sync pre-commit hook versions with uv.lock
