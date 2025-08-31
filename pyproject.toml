@@ -32,7 +32,7 @@ classifiers = [
 ]
 dependencies = [
   "typer >=0.13",
-  "click >= 8.2",
+  "click >= 8.2.1",
   "tomli >= 2",
 ]
 

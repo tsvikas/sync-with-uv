@@ -899,7 +899,7 @@ typing = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = ">=8.2" },
+    { name = "click", specifier = ">=8.2.1" },
     { name = "tomli", specifier = ">=2" },
     { name = "typer", specifier = ">=0.13" },
 ]
