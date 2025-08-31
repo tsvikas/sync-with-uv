@@ -1,5 +1,10 @@
-# Configure trusted publishing for this workflow. See:
-# https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+# Configure trusted publishing for this workflow.
+# See: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+# Go to: https://pypi.org/manage/account/publishing/
+# Fill: sync-with-uv / tsvikas / sync-with-uv / build-and-publish.yml / pypi
+# Go to: https://test.pypi.org/manage/account/publishing/
+# Fill: sync-with-uv / tsvikas / sync-with-uv / build-and-publish.yml / testpypi
+
 name: Build and Publish
 
 on:
@@ -9,35 +14,34 @@ on:
     types: [published]
 
 jobs:
-  build:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build-and-inspect-package:
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v6
-      - name: Build package
-        run: uv build
-      - name: Upload package distributions
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
+      - uses: hynek/build-and-inspect-python-package@v2
 
   publish-to-testpypi:
     if: github.event_name == 'push'
-    needs: [build]
+    needs: build-and-inspect-package
     runs-on: ubuntu-latest
     environment:
       name: testpypi
       url: https://test.pypi.org/p/sync-with-uv
     permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing, but
+      # should NOT be granted anywhere else!
       id-token: write
     steps:
       - name: Download package distributions
         uses: actions/download-artifact@v5
         with:
-          name: python-package-distributions
+          name: Packages
           path: dist/
       - name: Publish distribution to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -46,18 +50,20 @@ jobs:
 
   publish-to-pypi:
     if: github.event_name == 'release'
-    needs: [build]
+    needs: build-and-inspect-package
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/sync-with-uv
     permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing, but
+      # should NOT be granted anywhere else!
       id-token: write
     steps:
       - name: Download package distributions
         uses: actions/download-artifact@v5
         with:
-          name: python-package-distributions
+          name: Packages
           path: dist/
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

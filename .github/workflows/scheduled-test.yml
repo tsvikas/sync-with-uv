@@ -1,0 +1,32 @@
+name: Scheduled CI
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 0'  # Sunday at 6 AM UTC
+
+jobs:
+  test-weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: false
+      - name: Install packages
+        run: >-
+          uv sync
+          --all-extras
+          --no-default-groups
+          --group test
+          --exact
+          --upgrade
+          --resolution highest
+      - name: List packages
+        run: uv pip list
+      - name: Run tests
+        run: uv run --no-sync pytest

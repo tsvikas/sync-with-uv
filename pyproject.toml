@@ -42,10 +42,10 @@ dependencies = [
 [project.urls]
 # homepage = "https://sync-with-uv.readthedocs.io"
 source = "https://github.com/tsvikas/sync-with-uv"
-# changelog = "https://github.com/tsvikas/sync-with-uv/blob/master/CHANGELOG.md"
+changelog = "https://github.com/tsvikas/sync-with-uv/blob/main/CHANGELOG.md"
 # releasenotes = "https://github.com/tsvikas/sync-with-uv/releases"
 # documentation = "https://sync-with-uv.readthedocs.io"
-# issues = "https://github.com/tsvikas/sync-with-uv/issues"
+issues = "https://github.com/tsvikas/sync-with-uv/issues"
 # funding = "https://github.com/sponsors/tsvikas"
 
 [project.scripts]
@@ -80,14 +80,15 @@ test = [
   "pytest-xdist[psutil] ~=3.0",
   ## reporting
   "pytest-clarity ~=1.0",
+  "pytest-github-actions-annotate-failures ~=0.3.0",
   ## extras
   "pytest-benchmark ~=5.0",
   "pytest-cov ~=6.0",
   ## fixtures
-  "pytest-loguru >=0",
-  "pytest-datadir ~=1.0",
   # "freezegun ~=1.0",
   # "hypothesis ~=6.0",
+  "pytest-datadir ~=1.0",
+  "pytest-loguru >=0",
   "pytest-mock ~=3.3",
   # "pytest-regressions ~=2.0",
   "pre-commit >=4.0",
@@ -113,12 +114,18 @@ addopts = [
   "--strict-config",
   ## reporting
   "-ra",
-  ## addons
-  "--benchmark-disable",  # pytest-benchmark
-  "--cov=src/sync_with_uv",  # pytest-cov
-  "--reverse",  # pytest-reverse
-  # Uncomment to enable pytest-xdist for parallel execution,
-  # but note that it hides filenames in output.
+  ## addons: pytest-benchmark
+  "--benchmark-disable",
+  ## addons: pytest-cov
+  # this might affect debuggers.
+  # use `--no-cov` to disable in the debugger
+  # see https://pytest-cov.readthedocs.io/en/latest/debuggers.html
+  "--cov=src/sync_with_uv",
+  "--cov-branch",
+  ## addons: pytest-reverse
+  "--reverse",
+  ## addons: pytest-xdist
+  # this enable parallel execution, but hides filenames in output
   # "--numprocesses=auto",  # pytest-xdist
 ]
 xfail_strict = true

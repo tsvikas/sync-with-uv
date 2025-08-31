@@ -5,6 +5,7 @@ on:
   pull_request:
   push:
     branches: [main, develop]
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -181,3 +182,19 @@ jobs:
           [ $((result & 16)) -ne 0 ] && echo "::warning ::Pylint convention(s) found"
           [ $((result & 32)) -ne 0 ] && echo "::error ::Pylint usage error"
           exit $((result & 35))
+
+  pass:
+    if: always()
+    needs: [
+      black,
+      ruff-check,
+      pre-commit,
+      mypy,
+      test,
+      pylint,
+    ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
