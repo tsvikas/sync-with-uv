@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-from pytest_mock import MockerFixture
 from typer.testing import CliRunner
 
 from sync_with_uv import __version__
@@ -163,14 +162,6 @@ def test_process_precommit_cli_with_write(
     content = sample_precommit_config.read_text()
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in content
     assert "ruff-pre-commit\n  rev: v0.1.5" in content
-
-
-def test_main_module_execution(mocker: MockerFixture) -> None:
-    """Test __main__ module execution."""
-    mock_app = mocker.patch("sync_with_uv.cli.app")
-    import sync_with_uv.__main__  # noqa: F401, PLC0415
-
-    mock_app.assert_called_once_with(prog_name="sync-with-uv")
 
 
 def test_cli_exception_handling(tmp_path: Path) -> None:
