@@ -162,3 +162,25 @@ def test_process_precommit_cli_with_write(
     content = sample_precommit_config.read_text()
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in content
     assert "ruff-pre-commit\n  rev: v0.1.5" in content
+
+
+def test_cli_exception_handling(tmp_path: Path) -> None:
+    """Test CLI handles exceptions and exits with code 123."""
+    # Create a malformed uv.lock file
+    malformed_uv_lock = tmp_path / "uv.lock"
+    malformed_uv_lock.write_text("invalid toml content: [[[")
+
+    precommit_config = tmp_path / ".pre-commit-config.yaml"
+    precommit_config.write_text("repos: []")
+
+    result = runner.invoke(
+        app,
+        [
+            "-p",
+            str(precommit_config),
+            "-u",
+            str(malformed_uv_lock),
+        ],
+    )
+    assert result.exit_code == 123
+    assert "Error:" in result.stderr
