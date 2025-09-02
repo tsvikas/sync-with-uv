@@ -10,7 +10,6 @@ description = "Sync '.pre-commit-config.yaml' from 'uv.lock'."
 license = "MIT"
 license-files = ["LICEN[CS]E.*"]
 readme = "README.md"
-requires-python = ">=3.10"
 authors = [
   {name = "Tsvika Shapira", email = "tsvikas@gmail.com"}
 ]
@@ -30,6 +29,15 @@ classifiers = [
   "Topic :: Software Development :: Quality Assurance",
   "Typing :: Typed",
 ]
+# urls.homepage = "https://sync-with-uv.readthedocs.io"
+urls.source = "https://github.com/tsvikas/sync-with-uv"
+urls.changelog = "https://github.com/tsvikas/sync-with-uv/blob/main/CHANGELOG.md"
+# urls.releasenotes = "https://github.com/tsvikas/sync-with-uv/releases"
+# urls.documentation = "https://sync-with-uv.readthedocs.io"
+urls.issues = "https://github.com/tsvikas/sync-with-uv/issues"
+# urls.funding = "https://github.com/sponsors/tsvikas"
+
+requires-python = ">=3.10"
 dependencies = [
   "typer >=0.13",
   "click >= 8.2.1",
@@ -38,15 +46,6 @@ dependencies = [
 
 [project.optional-dependencies]
 # optional_name = ["some_package >=1.0"]
-
-[project.urls]
-# homepage = "https://sync-with-uv.readthedocs.io"
-source = "https://github.com/tsvikas/sync-with-uv"
-changelog = "https://github.com/tsvikas/sync-with-uv/blob/main/CHANGELOG.md"
-# releasenotes = "https://github.com/tsvikas/sync-with-uv/releases"
-# documentation = "https://sync-with-uv.readthedocs.io"
-issues = "https://github.com/tsvikas/sync-with-uv/issues"
-# funding = "https://github.com/sponsors/tsvikas"
 
 [project.scripts]
 sync-with-uv = "sync_with_uv.cli:app"
@@ -93,7 +92,14 @@ test = [
   # "pytest-regressions ~=2.0",
   "pre-commit >=4.0",
 ]
-# docs = []
+docs = [
+  "mkdocs ~=1.0",
+  "mkdocs-material ~=9.0",
+  "mkdocstrings-python ~=1.0",
+  "mkdocs-gen-files ~=0.5.0",
+  "mkdocs-literate-nav ~=0.6.0",
+  "mkdocs-section-index ~=0.3.0",
+]
 typing = [
   "mypy ~=1.17.0",
   # add "*-stubs" and "types-*" packages here (">=0")
@@ -107,6 +113,10 @@ build.hooks.vcs.version-file = "src/sync_with_uv/_version.py"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
+testpaths = [
+  "src/",
+  "tests/",
+]
 addopts = [
   ## testing
   "--doctest-modules",

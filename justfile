@@ -85,3 +85,13 @@ check-at-commit commit:
 
 tag-skip-check version commit: (_assert-legal-version version)
   git tag -a v{{ version }} -m "Release v{{ version }}" {{ commit }}
+
+build-docs-ref:
+  rm -rf docs/reference
+  uv run --python 3.13 --only-group docs scripts/gen_ref_pages.py
+
+build-docs: build-docs-ref
+  uv run --python 3.13 --only-group docs mkdocs build
+
+serve-docs: build-docs-ref
+  uv run --python 3.13 --only-group docs mkdocs serve

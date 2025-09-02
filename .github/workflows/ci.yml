@@ -22,7 +22,7 @@ jobs:
       - uses: psf/black@stable
         with:
           jupyter: false
-          version: "~=25.0"
+          version: ~=25.0
 
   ruff-check:
     if: ${{ always() }}
@@ -73,37 +73,37 @@ jobs:
       matrix:
         include:
           # test with highest resolution
-          - resolution: "highest"
+          - resolution: highest
             os: ubuntu-latest
-            python-version: "3.13"
+            python-version: '3.13'
           # test with pypy
-          - resolution: "highest"
+          - resolution: highest
             os: ubuntu-latest
-            python-version: "pypy3.10"
-          - resolution: "highest"
+            python-version: 'pypy3.10'
+          - resolution: highest
             os: ubuntu-latest
-            python-version: "pypy3.11"
+            python-version: 'pypy3.11'
           # test with lowest resolution
-          - resolution: "lowest"
+          - resolution: lowest
             os: ubuntu-latest
-            python-version: "3.10"
+            python-version: '3.10'
           # test with different os
-          - resolution: "locked"
+          - resolution: locked
             os: ubuntu-latest
-            python-version: "3.10"
-          - resolution: "locked"
+            python-version: '3.10'
+          - resolution: locked
             os: macos-latest
-            python-version: "3.10"
-          - resolution: "locked"
+            python-version: '3.10'
+          - resolution: locked
             os: windows-latest
-            python-version: "3.10"
+            python-version: '3.10'
           # test on prerelease
-          - resolution: "prerelease"
+          - resolution: prerelease
             os: ubuntu-latest
-            python-version: "3.13"
-          - resolution: "prerelease"
+            python-version: '3.13'
+          - resolution: prerelease
             os: ubuntu-latest
-            python-version: "3.14"
+            python-version: '3.14'
       fail-fast: false
     name: test-${{ matrix.python-version }}-${{ matrix.resolution }}-${{ matrix.os }}
     steps:
@@ -127,11 +127,11 @@ jobs:
           --no-default-groups
           --group test
           --exact
-          ${{ matrix.resolution == 'locked' && '--locked' ||
-              matrix.resolution == 'lowest' && '--upgrade --resolution lowest-direct' ||
-              matrix.resolution == 'highest' && '--upgrade --resolution highest' ||
-              matrix.resolution == 'prerelease' && '--upgrade --resolution highest --prerelease allow' ||
-              '--NON_RECOGNIZED_RESOLUTION'
+          ${{ matrix.resolution == 'locked' && '--locked'
+              || matrix.resolution == 'lowest' && '--upgrade --resolution lowest-direct'
+              || matrix.resolution == 'highest' && '--upgrade --resolution highest'
+              || matrix.resolution == 'prerelease' && '--upgrade --resolution highest --prerelease allow'
+              || '--NON_RECOGNIZED_RESOLUTION'
           }}
         continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
       - name: Stop job with warning if install fails for specific versions

@@ -3,7 +3,7 @@ name: Scheduled CI
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 0'  # Sunday at 6 AM UTC
+    - cron: 0 6 * * 0  # Sunday at 6 AM UTC
 
 jobs:
   test-weekly:
@@ -15,7 +15,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.13"
+          python-version: '3.13'
           enable-cache: false
       - name: Install packages
         run: >-
