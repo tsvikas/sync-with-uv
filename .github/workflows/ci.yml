@@ -143,10 +143,15 @@ jobs:
         run: uv pip list
       - name: Run tests
         if: ${{ success() && steps.install_packages.outcome == 'success' }}
-        run: uv run --no-sync pytest --cov-branch --cov-report=xml
+        run: uv run --no-sync pytest --cov-branch --cov-report=xml --junitxml=junit.xml
       - name: Upload coverage reports to Codecov
         if: ${{ success() && steps.install_packages.outcome == 'success' }}
         uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 

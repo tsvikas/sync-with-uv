@@ -42,7 +42,7 @@ format-and-check:
 check:
   just test
   uv run mypy
-  uv run pre-commit run --all-files --show-diff-on-failure
+  uv run pre-commit run --all-files
 
 # Format code and files
 format:
@@ -66,7 +66,7 @@ pylint:
 
 # Run tests with pytest
 test:
-  uv run --exact pytest
+  uv run --all-extras --exact pytest
 
 # add a new version tag
 tag version commit="HEAD": (_assert-legal-version version)

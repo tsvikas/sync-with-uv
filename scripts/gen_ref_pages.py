@@ -1,4 +1,4 @@
-"""Generate the code reference pages."""  # noqa: INP001
+"""Generate the code reference pages."""
 
 from pathlib import Path
 
