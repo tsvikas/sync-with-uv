@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.4.0
+
 - Redirect non-diff output to stderr for better CLI experience
 - Improve diff color output to match black's color scheme
 
