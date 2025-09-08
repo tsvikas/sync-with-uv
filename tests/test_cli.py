@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from colorama import Fore
 from typer.testing import CliRunner
 
 from sync_with_uv import __version__
@@ -128,9 +129,9 @@ def test_process_precommit_cli_diff(
     assert "-  rev: 23.9.1  # a comment" in result.stdout
     assert "+  rev: 23.11.0  # a comment" in result.stdout
     if color:
-        assert "\033[0m" in result.stdout
+        assert Fore.RESET in result.stdout
     else:
-        assert "\033[0m" not in result.stdout
+        assert Fore.RESET not in result.stdout
 
     # Verify file wasn't modified
     content = sample_precommit_config.read_text()

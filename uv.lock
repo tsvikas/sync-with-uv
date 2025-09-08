@@ -1317,6 +1317,7 @@ name = "sync-with-uv"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
+    { name = "colorama" },
     { name = "tomli" },
     { name = "typer" },
 ]
@@ -1355,11 +1356,13 @@ test = [
 ]
 typing = [
     { name = "mypy" },
+    { name = "types-colorama" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.2.1" },
+    { name = "colorama", specifier = ">=0.4.6" },
     { name = "tomli", specifier = ">=2" },
     { name = "typer", specifier = ">=0.13" },
 ]
@@ -1395,7 +1398,10 @@ test = [
     { name = "pytest-reverse", specifier = "~=1.0" },
     { name = "pytest-xdist", extras = ["psutil"], specifier = "~=3.0" },
 ]
-typing = [{ name = "mypy", specifier = "~=1.17.0" }]
+typing = [
+    { name = "mypy", specifier = "~=1.17.0" },
+    { name = "types-colorama", specifier = ">=0" },
+]
 
 [[package]]
 name = "tomli"
@@ -1458,6 +1464,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/43/78/d90f616bf5f88f8710ad067c1f8705bf7618059836ca084e5bb2a0855d75/typer-0.16.1.tar.gz", hash = "sha256:d358c65a464a7a90f338e3bb7ff0c74ac081449e53884b12ba658cbd72990614", size = 102836, upload-time = "2025-08-18T19:18:22.898Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2d/76/06dbe78f39b2203d2a47d5facc5df5102d0561e2807396471b5f7c5a30a1/typer-0.16.1-py3-none-any.whl", hash = "sha256:90ee01cb02d9b8395ae21ee3368421faf21fa138cb2a541ed369c08cec5237c9", size = 46397, upload-time = "2025-08-18T19:18:21.663Z" },
+]
+
+[[package]]
+name = "types-colorama"
+version = "0.4.15.20250801"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/37/af713e7d73ca44738c68814cbacf7a655aa40ddd2e8513d431ba78ace7b3/types_colorama-0.4.15.20250801.tar.gz", hash = "sha256:02565d13d68963d12237d3f330f5ecd622a3179f7b5b14ee7f16146270c357f5", size = 10437, upload-time = "2025-08-01T03:48:22.605Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/95/3a/44ccbbfef6235aeea84c74041dc6dfee6c17ff3ddba782a0250e41687ec7/types_colorama-0.4.15.20250801-py3-none-any.whl", hash = "sha256:b6e89bd3b250fdad13a8b6a465c933f4a5afe485ea2e2f104d739be50b13eea9", size = 10743, upload-time = "2025-08-01T03:48:21.774Z" },
 ]
 
 [[package]]

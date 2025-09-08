@@ -42,6 +42,7 @@ dependencies = [
   "typer >=0.13",
   "click >= 8.2.1",
   "tomli >= 2",
+  "colorama >= 0.4.6"
 ]
 
 [project.optional-dependencies]
@@ -103,6 +104,7 @@ docs = [
 typing = [
   "mypy ~=1.17.0",
   # add "*-stubs" and "types-*" packages here (">=0")
+  "types-colorama >=0",
 ]
 
 

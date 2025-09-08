@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+from colorama import Fore, Style
 
 from . import __version__
 from .repo_data import load_user_mappings
@@ -19,13 +20,13 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
     output_lines = []
     for line in diff_lines:
         if line.startswith(("+++", "---")):
-            output_lines.append("\033[1m" + line + "\033[0m")  # Bold
+            output_lines.append(Style.BRIGHT + line + Fore.RESET)
         elif line.startswith("+"):
-            output_lines.append("\033[32m" + line + "\033[0m")  # Green
+            output_lines.append(Fore.GREEN + line + Fore.RESET)
         elif line.startswith("-"):
-            output_lines.append("\033[31m" + line + "\033[0m")  # Red
+            output_lines.append(Fore.RED + line + Fore.RESET)
         elif line.startswith("@@"):
-            output_lines.append("\033[36m" + line + "\033[0m")  # Cyan
+            output_lines.append(Fore.CYAN + line + Fore.RESET)
         else:
             output_lines.append(line)
     return output_lines
