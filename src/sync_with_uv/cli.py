@@ -135,12 +135,12 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
     if verbose:
         for package, change in changes.items():
             if isinstance(change, tuple):
-                print(f"{package}: {change[0]} -> {change[1]}")
+                print(f"{package}: {change[0]} -> {change[1]}", file=sys.stderr)
             elif change:
-                print(f"{package}: unchanged")
+                print(f"{package}: unchanged", file=sys.stderr)
             else:
-                print(f"{package}: not managed in uv")
-        print()
+                print(f"{package}: not managed in uv", file=sys.stderr)
+        print(file=sys.stderr)
     # output a diff to to stdout
     if diff:
         diff_lines = list(
@@ -159,7 +159,7 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         precommit_filename.write_text(fixed_text, encoding="utf-8")
     # print summary
     if verbose or not quiet:
-        print("All done!")
+        print("All done!", file=sys.stderr)
         n_changed = n_unchanged = 0
         for change in changes.values():
             if isinstance(change, tuple):
@@ -169,7 +169,8 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         would_be = "would be " if (diff or check) else ""
         print(
             f"{n_changed} package {would_be}changed, "
-            f"{n_unchanged} packages {would_be}left unchanged."
+            f"{n_unchanged} packages {would_be}left unchanged.",
+            file=sys.stderr,
         )
     # return 1 if check and changed
     raise typer.Exit(check and fixed_text != precommit_text)

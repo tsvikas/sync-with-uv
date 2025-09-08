@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Redirect non-diff output to stderr for better CLI experience
+
 ## v0.3.1
 
 - Add keywords to pyproject.toml for better package discoverability
