@@ -18,12 +18,14 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
     """Apply ANSI color codes to a list of diff lines."""
     output_lines = []
     for line in diff_lines:
-        if line.startswith("+"):
-            output_lines.append("\033[92m" + line + "\033[0m")  # Green
+        if line.startswith(("+++", "---")):
+            output_lines.append("\033[1m" + line + "\033[0m")  # Bold
+        elif line.startswith("+"):
+            output_lines.append("\033[32m" + line + "\033[0m")  # Green
         elif line.startswith("-"):
-            output_lines.append("\033[91m" + line + "\033[0m")  # Red
+            output_lines.append("\033[31m" + line + "\033[0m")  # Red
         elif line.startswith("@@"):
-            output_lines.append("\033[96m" + line + "\033[0m")  # Cyan
+            output_lines.append("\033[36m" + line + "\033[0m")  # Cyan
         else:
             output_lines.append(line)
     return output_lines
