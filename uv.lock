@@ -1316,7 +1316,6 @@ wheels = [
 name = "sync-with-uv"
 source = { editable = "." }
 dependencies = [
-    { name = "click" },
     { name = "colorama" },
     { name = "tomli" },
     { name = "typer" },
@@ -1361,7 +1360,6 @@ typing = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = ">=8.2.1" },
     { name = "colorama", specifier = ">=0.4.6" },
     { name = "tomli", specifier = ">=2" },
     { name = "typer", specifier = ">=0.13" },
