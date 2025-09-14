@@ -79,7 +79,7 @@ For tools not included in the built-in mapping, you can add custom mappings in y
 
 **Example scenario:**
 
-- Your `.pre-commit-config.yaml` has: `repo: https://github.com/myorg/my-awesome-linter` with `rev: 1.2.0`
+- Your `.pre-commit-config.yaml` has: `repo: https://github.com/myorg/my-awesome-linter` with `rev: ver_1.2.0`
 - Your `uv.lock` contains: `awesome-linter = "1.5.0"`
 - With the mapping above, sync-with-uv will update the pre-commit version to `ver_1.5.0`
 
