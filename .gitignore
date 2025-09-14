@@ -52,6 +52,7 @@ venv/
 
 # development tools
 .mypy_cache/
+.dmypy.json
 .ruff_cache/
 .hypothesis/
 .benchmarks/

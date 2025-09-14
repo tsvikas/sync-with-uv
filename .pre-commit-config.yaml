@@ -1,8 +1,8 @@
 # exclude those files from pre-commit checks
-exclude: >-
-  ^$
-  |^.copier-answers.yml$
-  |^tests/test_\w*/output/
+exclude: "^$\
+  |^\\.copier-answers\\.yml$\
+  |^tests/test_\\w*/output/\
+  "
 
 # pre-commit.ci config
 ci:
@@ -141,7 +141,7 @@ repos:
       - id: blacken-docs
         additional_dependencies: [black==25.1.0]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+    rev: v0.13.0
     hooks:
       - id: ruff-check
         alias: ruff-isort
@@ -149,7 +149,7 @@ repos:
         args: [--select, I001, --fix]
       - id: ruff-check
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.18.1
     hooks:
       - id: mypy
         name: mypy (without imports)
