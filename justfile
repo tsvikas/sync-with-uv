@@ -1,14 +1,16 @@
 list-tasks:
   @just --list
 
-alias t := test
-alias c := check
-alias cp := check-and-push
-alias fc := format-and-check
 alias f := format
+alias t := test
+alias l := lint
+alias q := quick-tools
+
+
+### run once after init/clone ###
 
 # Initialize a new project
-init:
+init: && prepare
   git init
   git commit --allow-empty -m "Initial commit"
   git add --all
@@ -16,7 +18,6 @@ init:
   just update-deps
   git add --all
   [ -z "$(git status --porcelain)" ] || git commit -m "⬆️ Updated project dependencies"
-  just prepare
 
 # Setup the project after cloning
 prepare:
@@ -30,7 +31,7 @@ list-outdated-deps:
   uv tree --outdated --depth 1 --color always -q  | { grep latest --color=never || exit 0; }
 
 # Update all dependencies
-update-deps:
+update-deps: && list-outdated-deps
   uv sync --upgrade
   uv run pre-commit autoupdate -j "$( (uname -s | grep -q Linux && nproc) || (uname -s | grep -q Darwin && sysctl -n hw.ncpu) || echo 1 )"
   uvx sync-with-uv
@@ -39,15 +40,20 @@ update-deps:
 
 ### code quality ###
 
+# Check the code, and push if it pass
 check-and-push:
   [ -z "$(git status --porcelain)" ]
-  just check
+  just _check
   git push --follow-tags
 
-format-and-check: format check
+# Tests to run before push, tag, or release
+_check: test lint
 
-# Run test, lint
-check: test lint
+# Run fast formatting and linting tools
+quick-tools:
+  uv run ruff check --select I001 --fix -q
+  uv run black -q .
+  uv run ruff check
 
 # Format code and files
 format:
@@ -56,14 +62,15 @@ format:
   uv run pre-commit run --all-files blacken-docs
   uv run pre-commit run --all-files mdformat
 
-# Run linters: ruff, mypy, deptry, pre-commit
+# Run linters
 lint:
   uv run ruff check
   uv run dmypy run
   uv run --all-extras --all-groups --with deptry deptry src/
+  uv run --all-extras --all-groups --with pip-audit pip-audit --skip-editable
   uv run pre-commit run --all-files
 
-# Run Pylint, might be slow
+# Run Pylint (slow, not used in other tasks)
 pylint:
   uv run --with pylint pylint src
 
@@ -85,7 +92,7 @@ test-lowest python:
 # Create a release commit
 release version: (_assert-legal-version version)
   [ -z "$(git status --porcelain)" ]
-  just check
+  just _check
   sed -i "s/## Unreleased/## Unreleased\n\n## v{{version}}/" CHANGELOG.md
   git add CHANGELOG.md
   git commit -m "Release v{{version}}"
@@ -93,24 +100,24 @@ release version: (_assert-legal-version version)
 
 # Add a new version tag at a specific commit
 tag-version-at-commit version commit: (_assert-legal-version version)
-  just check-at-commit {{ commit }}
-  just _tag-skip-check {{ version }} {{ commit }}
+  just check-at-commit {{commit}}
+  just _tag-skip-check {{version}} {{commit}}
 
 version_regex := '^([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$'
 
 _assert-legal-version version:
-  @echo "{{ version }}" | grep -qE '{{ version_regex }}' || ( echo "Error: not a legal version" && false )
+  @echo "{{version}}" | grep -qE '{{version_regex}}' || ( echo "Error: not a legal version" && false )
 
 tmp_rc_dir := '/tmp/rc/' + file_name(justfile_directory()) + '/' + datetime('%s')
 
-# Run the 'check' task at a specific commit
+# Run code checks at a specific commit
 check-at-commit commit:
-  git worktree add {{ tmp_rc_dir }} --detach {{ commit }}
-  just -f {{ tmp_rc_dir }}/justfile check || ( git worktree remove -f {{ tmp_rc_dir }} && false )
-  git worktree remove {{ tmp_rc_dir }}
+  git worktree add {{tmp_rc_dir}} --detach {{commit}}
+  just -f {{tmp_rc_dir}}/justfile _check || ( git worktree remove -f {{tmp_rc_dir}} && false )
+  git worktree remove {{tmp_rc_dir}}
 
 _tag-skip-check version commit: (_assert-legal-version version)
-  git tag -a v{{ version }} -m "Release v{{ version }}" {{ commit }}
+  git tag -a v{{version}} -m "Release v{{version}}" {{commit}}
 
 
 ### Documentation ###
