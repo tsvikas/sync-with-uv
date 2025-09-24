@@ -10,6 +10,7 @@ REPO_TO_PACKAGE = {
     "https://github.com/adamchainz/djade-pre-commit": "djade",
     "https://github.com/astral-sh/ruff-pre-commit": "ruff",
     "https://github.com/charliermarsh/ruff-pre-commit": "ruff",
+    "https://github.com/crate-ci/typos": "typos",
     "https://github.com/pre-commit/mirrors-autopep8": "autopep8",
     "https://github.com/pre-commit/mirrors-clang-format": "clang-format",
     "https://github.com/pre-commit/mirrors-isort": "isort",

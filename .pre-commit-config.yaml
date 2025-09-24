@@ -100,7 +100,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-  - repo: https://github.com/adhtruong/mirrors-typos
+  - repo: https://github.com/crate-ci/typos
     rev: v1.36.2
     hooks:
       - id: typos
