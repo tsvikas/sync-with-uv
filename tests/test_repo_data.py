@@ -30,9 +30,9 @@ def test_local_repo_to_package() -> None:
 @pytest.mark.parametrize(
     ("url", "version_template"),
     [
-        ("https://github.com/psf/black-pre-commit-mirror", "${rev}"),
-        ("https://github.com/psf/black", "${rev}"),
-        ("https://github.com/astral-sh/ruff-pre-commit", "v${rev}"),
+        ("https://github.com/psf/black-pre-commit-mirror", "${version}"),
+        ("https://github.com/psf/black", "${version}"),
+        ("https://github.com/astral-sh/ruff-pre-commit", "v${version}"),
     ],
 )
 def test_repo_to_version_template(url: str, version_template: str) -> None:
@@ -72,7 +72,7 @@ def test_load_user_mappings_with_config() -> None:
     config_content = """
 [tool.sync-with-uv]
 repo-to-package = {"https://github.com/example/test" = "test-pkg"}
-repo-to-version-template = {"https://github.com/example/test" = "v${rev}"}
+repo-to-version-template = {"https://github.com/example/test" = "v${version}"}
 """
 
     with NamedTemporaryFile(mode="w", suffix=".toml", delete=False) as f:
@@ -83,7 +83,7 @@ repo-to-version-template = {"https://github.com/example/test" = "v${rev}"}
     try:
         repo_mappings, version_mappings = load_user_mappings(path)
         assert repo_mappings == {"https://github.com/example/test": "test-pkg"}
-        assert version_mappings == {"https://github.com/example/test": "v${rev}"}
+        assert version_mappings == {"https://github.com/example/test": "v${version}"}
     finally:
         path.unlink()
 
@@ -120,20 +120,20 @@ def test_repo_to_package_with_user_mappings() -> None:
 def test_repo_to_version_template_with_user_mappings() -> None:
     """Test repo_to_version_template with user-defined mappings."""
     user_mappings = {
-        "https://github.com/example/custom": "custom-${rev}",
-        "https://github.com/example/override": "user-${rev}",
+        "https://github.com/example/custom": "custom-${version}",
+        "https://github.com/example/override": "user-${version}",
     }
 
     # Test custom mapping
     assert (
         repo_to_version_template("https://github.com/example/custom", user_mappings)
-        == "custom-${rev}"
+        == "custom-${version}"
     )
 
     # Test user mapping overrides built-in
     assert (
         repo_to_version_template("https://github.com/example/override", user_mappings)
-        == "user-${rev}"
+        == "user-${version}"
     )
 
     # Test fallback to built-in
@@ -141,7 +141,7 @@ def test_repo_to_version_template_with_user_mappings() -> None:
         repo_to_version_template(
             "https://github.com/psf/black-pre-commit-mirror", user_mappings
         )
-        == "${rev}"
+        == "${version}"
     )
 
     # Test unknown repo with user mappings
@@ -166,12 +166,12 @@ def test_repo_functions_with_empty_user_mappings() -> None:
         repo_to_version_template(
             "https://github.com/psf/black-pre-commit-mirror", empty_mappings
         )
-        == "${rev}"
+        == "${version}"
     )
 
     # Test with None (default parameter)
     assert repo_to_package("https://github.com/psf/black-pre-commit-mirror") == "black"
     assert (
         repo_to_version_template("https://github.com/psf/black-pre-commit-mirror")
-        == "${rev}"
+        == "${version}"
     )

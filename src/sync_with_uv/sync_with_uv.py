@@ -77,8 +77,10 @@ def process_precommit_text(
             current_version = repo_rev.group(1)
             version_template = repo_to_version_template(repo_url, user_version_mappings)
             if version_template is None:
-                version_template = "v${rev}" if current_version[0] == "v" else "${rev}"
-            target_version = version_template.replace("${rev}", uv_data[package])
+                version_template = (
+                    "v${version}" if current_version[0] == "v" else "${version}"
+                )
+            target_version = version_template.replace("${version}", uv_data[package])
             line_fixed = line.replace(current_version, target_version)
             new_lines.append(line_fixed)
             changes[package] = current_version == target_version or (

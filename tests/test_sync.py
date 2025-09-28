@@ -287,7 +287,7 @@ def test_process_precommit_text_with_user_mappings() -> None:
 
     user_repo_mappings = {"https://github.com/example/custom-tool": "custom-tool"}
 
-    user_version_mappings = {"https://github.com/example/custom-tool": "v${rev}"}
+    user_version_mappings = {"https://github.com/example/custom-tool": "v${version}"}
 
     result, changes = process_precommit_text(
         precommit_text, uv_data, user_repo_mappings, user_version_mappings
