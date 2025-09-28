@@ -63,25 +63,45 @@ sync-with-uv -p custom-precommit.yaml -u custom-lock.toml
 
 Most users don't need this section - the tool works out of the box with popular tools like black, ruff, and mypy.
 
-### Custom Repository Mappings
+### Mapping from repo URL to package name
 
-For tools not included in the built-in mapping, you can add custom mappings in your `pyproject.toml`:
+By default, the tool assumes the last part of a repo URL is the package name.
+For example, if `repo: https://github.com/my-org/my-awesome-linter` is in `.pre-commit-config.yaml`,
+the tool will sync with the version of `my-awesome-linter` in `uv.lock`.
+
+The tool skips any repo without a corresponding package in `uv.lock`.
+
+To link a repo to a different package name,
+add an entry to the `[tool.sync-with-uv.repo-to-package]` section in `pyproject.toml`.
+
+Use an empty value to disable syncing for a specific repo.
 
 ```toml
-# Map repository URLs to package names
 [tool.sync-with-uv.repo-to-package]
-"https://github.com/myorg/my-awesome-linter" = "awesome-linter"
-
-# Define custom version templates (optional)
-[tool.sync-with-uv.repo-to-version-template]
-"https://github.com/myorg/my-awesome-linter" = "ver_${rev}"
+# sync this repo with the `awesome-linter` package
+"https://github.com/my-org/my-awesome-linter" = "awesome-linter"
+# do not sync this repo, even if `cool-tool` is in `uv.lock`
+"https://github.com/my-org/cool-tool" = ""
 ```
 
-**Example scenario:**
+### Mapping from repo URL to version tag format
 
-- Your `.pre-commit-config.yaml` has: `repo: https://github.com/myorg/my-awesome-linter` with `rev: ver_1.2.0`
-- Your `uv.lock` contains: `awesome-linter = "1.5.0"`
-- With the mapping above, sync-with-uv will update the pre-commit version to `ver_1.5.0`
+For each repo in `.pre-commit-config.yaml` with a linked package,
+the tool updates the `rev` field with the version from `uv.lock`, optionally preserving a leading `v`.
+The tool preserves the original formatting and any comments on the `rev` line.
+For example, if the `uv.lock` version is `1.2.3`,
+it will update `rev: 1.0.0` to `rev: 1.2.3`,
+and `rev: v1.0.0` to `rev: v1.2.3`.
+
+To use a custom format for the `rev` field,
+add an entry to the `[tool.sync-with-uv.repo-to-version-template]` section in `pyproject.toml`,
+using `${rev}` as a placeholder for the package version.
+
+```toml
+[tool.sync-with-uv.repo-to-version-template]
+# for example, this project uses `version_1.2.3` format for tags
+"https://github.com/my-org/my-awesome-linter" = "version_${rev}"
+```
 
 ## Contributing
 
