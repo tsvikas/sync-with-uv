@@ -16,7 +16,14 @@ app = typer.Typer()
 
 
 def get_colored_diff(diff_lines: list[str]) -> list[str]:
-    """Apply ANSI color codes to a list of diff lines."""
+    """Apply ANSI color codes to diff lines.
+
+    Args:
+        diff_lines: List of unified diff lines.
+
+    Returns:
+        List of diff lines with ANSI color codes applied.
+    """
     output_lines = []
     for line in diff_lines:
         if line.startswith(("+++", "---")):
@@ -33,6 +40,7 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
 
 
 def _version_callback(value: bool) -> None:  # noqa: FBT001
+    """Print version and exit if requested."""
     if value:
         print(f"sync-with-uv {__version__}")
         raise typer.Exit(0)
@@ -51,7 +59,7 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
             writable=False,
             readable=True,
             resolve_path=True,
-            help="pre-commit file to update",
+            help="Path to .pre-commit-config.yaml file to update",
         ),
     ] = Path(".pre-commit-config.yaml"),
     uv_lock_filename: Annotated[
@@ -65,7 +73,7 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
             writable=False,
             readable=True,
             resolve_path=True,
-            help="lock file to use",
+            help="Path to uv.lock file containing package versions",
         ),
     ] = Path("uv.lock"),
     *,
@@ -73,9 +81,9 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         bool,
         typer.Option(
             "--check",
-            help="Don't write the files back, just return the status. "
+            help="Don't write the file back, just return the status. "
             "Return code 0 means nothing would change. "
-            "Return code 1 means some files would be reformatted. "
+            "Return code 1 means some package versions would be updated. "
             "Return code 123 means there was an internal error.",
         ),
     ] = False,
@@ -83,15 +91,14 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         bool,
         typer.Option(
             "--diff",
-            help="Don't write the files back, "
-            "just output a diff to indicate what changes would've made.",
+            help="Don't write the file back, "
+            "just output a diff to indicate what changes would be made.",
         ),
     ] = False,
     color: Annotated[
         bool,
         typer.Option(
-            help="Show (or do not show) colored diff. "
-            "Only applies when --diff is given."
+            help="Enable colored diff output. Only applies when --diff is given."
         ),
     ] = False,
     quiet: Annotated[
@@ -108,8 +115,8 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         typer.Option(
             "-v",
             "--verbose",
-            help="Emit messages about files that were not changed "
-            "or were ignored due to exclusion patterns.",
+            help="Show detailed information about all packages, "
+            "including those that were not changed.",
         ),
     ] = False,
     version: Annotated[  # noqa: ARG001
@@ -123,7 +130,11 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         ),
     ] = None,
 ) -> None:
-    """Sync the versions of a pre-commit-config file to a uv.lock file."""
+    """Sync pre-commit hook versions with uv.lock.
+
+    Updates the 'rev' fields in .pre-commit-config.yaml to match the package
+    versions found in uv.lock, ensuring consistent versions for development tools.
+    """
     try:
         user_repo_mappings, user_version_mappings = load_user_mappings()
         uv_data = load_uv_lock(uv_lock_filename)

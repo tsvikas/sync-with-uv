@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Improve docstrings and CLI help text
+
 ## v0.4.0
 
 - Redirect non-diff output to stderr for better CLI experience
