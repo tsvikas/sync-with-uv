@@ -66,7 +66,7 @@ def process_precommit_text(
             repo_url = repo_header.group(1)
             package = repo_to_package(repo_url, user_repo_mappings)
             if not package:
-                if repo_url != "local":
+                if repo_url not in {"local", "meta"}:
                     changes[repo_url] = False
             elif package not in uv_data:
                 changes[package] = False

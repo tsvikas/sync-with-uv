@@ -7,6 +7,7 @@
   Users with custom version templates in `pyproject.toml` must update their configuration.
 - Improve docstrings and CLI help text
 - Update README with clearer setup instructions and examples
+- Skip repos marked as 'meta' for better compatibility with pre-commit configs
 
 ## v0.4.0
 
