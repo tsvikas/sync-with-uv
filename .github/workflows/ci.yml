@@ -22,7 +22,7 @@ jobs:
       - uses: psf/black@stable
         with:
           jupyter: false
-          version: ~=25.0
+          use_pyproject: true
 
   ruff-check:
     if: ${{ always() }}
