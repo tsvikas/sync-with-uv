@@ -1,8 +1,8 @@
 """Maps repo urls to package names and version templates."""
 
-import re
 from collections import ChainMap
 from pathlib import Path
+from urllib.parse import urlparse
 
 import tomli
 
@@ -91,25 +91,27 @@ def repo_to_package(
     """
     if repo_url in {"local", "meta"}:
         return None
+    repo_url = repo_url.removesuffix("/")
 
     # Use ChainMap to prioritize user mappings over built-in ones
     combined_mappings = ChainMap(user_mappings or {}, REPO_TO_PACKAGE)
 
-    # Check exact match first
-    if repo_url in combined_mappings:
+    # Check the mapping
+    try:
         return combined_mappings[repo_url]
+    except KeyError:
+        pass
+    try:
+        return combined_mappings[repo_url + "/"]
+    except KeyError:
+        pass
 
-    # Check prefix matches (for repos with sub-paths)
-    for repo, package in combined_mappings.items():
-        if repo_url.startswith(repo + "/"):
-            return package
-
-    # Extract from regex as fallback
-    repo_url_re = re.compile(
-        r"https?://(www\.)?github.com/(?P<user_name>[^/]*)/(?P<repo_name>[^/]*)/?"
-    )
-    repo_url_match = repo_url_re.fullmatch(repo_url)
-    return repo_url_match.group("repo_name") if repo_url_match else None
+    # Extract from the url as fallback
+    url_parsed = urlparse(repo_url)
+    if not url_parsed.netloc:
+        return None
+    url_last_path = url_parsed.path.split("/")[-1]
+    return url_last_path or None
 
 
 def repo_to_version_template(
