@@ -6,6 +6,7 @@
   Replace `${rev}` with `${version}` in version templates for improved clarity.
   Users with custom version templates in `pyproject.toml` must update their configuration.
 - Improve docstrings and CLI help text
+- Update README with clearer setup instructions and examples
 
 ## v0.4.0
 
