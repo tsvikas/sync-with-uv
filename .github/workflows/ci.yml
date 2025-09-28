@@ -66,6 +66,28 @@ jobs:
       - name: Run mypy
         run: uv run --no-sync mypy
 
+  dependencies:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Install packages
+        run: >-
+          uv sync
+          --all-extras
+          --all-groups
+          --exact
+          --locked
+      - name: List packages
+        run: uv pip list
+      - name: Run deptry
+        run: uv run --no-sync --with deptry deptry src/
+      - name: Run pip-audit
+        run: uv run --no-sync --with pip-audit pip-audit --skip-editable
+
   test:
     if: ${{ always() }}
     runs-on: ${{ matrix.os }}
@@ -195,6 +217,7 @@ jobs:
       ruff-check,
       pre-commit,
       mypy,
+      dependencies,
       test,
       pylint,
     ]

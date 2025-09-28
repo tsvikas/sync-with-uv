@@ -6,7 +6,7 @@ on:
     - cron: 0 6 * * 0  # Sunday at 6 AM UTC
 
 jobs:
-  test-weekly:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -30,3 +30,24 @@ jobs:
         run: uv pip list
       - name: Run tests
         run: uv run --no-sync pytest
+
+  pip-audit:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Install packages
+        run: >-
+          uv sync
+          --all-extras
+          --all-groups
+          --exact
+          --locked
+      - name: List packages
+        run: uv pip list
+      - name: Run pip-audit
+        run: uv run --no-sync --with pip-audit pip-audit --skip-editable
