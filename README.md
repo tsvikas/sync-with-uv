@@ -95,12 +95,12 @@ and `rev: v1.0.0` to `rev: v1.2.3`.
 
 To use a custom format for the `rev` field,
 add an entry to the `[tool.sync-with-uv.repo-to-version-template]` section in `pyproject.toml`,
-using `${rev}` as a placeholder for the package version.
+using `${version}` as a placeholder for the package version.
 
 ```toml
 [tool.sync-with-uv.repo-to-version-template]
 # for example, this project uses `version_1.2.3` format for tags
-"https://github.com/my-org/my-awesome-linter" = "version_${rev}"
+"https://github.com/my-org/my-awesome-linter" = "version_${version}"
 ```
 
 ## Contributing
