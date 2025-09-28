@@ -32,7 +32,6 @@ jobs:
         run: uv run --no-sync pytest
 
   pip-audit:
-    if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
