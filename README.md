@@ -29,7 +29,7 @@ Simply add this pre-commit hook to your setup and enjoy consistent dependency ma
 
 ## Usage
 
-**Recommended: Use as a pre-commit hook**
+### Recommended: Use as a pre-commit hook
 
 Simply add these lines to your `.pre-commit-config.yaml` file:
 
