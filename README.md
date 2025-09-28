@@ -40,7 +40,9 @@ Simply add these lines to your `.pre-commit-config.yaml` file:
     - id: sync-with-uv
 ```
 
-That's it! The hook will automatically keep your pre-commit versions in sync with `uv.lock`.
+That's it! The hook will automatically sync versions for any tools present in both your pre-commit config and `uv.lock`.
+
+To add a tool to your uv dependencies, use `uv add --group dev tool-name` (the tool must be available on PyPI).
 
 ### Alternative: Command Line Interface
 
@@ -61,7 +63,9 @@ sync-with-uv -p custom-precommit.yaml -u custom-lock.toml
 
 ## Advanced Configuration
 
-Most users don't need this section - the tool works out of the box with popular tools like black, ruff, and mypy.
+Most users don't need this section -
+the tool works out of the box with popular tools like black, ruff, and mypy,
+as well as commonly used mirrors for those tools.
 
 ### Mapping from repo URL to package name
 
