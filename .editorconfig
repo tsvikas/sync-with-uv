@@ -46,18 +46,10 @@ indent_style = tab
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-# Markdown files
-# Those are formatted with mdformat
-[*.md]
+# These files are formatted with tools
+[*.{py,md}]
 indent_size = 1
 
 # LICENSE files
 [LICENSE]
 indent_size = 1
-
-# Project exceptions
-[tests/test_sync.py]
-indent_size = 2
-
-[tests/test_precommit.py]
-indent_size = 2
