@@ -89,7 +89,7 @@ def repo_to_package(
     Returns:
         The package name, or None if no mapping is found.
     """
-    if repo_url == "local":
+    if repo_url in {"local", "meta"}:
         return None
 
     # Use ChainMap to prioritize user mappings over built-in ones
