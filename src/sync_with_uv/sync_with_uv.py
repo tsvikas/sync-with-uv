@@ -9,7 +9,14 @@ from sync_with_uv.repo_data import repo_to_package, repo_to_version_template
 
 
 def load_uv_lock(filename: Path) -> dict[str, str]:
-    """Read 'uv.lock' and return a dict of package, version."""
+    """Load package versions from uv.lock file.
+
+    Args:
+        filename: Path to uv.lock file.
+
+    Returns:
+        Mapping of package names to their versions.
+    """
     with filename.open("rb") as f:
         toml_data = tomli.load(f)
     return (
@@ -29,7 +36,23 @@ def process_precommit_text(
     user_repo_mappings: dict[str, str] | None = None,
     user_version_mappings: dict[str, str] | None = None,
 ) -> tuple[str, dict[str, bool | tuple[str, str]]]:
-    """Read a pre-commit config file and return a fixed pre-commit config string."""
+    """Process pre-commit config text and sync versions with uv.lock.
+
+    Parses pre-commit config YAML text and updates repository revision
+    tags to match versions from uv.lock file.
+
+    Args:
+        precommit_text: Raw pre-commit config file content.
+        uv_data: Package name to version mapping from uv.lock.
+        user_repo_mappings: Optional user repo-to-package mappings.
+        user_version_mappings: Optional user repo-to-version-template mappings.
+
+    Returns:
+        Tuple of (updated_config_text, changes_dict) where changes_dict maps:
+        - package names to True (unchanged), False (not in uv.lock), or
+          tuple of (old_version, new_version) when changed
+        - repo URLs to False when no package mapping exists
+    """
     # NOTE: this only works if the 'repo' is the first key of the element
     repo_header_re = re.compile(r"\s*-\s*repo\s*:\s*(\S*).*")
     repo_rev_re = re.compile(r"\s*rev\s*:\s*(\S*).*")
