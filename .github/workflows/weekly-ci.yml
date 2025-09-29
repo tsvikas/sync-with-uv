@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: 0 6 * * 0  # Sunday at 6 AM UTC
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -30,6 +34,54 @@ jobs:
         run: uv pip list
       - name: Run tests
         run: uv run --no-sync pytest
+      - name: Create failure issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Check for existing test failure issues
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'scheduled-ci-tests',
+              per_page: 10
+            });
+
+            if (existingIssues.data.length > 0) {
+              // Update existing issue
+              const existingIssue = existingIssues.data[0];
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `Another test failure occurred on ${context.sha.substring(0, 7)}, see the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+              });
+              await core.notice(`Updated existing issue ${existingIssue.html_url}`);
+
+            } else {
+              // Create new issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Scheduled CI Tests Failed - ${new Date().toISOString().split('T')[0]}`,
+                body: `The scheduled CI tests failed on ${context.sha.substring(0, 7)}.
+
+            **Failed Jobs:**
+            - Check the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+
+            **Likely Causes:**
+            - New dependency versions with breaking changes
+
+            **Next Steps:**
+            - Review the logs above
+            - Update code for new dependencies or limit package versions
+            - Re-run the workflow to verify fixes`,
+                labels: ['scheduled-ci-tests'],
+                assignees: [context.repo.owner],
+              });
+              await core.notice(`Created issue ${issue.data.html_url}`);
+            }
 
   pip-audit:
     runs-on: ubuntu-latest
@@ -50,3 +102,51 @@ jobs:
         run: uv pip list
       - name: Run pip-audit
         run: uv run --no-sync --with pip-audit pip-audit --skip-editable
+      - name: Create failure issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Check for existing audit failure issues
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'scheduled-ci-audit',
+              per_page: 10
+            });
+
+            if (existingIssues.data.length > 0) {
+              // Update existing issue instead of creating new one
+              const existingIssue = existingIssues.data[0];
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `Another audit failure occurred on ${context.sha.substring(0, 7)}, see the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+              });
+              await core.notice(`Updated existing issue ${existingIssue.html_url}`);
+
+            } else {
+              // Create new issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Scheduled CI Audit Failed - ${new Date().toISOString().split('T')[0]}`,
+                body: `The scheduled CI audit check failed on ${context.sha.substring(0, 7)}.
+
+            **Failed Jobs:**
+            - Check the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+
+            **Likely Causes:**
+            - New security vulnerabilities detected by pip-audit
+
+            **Next Steps:**
+            - Review the logs above
+            - Update locked dependencies
+            - Re-run the workflow to verify fixes`,
+                labels: ['scheduled-ci-audit'],
+                assignees: [context.repo.owner],
+              });
+              await core.notice(`Created issue ${issue.data.html_url}`);
+            }
