@@ -9,6 +9,7 @@
 - Update README with clearer setup instructions and examples
 - Skip repos marked as 'meta' for better compatibility with pre-commit configs
 - Support repo URLs from any Git provider (not just GitHub) by using URL parsing instead of regex
+- Include pyproject.toml in pre-commit hook file triggers
 
 ## v0.4.0
 
