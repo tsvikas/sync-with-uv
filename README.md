@@ -40,6 +40,8 @@ Simply add these lines to your `.pre-commit-config.yaml` file:
     - id: sync-with-uv
 ```
 
+**Note:** Place this hook **after** hooks that modify `uv.lock` (like `uv-lock`), and **before** hooks that read versions from `.pre-commit-config.yaml` (like `sync-pre-commit-deps`).
+
 That's it! The hook will automatically sync versions for any tools present in both your pre-commit config and `uv.lock`.
 
 To add a tool to your uv dependencies, use `uv add --group dev tool-name` (the tool must be available on PyPI).
