@@ -46,11 +46,12 @@ Ready to get started? Follow the development setup below.
 
 ### Code Quality Tools
 
-- **Format code**: `uv run just format` (runs `black`)
-- **Lint code**: `uv run just lint` (runs `ruff check` and `mypy`)
+- **Format code**: `uv run just format` (runs all the formatting tools)
+- **Lint code**: `uv run just lint` (runs all the linting tools)
+- **Format and lint code**: `uv run just quick-tools` (runs quick formatting and linting tools)
 - **Run tests**: `uv run just test` (runs `pytest`)
-- **Run pre-commit tests**: `uv run pre-commit run` (this also runs on each commit)
-- **Run all checks**: `uv run just check` (lint, test, and pre-commit)
+- **Run pre-commit tests**: `uv run pre-commit run`. This also runs on each commit.
+- **Run all checks**: `uv run just format lint test`
 
 ### Running Individual Tools
 
@@ -58,10 +59,10 @@ You can run specific tools directly:
 
 ```bash
 uv run black
-uv run ruff
+uv run ruff check
 uv run mypy
 uv run pytest
-uv run pre-commit
+uv run pre-commit run
 ```
 
 [how-to-contribute]: https://opensource.guide/how-to-contribute/
