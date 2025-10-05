@@ -11,6 +11,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   format-python:
     runs-on: ubuntu-latest
@@ -81,7 +84,15 @@ jobs:
       - name: Run deptry
         run: uv run --no-sync --with deptry deptry src/
       - name: Run pip-audit
-        run: uv run --no-sync --with pip-audit pip-audit --skip-editable
+        run: >-
+          uv run --no-sync --with pip-audit pip-audit --skip-editable
+          --ignore-vuln GHSA-4xh5-x5gv-qwph
+        # pip-audit ignored vuln:
+        # GHSA-4xh5-x5gv-qwph:
+        #   vuln is in pip, which is not a pinned requirwement
+        #   vuln is fixed in recent python versions
+        #   see https://github.com/pypa/pip/issues/13607
+
 
   test:
     strategy:
