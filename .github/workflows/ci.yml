@@ -14,6 +14,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # Many color libraries just need this variable to be set to any value.
+  # Set it to 3 to support 8-bit color graphics (256 colors per channel)
+  # for libraries that care about the value set.
+  FORCE_COLOR: 3
+
 jobs:
   format-python:
     runs-on: ubuntu-latest
@@ -101,7 +107,7 @@ jobs:
           # test with highest resolution
           - resolution: highest
             os: ubuntu-latest
-            python-version: '3.13'
+            python-version: '3.14'
           # test with lowest resolution
           - resolution: lowest
             os: ubuntu-latest
@@ -167,10 +173,10 @@ jobs:
           # test on prerelease
           - resolution: prerelease
             os: ubuntu-latest
-            python-version: '3.13'
+            python-version: '3.14'
           - resolution: prerelease
             os: ubuntu-latest
-            python-version: '3.14'
+            python-version: '3.15'
       fail-fast: false
     runs-on: ${{ matrix.os }}
     name: test-${{ matrix.python-version }}-${{ matrix.resolution }}-${{ matrix.os }}

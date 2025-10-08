@@ -25,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development",
   "Topic :: Software Development :: Quality Assurance",
   "Typing :: Typed",
@@ -65,7 +66,7 @@ dev = [
   "rust-just ~=1.0",
   "pre-commit ~=4.0",
   "black ~=25.9",
-  "ruff ~=0.13.0",
+  "ruff ~=0.14.0",
   ## can be used for debug
   "icecream >=2",
   "snoop >=0.3",
@@ -254,6 +255,9 @@ flake8-comprehensions.allow-dict-calls-with-keyword-arguments = true
   "PLR2004",  # PyLint-Refactor/magic-value-comparison
   "S101",     # flake8-bandit/assert
   "D1",       # pydocstyle/undocumented-*
+  "TC001",    # flake8-type-checking/typing-only-*-import
+  "TC002",    # flake8-type-checking/typing-only-*-import
+  "TC003",    # flake8-type-checking/typing-only-*-import
   "S603",     # flake8-bandit/subprocess-without-shell-equals-true
   "F811",     # redefined-while-unused
 ]
