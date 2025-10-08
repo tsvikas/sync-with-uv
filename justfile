@@ -134,12 +134,12 @@ _tag-skip-check version commit: (_assert-legal-version version)
 # Generate reference pages from docstrings
 build-docs-ref:
   rm -rf docs/reference
-  uv run --python 3.13 --only-group docs scripts/gen_ref_pages.py
+  uv run --python 3.14 --only-group docs scripts/gen_ref_pages.py
 
 # Build the documentation
 build-docs: build-docs-ref
-  uv run --python 3.13 --only-group docs mkdocs build
+  uv run --python 3.14 --only-group docs mkdocs build
 
 # Serve the documentation locally
 serve-docs: build-docs-ref
-  uv run --python 3.13 --only-group docs mkdocs serve
+  uv run --python 3.14 --only-group docs mkdocs serve

@@ -7,9 +7,7 @@ exclude: "^$\
 # pre-commit.ci config
 ci:
   # TODO: enable pre-commit.ci repository access
-  autoupdate_commit_msg: '[pre-commit.ci] chore: update pre-commit hooks'
-  autofix_commit_msg: '[pre-commit.ci] style: pre-commit fixes'
-  skip: []
+  autoupdate_commit_msg: '[pre-commit.ci] 🔧 pre-commit autoupdate'
   autoupdate_schedule: quarterly
 
 repos:
@@ -29,6 +27,7 @@ repos:
     rev: v0.0.3
     hooks:
       - id: sync-pre-commit-deps
+        args: [--yaml-mapping, '2', --yaml-sequence, '4', --yaml-offset, '2']
 
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -141,7 +140,7 @@ repos:
       - id: blacken-docs
         additional_dependencies: [black==25.9.0]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.2
+    rev: v0.14.0
     hooks:
       - id: ruff-check
         alias: ruff-isort
