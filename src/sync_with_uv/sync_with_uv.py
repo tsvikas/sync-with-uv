@@ -57,9 +57,9 @@ def process_precommit_text(
     repo_header_re = re.compile(r"\s*-\s*repo\s*:\s*(\S*).*")
     repo_rev_re = re.compile(r"\s*rev\s*:\s*(\S*).*")
     lines = precommit_text.split("\n")
-    new_lines = []
+    new_lines: list[str] = []
     repo_url: str | None = None
-    package = None
+    package: str | None = None
     changes: dict[str, bool | tuple[str, str]] = {}
     for line in lines:
         if repo_header := repo_header_re.fullmatch(line):
