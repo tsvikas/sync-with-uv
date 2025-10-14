@@ -1,4 +1,4 @@
-import importlib
+import importlib.metadata
 
 import sync_with_uv
 
