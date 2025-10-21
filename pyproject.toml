@@ -40,7 +40,7 @@ urls.issues = "https://github.com/tsvikas/sync-with-uv/issues"
 
 requires-python = ">=3.10"
 dependencies = [
-  "typer >=0.16",
+  "cyclopts >=4",
   "tomli >=2",
   "colorama >=0.4.6"
 ]
