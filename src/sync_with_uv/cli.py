@@ -5,14 +5,15 @@ import sys
 from pathlib import Path
 from typing import Annotated
 
-import typer
+import cyclopts.types
 from colorama import Fore, Style
+from cyclopts import App, Parameter
 
-from . import __version__
 from .repo_data import load_user_mappings
 from .sync_with_uv import load_uv_lock, process_precommit_text
 
-app = typer.Typer()
+app = App(name="sync-with-uv")
+app.register_install_completion_command()
 
 
 def get_colored_diff(diff_lines: list[str]) -> list[str]:
@@ -39,47 +40,26 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
     return output_lines
 
 
-def _version_callback(value: bool) -> None:  # noqa: FBT001
-    """Print version and exit if requested."""
-    if value:
-        print(f"sync-with-uv {__version__}")
-        raise typer.Exit(0)
-
-
-@app.command()
+@app.default()
 def process_precommit(  # noqa: C901, PLR0912, PLR0913
     precommit_filename: Annotated[
-        Path,
-        typer.Option(
-            "-p",
-            "--pre-commit-config",
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            writable=False,
-            readable=True,
-            resolve_path=True,
+        cyclopts.types.ResolvedExistingFile,
+        Parameter(
+            ["-p", "--pre-commit-config"],
             help="Path to .pre-commit-config.yaml file to update",
         ),
     ] = Path(".pre-commit-config.yaml"),
     uv_lock_filename: Annotated[
-        Path,
-        typer.Option(
-            "-u",
-            "--uv-lock",
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            writable=False,
-            readable=True,
-            resolve_path=True,
+        cyclopts.types.ResolvedExistingFile,
+        Parameter(
+            ["-u", "--uv-lock"],
             help="Path to uv.lock file containing package versions",
         ),
     ] = Path("uv.lock"),
     *,
     check: Annotated[
         bool,
-        typer.Option(
+        Parameter(
             "--check",
             help="Don't write the file back, just return the status. "
             "Return code 0 means nothing would change. "
@@ -89,7 +69,7 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
     ] = False,
     diff: Annotated[
         bool,
-        typer.Option(
+        Parameter(
             "--diff",
             help="Don't write the file back, "
             "just output a diff to indicate what changes would be made.",
@@ -97,39 +77,27 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
     ] = False,
     color: Annotated[
         bool,
-        typer.Option(
+        Parameter(
             help="Enable colored diff output. Only applies when --diff is given."
         ),
     ] = False,
     quiet: Annotated[
         bool,
-        typer.Option(
-            "-q",
-            "--quiet",
+        Parameter(
+            ["-q", "--quiet"],
             help="Stop emitting all non-critical output. "
             "Error messages will still be emitted.",
         ),
     ] = False,
     verbose: Annotated[
         bool,
-        typer.Option(
-            "-v",
-            "--verbose",
+        Parameter(
+            ["-v", "--verbose"],
             help="Show detailed information about all packages, "
             "including those that were not changed.",
         ),
     ] = False,
-    version: Annotated[  # noqa: ARG001
-        bool | None,
-        typer.Option(
-            "--version",
-            "-V",
-            callback=_version_callback,
-            is_eager=True,
-            help="Show the version and exit.",
-        ),
-    ] = None,
-) -> None:
+) -> int:
     """Sync pre-commit hook versions with uv.lock.
 
     Updates the 'rev' fields in .pre-commit-config.yaml to match the package
@@ -142,9 +110,9 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         fixed_text, changes = process_precommit_text(
             precommit_text, uv_data, user_repo_mappings, user_version_mappings
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("Error:", e, file=sys.stderr)
-        raise typer.Exit(123) from e
+        return 123
     # report the results / change files
     if verbose:
         for package, change in changes.items():
@@ -187,4 +155,4 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
             file=sys.stderr,
         )
     # return 1 if check and changed
-    raise typer.Exit(check and fixed_text != precommit_text)
+    return int(check and fixed_text != precommit_text)
