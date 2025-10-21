@@ -49,8 +49,8 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
     uv_lock_filename: Annotated[
         cyclopts.types.ResolvedExistingFile, Parameter(["-u", "--uv-lock"])
     ] = Path("uv.lock"),
-    check: bool = False,
-    diff: bool = False,
+    check: Annotated[bool, Parameter(negative="")] = False,
+    diff: Annotated[bool, Parameter(negative="")] = False,
     color: bool = False,
     quiet: Annotated[bool, Parameter(alias="-q")] = False,
     verbose: Annotated[bool, Parameter(alias="-v")] = False,
