@@ -1,10 +1,10 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.22.6
+_commit: v0.23.0
 _src_path: gh:tsvikas/python-template
+cli_framework: typer
 format_tool: black
 get_package_version_from_vcs: true
 github_user: tsvikas
-has_cli: true
 in_codecov: true
 in_pypi: true
 in_rtd: false
