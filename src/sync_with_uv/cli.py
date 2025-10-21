@@ -43,65 +43,45 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
 @app.default()
 def process_precommit(  # noqa: C901, PLR0912, PLR0913
     precommit_filename: Annotated[
-        cyclopts.types.ResolvedExistingFile,
-        Parameter(
-            ["-p", "--pre-commit-config"],
-            help="Path to .pre-commit-config.yaml file to update",
-        ),
+        cyclopts.types.ResolvedExistingFile, Parameter(["-p", "--pre-commit-config"])
     ] = Path(".pre-commit-config.yaml"),
     uv_lock_filename: Annotated[
-        cyclopts.types.ResolvedExistingFile,
-        Parameter(
-            ["-u", "--uv-lock"],
-            help="Path to uv.lock file containing package versions",
-        ),
+        cyclopts.types.ResolvedExistingFile, Parameter(["-u", "--uv-lock"])
     ] = Path("uv.lock"),
     *,
-    check: Annotated[
-        bool,
-        Parameter(
-            "--check",
-            help="Don't write the file back, just return the status. "
-            "Return code 0 means nothing would change. "
-            "Return code 1 means some package versions would be updated. "
-            "Return code 123 means there was an internal error.",
-        ),
-    ] = False,
-    diff: Annotated[
-        bool,
-        Parameter(
-            "--diff",
-            help="Don't write the file back, "
-            "just output a diff to indicate what changes would be made.",
-        ),
-    ] = False,
-    color: Annotated[
-        bool,
-        Parameter(
-            help="Enable colored diff output. Only applies when --diff is given."
-        ),
-    ] = False,
-    quiet: Annotated[
-        bool,
-        Parameter(
-            ["-q", "--quiet"],
-            help="Stop emitting all non-critical output. "
-            "Error messages will still be emitted.",
-        ),
-    ] = False,
-    verbose: Annotated[
-        bool,
-        Parameter(
-            ["-v", "--verbose"],
-            help="Show detailed information about all packages, "
-            "including those that were not changed.",
-        ),
-    ] = False,
+    check: Annotated[bool, Parameter("--check")] = False,
+    diff: Annotated[bool, Parameter("--diff")] = False,
+    color: Annotated[bool, Parameter()] = False,
+    quiet: Annotated[bool, Parameter(["-q", "--quiet"])] = False,
+    verbose: Annotated[bool, Parameter(["-v", "--verbose"])] = False,
 ) -> int:
     """Sync pre-commit hook versions with uv.lock.
 
     Updates the 'rev' fields in .pre-commit-config.yaml to match the package
     versions found in uv.lock, ensuring consistent versions for development tools.
+
+    Parameters
+    ----------
+    precommit_filename:
+        Path to .pre-commit-config.yaml file to update
+    uv_lock_filename
+        Path to uv.lock file containing package versions
+    check
+        Don't write the file back, just return the status.
+        Return code 0 means nothing would change.
+        Return code 1 means some package versions would be updated.
+        Return code 123 means there was an internal error.
+    diff
+        Don't write the file back,
+        just output a diff to indicate what changes would be made.
+    color
+        Enable colored diff output. Only applies when --diff is given.
+    quiet
+        Stop emitting all non-critical output.
+        Error messages will still be emitted.
+    verbose
+        Show detailed information about all packages,
+        including those that were not changed.
     """
     try:
         user_repo_mappings, user_version_mappings = load_user_mappings()
