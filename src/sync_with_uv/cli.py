@@ -42,13 +42,13 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
 
 @app.default()
 def process_precommit(  # noqa: C901, PLR0912, PLR0913
+    *,
     precommit_filename: Annotated[
         cyclopts.types.ResolvedExistingFile, Parameter(["-p", "--pre-commit-config"])
     ] = Path(".pre-commit-config.yaml"),
     uv_lock_filename: Annotated[
         cyclopts.types.ResolvedExistingFile, Parameter(["-u", "--uv-lock"])
     ] = Path("uv.lock"),
-    *,
     check: bool = False,
     diff: bool = False,
     color: bool = False,
