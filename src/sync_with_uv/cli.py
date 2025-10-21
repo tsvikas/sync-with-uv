@@ -49,11 +49,11 @@ def process_precommit(  # noqa: C901, PLR0912, PLR0913
         cyclopts.types.ResolvedExistingFile, Parameter(["-u", "--uv-lock"])
     ] = Path("uv.lock"),
     *,
-    check: Annotated[bool, Parameter("--check")] = False,
-    diff: Annotated[bool, Parameter("--diff")] = False,
-    color: Annotated[bool, Parameter()] = False,
-    quiet: Annotated[bool, Parameter(["-q", "--quiet"])] = False,
-    verbose: Annotated[bool, Parameter(["-v", "--verbose"])] = False,
+    check: bool = False,
+    diff: bool = False,
+    color: bool = False,
+    quiet: Annotated[bool, Parameter(alias="-q")] = False,
+    verbose: Annotated[bool, Parameter(alias="-v")] = False,
 ) -> int:
     """Sync pre-commit hook versions with uv.lock.
 
