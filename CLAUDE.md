@@ -39,8 +39,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Type Hints**: Strict mypy typing with complete type coverage (e.g., `dict[str, str]`, `str | None`)
 - **Formatting**: Black formatting style with ruff for import sorting and linting
 - **Naming**: Snake case for variables/functions, PascalCase for classes/types
-- **Error Handling**: Use standard exceptions; CLI module uses typer.Exit for error codes
-- **CLI**: Use typer for command-line interfaces with type annotations
+- **Error Handling**: Use standard exceptions; CLI returns exit codes (0 for success, 1 for check-mode changes, 123 for errors)
+- **CLI**: Use cyclopts for command-line interfaces with type annotations
 - **Docstrings**: Google-style conventions (enforced by ruff)
 
 ## Architecture
@@ -51,7 +51,7 @@ This tool synchronizes pre-commit hook versions with those in uv.lock to ensure 
 
 ```
 src/sync_with_uv/
-├── cli.py              # Typer-based CLI interface with diff/check/write modes
+├── cli.py              # Cyclopts-based CLI interface with diff/check/write modes
 ├── sync_with_uv.py     # Core logic for parsing uv.lock and updating configs
 ├── repo_data.py        # Mapping tables for GitHub repo URLs to package names
 ├── __init__.py         # Package initialization
