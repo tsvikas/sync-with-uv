@@ -11,6 +11,7 @@
 - Support repo URLs from any Git provider (not just GitHub) by using URL parsing instead of regex
 - Trigger the hook also on changes of the pyproject.toml file
 - Migrate CLI framework from typer to cyclopts
+- Fix file write permission errors to return exit code 123 instead of raising unhandled exception
 
 ## v0.4.0
 

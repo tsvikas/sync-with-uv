@@ -90,23 +90,23 @@ def process_precommit(  # noqa: PLR0913
         fixed_text, changes = process_precommit_text(
             precommit_text, uv_data, user_repo_mappings, user_version_mappings
         )
+        # report the results / change files
+        if verbose:
+            _print_packages(changes)
+        # output a diff to to stdout
+        if diff:
+            _print_diff(precommit_text, fixed_text, precommit_filename, color=color)
+        # update the file
+        if not diff and not check:
+            precommit_filename.write_text(fixed_text, encoding="utf-8")
+        # print summary
+        if verbose or not quiet:
+            _print_summary(changes, dry_mode=diff or check)
+        # return 1 if check and changed
+        return int(check and fixed_text != precommit_text)
     except Exception as e:  # noqa: BLE001
         print("Error:", e, file=sys.stderr)
         return 123
-    # report the results / change files
-    if verbose:
-        _print_packages(changes)
-    # output a diff to to stdout
-    if diff:
-        _print_diff(precommit_text, fixed_text, precommit_filename, color=color)
-    # update the file
-    if not diff and not check:
-        precommit_filename.write_text(fixed_text, encoding="utf-8")
-    # print summary
-    if verbose or not quiet:
-        _print_summary(changes, dry_mode=diff or check)
-    # return 1 if check and changed
-    return int(check and fixed_text != precommit_text)
 
 
 def _print_packages(changes: dict[str, bool | tuple[str, str]]) -> None:
