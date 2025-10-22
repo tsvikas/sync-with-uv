@@ -276,7 +276,9 @@ def test_cli_exception_handling_quiet(
     assert captured.out == ""
 
 
-def test_cli_write_permission_error(tmp_path: Path) -> None:
+def test_cli_write_permission_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Test CLI handles file write permission errors."""
     # Create valid files
     uv_lock_file = tmp_path / "uv.lock"
@@ -302,10 +304,14 @@ version = "23.11.0"
     precommit_file.chmod(0o444)
 
     try:
-        # The write operation is not wrapped in exception handler,
-        # so PermissionError is raised directly
-        with pytest.raises(PermissionError):
+        with pytest.raises(SystemExit) as exc_info:
             app(["-p", str(precommit_file), "-u", str(uv_lock_file)])
+
+        # Should exit with error code 123
+        assert exc_info.value.code == 123
+        captured = capsys.readouterr()
+        assert "Error:" in captured.err
+        assert "Permission denied" in captured.err
     finally:
         # Restore write permissions for cleanup
         precommit_file.chmod(0o644)
