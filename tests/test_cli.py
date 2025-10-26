@@ -357,3 +357,50 @@ version = "23.11.0"
     assert exc_info.value.code == 1
     captured = capsys.readouterr()
     assert "does not exist" in captured.err
+
+
+@pytest.mark.parametrize(
+    "line_ending",
+    ["\n", "\r\n", "\r"],
+    ids=["LF", "CRLF", "CR"],
+)
+def test_cli_preserves_line_endings_when_writing(
+    tmp_path: Path, line_ending: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test CLI preserves line endings when writing files (issue #24)."""
+    # Create uv.lock with package version
+    uv_lock_file = tmp_path / "uv.lock"
+    uv_lock_file.write_text(
+        """
+[[package]]
+name = "black"
+version = "24.0.0"
+"""
+    )
+
+    # Create pre-commit config with specific line endings
+    precommit_file = tmp_path / ".pre-commit-config.yaml"
+    precommit_content = line_ending.join(
+        [
+            "repos:",
+            "- repo: https://github.com/psf/black-pre-commit-mirror",
+            "  rev: 23.11.0",
+            "  hooks:",
+            "    - id: black",
+        ]
+    )
+    # Write with binary mode to ensure exact line endings
+    precommit_content_bytes = precommit_content.encode("utf-8")
+    precommit_file.write_bytes(precommit_content_bytes)
+    assert precommit_content_bytes == precommit_file.read_bytes()
+
+    # Run CLI (version is already correct, so no changes needed)
+    with pytest.raises(SystemExit) as exc_info:
+        app(["-p", str(precommit_file), "-u", str(uv_lock_file)])
+    assert exc_info.value.code == 0
+    assert "All done" in capsys.readouterr().err
+
+    assert (
+        precommit_content_bytes.replace(b"23.11.0", b"24.0.0")
+        == precommit_file.read_bytes()
+    )
