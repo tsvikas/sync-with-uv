@@ -12,6 +12,7 @@
 - Trigger the hook also on changes of the pyproject.toml file
 - Migrate CLI framework from typer to cyclopts
 - Fix file write permission errors to return exit code 123 instead of raising unhandled exception
+- Preserve original line endings (CRLF/LF) when processing pre-commit config files
 
 ## v0.4.0
 
