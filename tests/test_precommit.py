@@ -100,3 +100,53 @@ def test_precommit_hook(repo_with_precommit: Path) -> None:
     # commit and succeed
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
     subprocess.run([GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir, check=True)
+
+
+@pytest.mark.parametrize("line_ending", ["crlf", "lf"])
+def test_precommit_hook_with_line_ending_fix(
+    repo_with_precommit: Path, line_ending: str
+) -> None:
+    repo_dir = repo_with_precommit
+
+    mixed_lines_ending_hook = textwrap.dedent(
+        f"""\
+          - repo: https://github.com/pre-commit/pre-commit-hooks\r
+            rev: v6.0.0
+            hooks:
+              - id: mixed-line-ending
+                args: [--fix={line_ending}]
+        """
+    )
+    # add mixed-line-ending
+    with repo_dir.joinpath(".pre-commit-config.yaml").open("a", newline="") as f:
+        f.write(textwrap.indent(mixed_lines_ending_hook, "  "))
+    # commit and fail
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True, capture_output=True)
+    commit_process = subprocess.run(  # noqa: PLW1510
+        [GIT_BIN, "commit", "-m", "failing commit - mixed line endings"],
+        cwd=repo_dir,
+        capture_output=True,
+        text=True,
+    )
+    assert commit_process.returncode == 1
+    assert ".....Failed" in commit_process.stderr
+    # commit and succeed
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
+    subprocess.run([GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir, check=True)
+
+    # add sync-with-uv
+    with repo_dir.joinpath(".pre-commit-config.yaml").open("a") as f:
+        f.write(textwrap.indent(THIS_REPO_HOOKS, "  "))
+    # commit and fail
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True, capture_output=True)
+    commit_process = subprocess.run(  # noqa: PLW1510
+        [GIT_BIN, "commit", "-m", "failing commit - ruff version"],
+        cwd=repo_dir,
+        capture_output=True,
+        text=True,
+    )
+    assert commit_process.returncode == 1
+    assert ".....Failed" in commit_process.stderr
+    # commit and succeed
+    subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
+    subprocess.run([GIT_BIN, "commit", "-m", "new hooks"], cwd=repo_dir, check=True)
