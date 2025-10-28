@@ -301,3 +301,65 @@ def test_process_precommit_text_with_user_mappings() -> None:
         "custom-tool": ("v1.0.0", "v2.1.0"),
         "black": ("23.9.1", "23.11.0"),
     }
+
+
+@pytest.mark.parametrize(
+    "line_ending",
+    ["\n", "\r\n", "\r"],
+    ids=["LF", "CRLF", "CR"],
+)
+def test_process_precommit_text_preserves_line_endings_no_version_change(
+    line_ending: str,
+) -> None:
+    """Test that line endings are preserved when version is already correct."""
+    precommit_text = line_ending.join(
+        [
+            "repos:",
+            "- repo: https://github.com/psf/black-pre-commit-mirror",
+            "  rev: 23.11.0",
+            "  hooks:",
+            "    - id: black",
+            "- repo: https://github.com/unchanged/unchanged",
+            "  rev: 1.2.3",
+            "  hooks:",
+            "    - id: unchanged",
+        ]
+    )
+    # Package exists in uv.lock but version is already correct
+    uv_data = {"black": "23.11.0"}
+
+    result, _changes = process_precommit_text(precommit_text, uv_data)
+
+    # Result should be identical to input when version is already correct
+    assert result == precommit_text
+
+
+@pytest.mark.parametrize(
+    "line_ending",
+    ["\n", "\r\n", "\r"],
+    ids=["LF", "CRLF", "CR"],
+)
+def test_process_precommit_text_preserves_line_endings(
+    line_ending: str,
+) -> None:
+    """Test that line endings are preserved and the version is updated in the output."""
+    precommit_text = line_ending.join(
+        [
+            "repos:",
+            "- repo: https://github.com/psf/black-pre-commit-mirror",
+            "  rev: 23.11.0",
+            "  hooks:",
+            "    - id: black",
+            "- repo: https://github.com/unchanged/unchanged",
+            "  rev: 1.2.3",
+            "  hooks:",
+            "    - id: unchanged",
+        ]
+    )
+    # Package exists in uv.lock but version is already correct
+    uv_data = {"black": "24.0.0"}
+
+    result, _changes = process_precommit_text(precommit_text, uv_data)
+
+    # Result should be identical to input when version is already correct
+    assert result == precommit_text.replace("23.11.0", "24.0.0")

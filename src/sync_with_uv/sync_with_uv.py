@@ -54,15 +54,15 @@ def process_precommit_text(
         - repo URLs to False when no package mapping exists
     """
     # NOTE: this only works if the 'repo' is the first key of the element
-    repo_header_re = re.compile(r"\s*-\s*repo\s*:\s*(\S*).*")
-    repo_rev_re = re.compile(r"\s*rev\s*:\s*(\S*).*")
-    lines = precommit_text.split("\n")
+    repo_header_re = re.compile(r"^\s*-\s*repo\s*:\s*(\S*).*$")
+    repo_rev_re = re.compile(r"^\s*rev\s*:\s*(\S*).*$")
+    lines = precommit_text.splitlines(keepends=True)
     new_lines: list[str] = []
     repo_url: str | None = None
     package: str | None = None
     changes: dict[str, bool | tuple[str, str]] = {}
     for line in lines:
-        if repo_header := repo_header_re.fullmatch(line):
+        if repo_header := repo_header_re.match(line):
             repo_url = repo_header.group(1)
             package = repo_to_package(repo_url, user_repo_mappings)
             if not package:
@@ -70,9 +70,7 @@ def process_precommit_text(
                     changes[repo_url] = False
             elif package not in uv_data:
                 changes[package] = False
-        elif (
-            package and package in uv_data and (repo_rev := repo_rev_re.fullmatch(line))
-        ):
+        elif package and package in uv_data and (repo_rev := repo_rev_re.match(line)):
             assert repo_url is not None  # noqa: S101
             current_version = repo_rev.group(1)
             version_template = repo_to_version_template(repo_url, user_version_mappings)
@@ -90,4 +88,4 @@ def process_precommit_text(
             continue  # don't add the line twice
         new_lines.append(line)
 
-    return "\n".join(new_lines), changes
+    return "".join(new_lines), changes

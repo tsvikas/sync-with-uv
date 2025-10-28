@@ -86,7 +86,9 @@ def process_precommit(  # noqa: PLR0913
     try:
         user_repo_mappings, user_version_mappings = load_user_mappings()
         uv_data = load_uv_lock(uv_lock_filename)
-        precommit_text = precommit_filename.read_text(encoding="utf-8")
+        # note that the next line can be simplified in Python>=3.13 using
+        # read_text with newline=""
+        precommit_text = precommit_filename.read_bytes().decode(encoding="utf-8")
         fixed_text, changes = process_precommit_text(
             precommit_text, uv_data, user_repo_mappings, user_version_mappings
         )
@@ -98,7 +100,7 @@ def process_precommit(  # noqa: PLR0913
             _print_diff(precommit_text, fixed_text, precommit_filename, color=color)
         # update the file
         if not diff and not check:
-            precommit_filename.write_text(fixed_text, encoding="utf-8")
+            precommit_filename.write_text(fixed_text, encoding="utf-8", newline="")
         # print summary
         if verbose or not quiet:
             _print_summary(changes, dry_mode=diff or check)
