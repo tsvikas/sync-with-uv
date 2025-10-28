@@ -40,6 +40,16 @@ update-deps: && list-outdated-deps
     && exit 1; \
   }
 
+# Audit dependencies
+audit-deps:
+  uv run --all-extras --all-groups --with pip-audit pip-audit --skip-editable \
+    --ignore-vuln GHSA-4xh5-x5gv-qwph
+  # pip-audit ignored vuln:
+  # GHSA-4xh5-x5gv-qwph:
+  #   vuln is in pip, which is not a pinned requirwement
+  #   vuln is fixed in recent python versions
+  #   see https://github.com/pypa/pip/issues/13607
+
 
 ### code quality ###
 
@@ -70,13 +80,6 @@ lint:
   uv run ruff check
   uv run dmypy run
   uv run --all-extras --all-groups --with deptry deptry src/
-  uv run --all-extras --all-groups --with pip-audit pip-audit --skip-editable \
-    --ignore-vuln GHSA-4xh5-x5gv-qwph
-  # pip-audit ignored vuln:
-  # GHSA-4xh5-x5gv-qwph:
-  #   vuln is in pip, which is not a pinned requirwement
-  #   vuln is fixed in recent python versions
-  #   see https://github.com/pypa/pip/issues/13607
   uv run pre-commit run --all-files
 
 # Run Pylint (slow, not used in other tasks)
