@@ -15,7 +15,7 @@ init: && prepare
   git commit --allow-empty -m "Initial commit"
   git add --all
   git commit -m "🚀 Initialized project using https://github.com/tsvikas/python-template"
-  just update-deps
+  just deps-update
   git add --all
   [ -z "$(git status --porcelain)" ] || git commit -m "⬆️ Updated project dependencies"
 
@@ -27,13 +27,15 @@ prepare:
 ### dependencies ###
 
 # List outdated python dependencies
-list-outdated-deps:
+deps-list-outdated:
   uv tree --outdated --depth 1 --color always -q  | { grep latest --color=never || exit 0; }
 
 # Update all dependencies
-update-deps: && list-outdated-deps
+deps-update: && deps-list-outdated
   uv sync --upgrade
-  uv run pre-commit autoupdate -j "$( (uname -s | grep -q Linux && nproc) || (uname -s | grep -q Darwin && sysctl -n hw.ncpu) || echo 1 )"
+  uv run -- \
+    pre-commit autoupdate -j \
+    "$( (uname -s | grep -q Linux && nproc) || (uname -s | grep -q Darwin && sysctl -n hw.ncpu) || echo 1 )"
   uvx sync-with-uv
   uvx sync-pre-commit-deps --yaml-mapping 2 --yaml-sequence 4 --yaml-offset 2 .pre-commit-config.yaml || { \
     echo "Note: '.pre-commit-config.yaml' changed, and might lost its formatting." \
@@ -41,26 +43,29 @@ update-deps: && list-outdated-deps
   }
 
 # Audit dependencies
-audit-deps:
-  uv run --all-extras --all-groups --with pip-audit pip-audit --skip-editable \
-    --ignore-vuln GHSA-4xh5-x5gv-qwph
+deps-audit:
+  uv run --all-extras --all-groups --with pip-audit -- \
+    pip-audit \
+    --ignore-vuln GHSA-4xh5-x5gv-qwph \
+    --skip-editable
   # pip-audit ignored vuln:
   # GHSA-4xh5-x5gv-qwph:
   #   vuln is in pip, which is not a pinned requirwement
   #   vuln is fixed in recent python versions
   #   see https://github.com/pypa/pip/issues/13607
+  uv sync --exact
 
 
 ### code quality ###
-
-# Check the code, and push if it pass
-check-and-push:
+_assert_clean_repo:
   [ -z "$(git status --porcelain)" ]
-  just _check
-  git push --follow-tags
 
 # Tests to run before push, tag, or release
-_check: test lint
+_check: _assert_clean_repo test lint
+
+# Check the code, and push if it pass
+check-and-push: _check
+  git push --follow-tags
 
 # Run fast formatting and linting tools
 quick-tools:
@@ -79,32 +84,36 @@ format:
 lint:
   uv run ruff check
   uv run dmypy run
-  uv run --all-extras --all-groups --with deptry deptry src/
+  uv run --all-extras --all-groups --with deptry -- deptry src/
+  uv sync --exact
   uv run pre-commit run --all-files
 
 # Run Pylint (slow, not used in other tasks)
 pylint:
-  uv run --with pylint pylint src
+  uv run --with pylint -- pylint src
+  uv sync --exact
 
 # Run tests with pytest
 test:
-  uv run --all-extras --exact --no-default-groups --group test pytest
+  uv run --all-extras --exact --no-default-groups --group test \
+    --reinstall-package sync_with_uv -- pytest
+  uv sync --exact
 
 # Run tests with pytest, using resolution lowest-direct
 test-lowest python:
   mv uv.lock uv.lock.1
   uv sync --all-extras --exact --no-default-groups --group test \
-    --upgrade --resolution lowest-direct --python {{python}}
+    --upgrade --resolution lowest-direct --python {{python}} \
+    --reinstall-package sync_with_uv
   mv uv.lock.1 uv.lock
   uv run --no-sync pytest
+  uv sync --exact
 
 
 ### Release, tags, previous commits ###
 
 # Create a release commit
-release version: (_assert-legal-version version)
-  [ -z "$(git status --porcelain)" ]
-  just _check
+release version: (_assert-legal-version version) _check
   sed -i "s/## Unreleased/## Unreleased\n\n## v{{version}}/" CHANGELOG.md
   git add CHANGELOG.md
   git commit -m "Release v{{version}}"
@@ -137,12 +146,18 @@ _tag-skip-check version commit: (_assert-legal-version version)
 # Generate reference pages from docstrings
 build-docs-ref:
   rm -rf docs/reference
-  uv run --python 3.14 --only-group docs scripts/gen_ref_pages.py
+  uv run --python 3.14 --only-group docs -- \
+    scripts/gen_ref_pages.py
+  uv sync --exact
 
 # Build the documentation
 build-docs: build-docs-ref
-  uv run --python 3.14 --only-group docs mkdocs build
+  uv run --python 3.14 --only-group docs -- \
+    mkdocs build
+  uv sync --exact
 
 # Serve the documentation locally
 serve-docs: build-docs-ref
-  uv run --python 3.14 --only-group docs mkdocs serve
+  uv run --python 3.14 --only-group docs -- \
+    mkdocs serve
+  uv sync --exact
