@@ -88,16 +88,10 @@ jobs:
       - name: List packages
         run: uv pip list
       - name: Run deptry
-        run: uv run --no-sync --with deptry deptry src/
+        run: uv run --no-sync --with deptry -- deptry src/
       - name: Run pip-audit
         run: >-
-          uv run --no-sync --with pip-audit pip-audit --skip-editable
-          --ignore-vuln GHSA-4xh5-x5gv-qwph
-        # pip-audit ignored vuln:
-        # GHSA-4xh5-x5gv-qwph:
-        #   vuln is in pip, which is not a pinned requirwement
-        #   vuln is fixed in recent python versions
-        #   see https://github.com/pypa/pip/issues/13607
+          uv run --no-sync --with pip-audit -- pip-audit --skip-editable
 
 
   test:
@@ -150,7 +144,7 @@ jobs:
         run: uv pip list
       - name: Run tests
         id: run_tests
-        run: uv run --no-sync pytest --cov-branch --cov-report=xml --junitxml=junit.xml
+        run: uv run --no-sync -- pytest --cov-branch --cov-report=xml --junitxml=junit.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && steps.run_tests.conclusion != 'skipped' }}
         uses: codecov/test-results-action@v1
@@ -212,7 +206,7 @@ jobs:
         run: uv pip list
       - name: Run tests
         if: ${{ steps.install_packages.outcome == 'success' }}
-        run: uv run --no-sync pytest --cov-branch --cov-report=xml --junitxml=junit.xml
+        run: uv run --no-sync -- pytest --cov-branch --cov-report=xml --junitxml=junit.xml
 
   pylint:
     runs-on: ubuntu-latest
@@ -235,7 +229,7 @@ jobs:
       - name: Run Pylint
         run: |
           set +e
-          uv run --no-sync --with pylint pylint src --output-format=github
+          uv run --no-sync --with pylint -- pylint src --output-format=github
           result=$?
           set -e
           [ $((result & 1)) -ne 0 ] && echo "::error ::Pylint fatal(s) found"

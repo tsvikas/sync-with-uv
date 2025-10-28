@@ -46,13 +46,7 @@ deps-update: && deps-list-outdated
 deps-audit:
   uv run --exact --all-extras --all-groups --with pip-audit -- \
     pip-audit \
-    --ignore-vuln GHSA-4xh5-x5gv-qwph \
     --skip-editable
-  # pip-audit ignored vuln:
-  # GHSA-4xh5-x5gv-qwph:
-  #   vuln is in pip, which is not a pinned requirwement
-  #   vuln is fixed in recent python versions
-  #   see https://github.com/pypa/pip/issues/13607
   uv sync --exact
 
 
@@ -83,7 +77,7 @@ format:
 # Run linters
 lint:
   uv run ruff check
-  uv run --exact --all-extras -- dmypy run
+  uv run --exact --all-extras --no-default-groups --group typing --group test -- dmypy run
   uv run --exact --all-extras --all-groups --with deptry -- deptry src/
   uv sync --exact
   uv run pre-commit run --all-files
