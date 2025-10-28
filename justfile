@@ -44,7 +44,7 @@ deps-update: && deps-list-outdated
 
 # Audit dependencies
 deps-audit:
-  uv run --all-extras --all-groups --with pip-audit -- \
+  uv run --exact --all-extras --all-groups --with pip-audit -- \
     pip-audit \
     --ignore-vuln GHSA-4xh5-x5gv-qwph \
     --skip-editable
@@ -83,26 +83,26 @@ format:
 # Run linters
 lint:
   uv run ruff check
-  uv run dmypy run
-  uv run --all-extras --all-groups --with deptry -- deptry src/
+  uv run --exact --all-extras -- dmypy run
+  uv run --exact --all-extras --all-groups --with deptry -- deptry src/
   uv sync --exact
   uv run pre-commit run --all-files
 
 # Run Pylint (slow, not used in other tasks)
 pylint:
-  uv run --with pylint -- pylint src
+  uv run --exact --with pylint -- pylint src
   uv sync --exact
 
 # Run tests with pytest
 test:
-  uv run --all-extras --exact --no-default-groups --group test \
+  uv run --exact --all-extras --no-default-groups --group test \
     --reinstall-package sync_with_uv -- pytest
   uv sync --exact
 
 # Run tests with pytest, using resolution lowest-direct
 test-lowest python:
   mv uv.lock uv.lock.1
-  uv sync --all-extras --exact --no-default-groups --group test \
+  uv sync --exact --all-extras --no-default-groups --group test \
     --upgrade --resolution lowest-direct --python {{python}} \
     --reinstall-package sync_with_uv
   mv uv.lock.1 uv.lock
@@ -146,18 +146,18 @@ _tag-skip-check version commit: (_assert-legal-version version)
 # Generate reference pages from docstrings
 build-docs-ref:
   rm -rf docs/reference
-  uv run --python 3.14 --only-group docs -- \
+  uv run --exact --python 3.14 --only-group docs -- \
     scripts/gen_ref_pages.py
   uv sync --exact
 
 # Build the documentation
 build-docs: build-docs-ref
-  uv run --python 3.14 --only-group docs -- \
+  uv run --exact --python 3.14 --only-group docs -- \
     mkdocs build
   uv sync --exact
 
 # Serve the documentation locally
 serve-docs: build-docs-ref
-  uv run --python 3.14 --only-group docs -- \
+  uv run --exact --python 3.14 --only-group docs -- \
     mkdocs serve
   uv sync --exact
