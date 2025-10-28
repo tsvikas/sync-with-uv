@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import tomli
 
 REPO_TO_PACKAGE = {
+    # keep-sorted start case=no
     "https://github.com/adamchainz/djade-pre-commit": "djade",
     "https://github.com/astral-sh/ruff-pre-commit": "ruff",
     "https://github.com/charliermarsh/ruff-pre-commit": "ruff",
@@ -17,8 +18,10 @@ REPO_TO_PACKAGE = {
     "https://github.com/pre-commit/mirrors-pylint": "pylint",
     "https://github.com/pre-commit/mirrors-yapf": "yapf",
     "https://github.com/psf/black-pre-commit-mirror": "black",
+    # keep-sorted end
 }
 REPO_TO_VERSION_TEMPLATE = {
+    # keep-sorted start case=no
     "https://github.com/adamchainz/djade-pre-commit": "${version}",
     "https://github.com/adrienverge/yamllint": "v${version}",
     "https://github.com/asottile/pyupgrade": "v${version}",
@@ -47,6 +50,7 @@ REPO_TO_VERSION_TEMPLATE = {
     "https://github.com/regebro/pyroma": "${version}",
     "https://github.com/rstcheck/rstcheck": "v${version}",
     "https://github.com/rtts/djhtml": "${version}",
+    # keep-sorted end
 }
 
 
