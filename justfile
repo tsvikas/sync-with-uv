@@ -47,7 +47,7 @@ deps-audit:
   uv run --exact --all-extras --all-groups --with pip-audit -- \
     pip-audit \
     --skip-editable
-  uv sync --exact
+  uv run --exact true
 
 
 ### code quality ###
@@ -79,19 +79,18 @@ lint:
   uv run ruff check
   uv run --exact --all-extras --no-default-groups --group typing --group test -- dmypy run
   uv run --exact --all-extras --all-groups --with deptry -- deptry src/
-  uv sync --exact
-  uv run pre-commit run --all-files
+  uv run --exact pre-commit run --all-files
 
 # Run Pylint (slow, not used in other tasks)
 pylint:
   uv run --exact --with pylint -- pylint src
-  uv sync --exact
+  uv run --exact true
 
 # Run tests with pytest
 test:
   uv run --exact --all-extras --no-default-groups --group test \
     --reinstall-package sync_with_uv -- pytest
-  uv sync --exact
+  uv run --exact true
 
 # Run tests with pytest, using resolution lowest-direct
 test-lowest python:
@@ -101,7 +100,7 @@ test-lowest python:
     --reinstall-package sync_with_uv
   mv uv.lock.1 uv.lock
   uv run --no-sync pytest
-  uv sync --exact
+  uv run --exact true
 
 
 ### Release, tags, previous commits ###
@@ -142,16 +141,16 @@ build-docs-ref:
   rm -rf docs/reference
   uv run --exact --python 3.14 --only-group docs -- \
     scripts/gen_ref_pages.py
-  uv sync --exact
+  uv run --exact true
 
 # Build the documentation
 build-docs: build-docs-ref
   uv run --exact --python 3.14 --only-group docs -- \
     mkdocs build
-  uv sync --exact
+  uv run --exact true
 
 # Serve the documentation locally
 serve-docs: build-docs-ref
   uv run --exact --python 3.14 --only-group docs -- \
     mkdocs serve
-  uv sync --exact
+  uv run --exact true
