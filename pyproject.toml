@@ -74,7 +74,7 @@ dev = [
   "ipython >=8",
 ]
 test = [
-  "pytest ~=8.0",
+  "pytest ~=9.0",
   ## running
   "pytest-reverse ~=1.0",
   "pytest-xdist[psutil] ~=3.0",
@@ -112,17 +112,15 @@ version.source = "vcs"
 build.hooks.vcs.version-file = "src/sync_with_uv/_version.py"
 
 
-[tool.pytest.ini_options]
-minversion = "7.0"
+[tool.pytest]
+minversion = "9.0"
 testpaths = [
   "src/",
   "tests/",
 ]
 addopts = [
-  ## testing
+  ## collection
   "--doctest-modules",
-  "--strict-markers",
-  "--strict-config",
   ## reporting
   "-ra",
   ## addons: pytest-benchmark
@@ -139,13 +137,14 @@ addopts = [
   # this enable parallel execution, but hides filenames in output
   # "--numprocesses=auto",  # pytest-xdist
 ]
-xfail_strict = true
+## testing
+strict = true
+empty_parameter_set_mark = "xfail"  # The default value in future releases
 filterwarnings = [
   "error",
   "default::DeprecationWarning",
   "error::DeprecationWarning:sync_with_uv",
 ]
-log_cli_level = "INFO"
 
 
 [tool.coverage]
@@ -158,12 +157,12 @@ run.omit = [
 [tool.mypy]
 files = ["src", "tests"]
 mypy_path = "stubs"
-# ENABLE WHEN SCHEMA UPDATES: fixed_format_cache = true
+fixed_format_cache = true
 # set the platform
 python_version = "3.10"
 # enable checks [last updated: mypy 1.18]
 strict = true
-# ENABLE WHEN SCHEMA UPDATES: strict_equality_for_none = true
+strict_equality_for_none = true
 local_partial_types = true
 disallow_any_unimported = true
 warn_unreachable = true

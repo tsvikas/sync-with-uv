@@ -170,10 +170,11 @@ repos:
         types: [jupyter]
 
   # pyproject.toml
-  - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.10.25
-    hooks:
-      - id: validate-pyproject
+  # the following hook fails for some new pyproject configs.
+  # - repo: https://github.com/henryiii/validate-pyproject-schema-store
+  #   rev: <placeholder_until_update_deps>
+  #   hooks:
+  #     - id: validate-pyproject
 
   # YAML files
   - repo: https://github.com/adrienverge/yamllint

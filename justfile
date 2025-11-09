@@ -154,3 +154,7 @@ serve-docs: build-docs-ref
   uv run --exact --python 3.14 --only-group docs -- \
     mkdocs serve
   uv run --exact true
+
+# Print the help of the CLI command
+print-cli-help:
+  uv run sync-with-uv --help
