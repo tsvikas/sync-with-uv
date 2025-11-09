@@ -1,3 +1,4 @@
+import textwrap
 from pathlib import Path
 
 import pytest
@@ -209,30 +210,35 @@ def test_process_precommit_cli_check_no_changes_needed(
     # Create uv.lock with package versions
     uv_lock_file = tmp_path / "uv.lock"
     uv_lock_file.write_text(
-        """
-[[package]]
-name = "black"
-version = "23.11.0"
+        textwrap.dedent(
+            """
+            [[package]]
+            name = "black"
+            version = "23.11.0"
 
-[[package]]
-name = "ruff"
-version = "0.1.5"
-"""
+            [[package]]
+            name = "ruff"
+            version = "0.1.5"
+            """
+        )
     )
 
     # Create pre-commit config that matches uv.lock versions
     precommit_file = tmp_path / ".pre-commit-config.yaml"
     precommit_file.write_text(
-        """repos:
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 23.11.0
-  hooks:
-    - id: black
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.5
-  hooks:
-    - id: ruff
-"""
+        textwrap.dedent(
+            """\
+            repos:
+            - repo: https://github.com/psf/black-pre-commit-mirror
+              rev: 23.11.0
+              hooks:
+                - id: black
+            - repo: https://github.com/astral-sh/ruff-pre-commit
+              rev: v0.1.5
+              hooks:
+                - id: ruff
+            """
+        )
     )
 
     with pytest.raises(SystemExit) as exc_info:
@@ -283,21 +289,26 @@ def test_cli_write_permission_error(
     # Create valid files
     uv_lock_file = tmp_path / "uv.lock"
     uv_lock_file.write_text(
-        """
-[[package]]
-name = "black"
-version = "23.11.0"
-"""
+        textwrap.dedent(
+            """
+            [[package]]
+            name = "black"
+            version = "23.11.0"
+            """
+        )
     )
 
     precommit_file = tmp_path / ".pre-commit-config.yaml"
     precommit_file.write_text(
-        """repos:
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 23.9.1
-  hooks:
-    - id: black
-"""
+        textwrap.dedent(
+            """\
+            repos:
+            - repo: https://github.com/psf/black-pre-commit-mirror
+              rev: 23.9.1
+              hooks:
+                - id: black
+            """
+        )
     )
 
     # Make the pre-commit file read-only
@@ -341,11 +352,13 @@ def test_cli_missing_precommit_config(
     """Test CLI handles missing pre-commit config file."""
     uv_lock_file = tmp_path / "uv.lock"
     uv_lock_file.write_text(
-        """
-[[package]]
-name = "black"
-version = "23.11.0"
-"""
+        textwrap.dedent(
+            """
+            [[package]]
+            name = "black"
+            version = "23.11.0"
+            """
+        )
     )
 
     nonexistent_precommit = tmp_path / "nonexistent.yaml"
@@ -371,11 +384,13 @@ def test_cli_preserves_line_endings_when_writing(
     # Create uv.lock with package version
     uv_lock_file = tmp_path / "uv.lock"
     uv_lock_file.write_text(
-        """
-[[package]]
-name = "black"
-version = "24.0.0"
-"""
+        textwrap.dedent(
+            """
+            [[package]]
+            name = "black"
+            version = "24.0.0"
+            """
+        )
     )
 
     # Create pre-commit config with specific line endings
