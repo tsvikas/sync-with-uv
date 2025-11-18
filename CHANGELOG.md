@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.5.0
+
 ### Breaking Changes
 
 - **Version template variable renamed**:
