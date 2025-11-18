@@ -145,6 +145,7 @@ filterwarnings = [
   "default::DeprecationWarning",
   "error::DeprecationWarning:sync_with_uv",
 ]
+log_level = "INFO"
 
 
 [tool.coverage]
