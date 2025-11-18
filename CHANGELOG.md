@@ -2,17 +2,28 @@
 
 ## Unreleased
 
-- **BREAKING CHANGE**:
-  Replace `${rev}` with `${version}` in version templates for improved clarity.
-  Users with custom version templates in `pyproject.toml` must update their configuration.
-- Improve docstrings and CLI help text
-- Update README with clearer setup instructions and examples
-- Skip repos marked as 'meta' for better compatibility with pre-commit configs
-- Support repo URLs from any Git provider (not just GitHub) by using URL parsing instead of regex
-- Trigger the hook also on changes of the pyproject.toml file
-- Migrate CLI framework from typer to cyclopts
-- Fix file write permission errors to return exit code 123 instead of raising unhandled exception
-- Preserve original line endings (CRLF/LF) when processing pre-commit config files
+### Breaking Changes
+
+- **Version template variable renamed**:
+  Custom version templates in `pyproject.toml` must use `${version}` instead of `${rev}`.
+
+### New Features
+
+- **Auto-sync on config changes**:
+  The pre-commit hook now also runs when you modify `pyproject.toml`.
+- **Support syncing for more tools**:
+  Sync hooks from any Git provider, not just GitHub
+
+### Improvements
+
+- Better CLI help
+- README now includes step-by-step setup and practical examples
+
+### Bug Fixes
+
+- Handle permission errors gracefully
+- Preserve original line endings on Windows (#24)
+- Skip `repo: meta` entries in pre-commit configs
 
 ## v0.4.0
 
