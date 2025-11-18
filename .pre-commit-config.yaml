@@ -14,7 +14,7 @@ repos:
   # Sync Python and pre-commit package versions
   # pyproject.toml -> uv.lock
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.5
+    rev: 0.9.10
     hooks:
       - id: uv-lock
   # uv.lock -> .pre-commit-config.yaml
@@ -88,7 +88,7 @@ repos:
 
   # All files
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 3.4.0
+    rev: 3.4.1
     hooks:
       - id: editorconfig-checker
         exclude_types: [jupyter]
@@ -103,7 +103,7 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.38.1
+    rev: v1.39.2
     hooks:
       - id: typos
   - repo: local
@@ -133,16 +133,16 @@ repos:
 
   # Python files
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.9.0
+    rev: 25.11.0
     hooks:
       - id: black
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.20.0
     hooks:
       - id: blacken-docs
-        additional_dependencies: [black==25.9.0]
+        additional_dependencies: [black==25.11.0]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.2
+    rev: v0.14.5
     hooks:
       - id: ruff-check
         alias: ruff-isort
@@ -184,7 +184,7 @@ repos:
 
   # GitHub files
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.34.1
+    rev: 0.35.0
     hooks:
       - id: check-dependabot
       - id: check-github-actions
