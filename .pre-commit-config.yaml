@@ -8,6 +8,7 @@ exclude: "^$\
 ci:
   # TODO: enable pre-commit.ci repository access
   autoupdate_commit_msg: '[pre-commit.ci] 🔧 pre-commit autoupdate'
+  autofix_commit_msg: '[pre-commit.ci] 🎨 pre-commit fixes'
   autoupdate_schedule: quarterly
 
 repos:
@@ -170,11 +171,10 @@ repos:
         types: [jupyter]
 
   # pyproject.toml
-  # the following hook fails for some new pyproject configs.
-  # - repo: https://github.com/henryiii/validate-pyproject-schema-store
-  #   rev: <placeholder_until_update_deps>
-  #   hooks:
-  #     - id: validate-pyproject
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: 2025.11.21
+    hooks:
+      - id: validate-pyproject
 
   # YAML files
   - repo: https://github.com/adrienverge/yamllint

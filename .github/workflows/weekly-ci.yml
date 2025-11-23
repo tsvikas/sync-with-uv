@@ -97,18 +97,19 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@v7
-      - name: Install packages
+      - name: Export packages
         run: >-
-          uv sync
-          --exact
+          uv export
+          --all-packages
           --all-extras
           --all-groups
+          -o requirements.txt
+          --no-emit-local
           --locked
-      - name: List packages
-        run: uv pip list
-      - name: Run pip-audit
-        run: >-
-          uv run --no-sync --with pip-audit -- pip-audit --skip-editable
+      - uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          inputs: requirements.txt
+          require-hashes: true
       - name: Create failure issue
         if: failure()
         uses: actions/github-script@v8

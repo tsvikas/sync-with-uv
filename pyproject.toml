@@ -30,13 +30,14 @@ classifiers = [
   "Topic :: Software Development :: Quality Assurance",
   "Typing :: Typed",
 ]
-# urls.homepage = "https://sync-with-uv.readthedocs.io"
-urls.source = "https://github.com/tsvikas/sync-with-uv"
-urls.changelog = "https://github.com/tsvikas/sync-with-uv/blob/main/CHANGELOG.md"
-# urls.releasenotes = "https://github.com/tsvikas/sync-with-uv/releases"
-# urls.documentation = "https://sync-with-uv.readthedocs.io"
-urls.issues = "https://github.com/tsvikas/sync-with-uv/issues"
-# urls.funding = "https://github.com/sponsors/tsvikas"
+# urls.Homepage = "https://sync-with-uv.readthedocs.io"
+urls.Source = "https://github.com/tsvikas/sync-with-uv"
+urls.Changelog = "https://github.com/tsvikas/sync-with-uv/blob/main/CHANGELOG.md"
+# urls.ReleaseNotes = "https://github.com/tsvikas/sync-with-uv/releases"
+# urls.Documentation = "https://sync-with-uv.readthedocs.io"
+urls.Issues = "https://github.com/tsvikas/sync-with-uv/issues"
+# urls.Funding = "https://github.com/sponsors/tsvikas"
+# Discussions = "https://github.com/tsvikas/sync-with-uv/discussions"
 
 requires-python = ">=3.10"
 dependencies = [
@@ -53,11 +54,6 @@ sync-with-uv = "sync_with_uv.cli:app"
 
 [project.gui-scripts]
 # sync-with-uv = "sync_with_uv.gui:app.run"
-
-
-[tool.uv]
-required-version = ">=0.7.3"
-default-groups = ["dev", "test", "typing"]
 
 
 [dependency-groups]
@@ -105,6 +101,11 @@ typing = [
   # add "*-stubs" and "types-*" packages here (">=0")
   "types-colorama >=0",
 ]
+
+
+[tool.uv]
+required-version = ">=0.7.3"
+default-groups = ["dev", "test", "typing"]
 
 
 [tool.hatch]

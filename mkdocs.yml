@@ -1,5 +1,10 @@
 site_name: sync-with-uv
+site_url: 'https://sync-with-uv.readthedocs.io/'
+site_author: Tsvika Shapira
 site_description: Sync '.pre-commit-config.yaml' from 'uv.lock'.
+
+repo_name: 'tsvikas/sync-with-uv'
+repo_url: 'https://github.com/tsvikas/sync-with-uv'
 
 theme:
   name: material

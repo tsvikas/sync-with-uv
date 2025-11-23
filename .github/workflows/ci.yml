@@ -144,7 +144,13 @@ jobs:
         run: uv pip list
       - name: Run tests
         id: run_tests
-        run: uv run --no-sync -- pytest --cov-branch --cov-report=xml --junitxml=junit.xml
+        run: >-
+          uv run --no-sync --
+          pytest
+          --cov-branch
+          --cov-report=term
+          --cov-report=xml
+          --junitxml=junit.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && steps.run_tests.conclusion != 'skipped' }}
         uses: codecov/test-results-action@v1
