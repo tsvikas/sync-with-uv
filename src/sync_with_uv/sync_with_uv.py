@@ -1,7 +1,7 @@
 """sync-with-uv: Sync '.pre-commit-config.yaml' from 'uv.lock'."""
 
 import re
-from pathlib import    Path
+from pathlib import Path
 
 import tomli
 
