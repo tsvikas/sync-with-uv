@@ -97,7 +97,7 @@ docs = [
   "mkdocs-section-index ~=0.3.0",
 ]
 typing = [
-  "mypy ~=1.18.0",
+  "mypy ~=1.19.0",
   # add "*-stubs" and "types-*" packages here (">=0")
   "types-colorama >=0",
 ]
@@ -162,7 +162,7 @@ mypy_path = "stubs"
 fixed_format_cache = true
 # set the platform
 python_version = "3.10"
-# enable checks [last updated: mypy 1.18]
+# enable checks [last updated: mypy 1.19]
 strict = true
 strict_equality_for_none = true
 local_partial_types = true
@@ -244,15 +244,17 @@ flake8-comprehensions.allow-dict-calls-with-keyword-arguments = true
 "src/sync_with_uv/_version.py" = [
   "ALL",
 ]
-"scripts/*.py" = [
+"scripts/**.py" = [
   "T20",      # flake8-print
   "INP001",   # implicit-namespace-package
 ]
 "!tests/test_*.py" = [
   "PT",       # flake8-pytest-style
 ]
-"tests/test_*.py" = [
+"tests/**.py" = [
   "INP001",   # flake8-no-pep420/implicit-namespace-package
+]
+"tests/test_*.py" = [
   "PLR2004",  # PyLint-Refactor/magic-value-comparison
   "S101",     # flake8-bandit/assert
   "D1",       # pydocstyle/undocumented-*

@@ -48,7 +48,7 @@ jobs:
       id-token: write
     steps:
       - name: Download package distributions
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: Packages
           path: dist/
@@ -70,7 +70,7 @@ jobs:
       id-token: write
     steps:
       - name: Download package distributions
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: Packages
           path: dist/
