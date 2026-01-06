@@ -15,8 +15,29 @@ else:
     raise RuntimeError("Could not find git binary")  # noqa: TRY003
 
 
+def _check_precommit_available() -> bool:
+    """Check if pre-commit is available and working."""
+    try:
+        subprocess.run(
+            ["pre-commit", "--version"],  # noqa: S607
+            capture_output=True,
+            check=True,
+            timeout=5,
+        )
+    except (
+        FileNotFoundError,
+        subprocess.TimeoutExpired,
+        subprocess.CalledProcessError,
+        OSError,
+    ):
+        return False
+    return True
+
+
 @pytest.fixture
 def repo_with_precommit(tmp_path: Path) -> Path:
+    if not _check_precommit_available():
+        pytest.skip("pre-commit is not available or not working")
     ruff = ("v0.0.200", "0.1.0")
     repo_dir = tmp_path / "repo"
     repo_dir.mkdir()
