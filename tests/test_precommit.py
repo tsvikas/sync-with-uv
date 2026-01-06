@@ -50,7 +50,13 @@ def repo_with_precommit(tmp_path: Path) -> Path:
     )
     repo_dir.joinpath(".pre-commit-config.yaml").write_text("repos:\n")
     repo_dir.joinpath("uv.lock").write_text("version = 1\nrequires = []\n")
-    subprocess.run(["pre-commit", "install"], cwd=repo_dir, check=True)  # noqa: S607
+    try:
+        subprocess.run(
+            ["pre-commit", "install"], cwd=repo_dir, check=True  # noqa: S607
+        )
+    except subprocess.CalledProcessError as e:
+        # pre-commit install might crash on prerelease Python versions (SIGSEGV)
+        pytest.skip(f"pre-commit install failed: {e}")
     if ruff:
         repo_dir.joinpath("dummy_module.py").write_text('print("Hello, world!")\n')
         with repo_dir.joinpath("pyproject.toml").open("a") as f:
