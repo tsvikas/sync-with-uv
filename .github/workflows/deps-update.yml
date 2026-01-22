@@ -1,0 +1,54 @@
+name: Update Dependencies
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v7
+      - name: Sync dependencies
+        run: uv sync
+      - name: Update dependencies
+        run: uv run just deps-update
+      - name: Run security audit
+        id: audit
+        run: |
+          echo 'AUDIT<<EOF' >> "$GITHUB_OUTPUT"
+          uv run just deps-audit 2>&1 || true
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+      - name: Check outdated packages
+        id: outdated
+        run: |
+          echo 'OUTDATED<<EOF' >> "$GITHUB_OUTPUT"
+          uv run just deps-list-outdated 2>&1 || true
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "⬆️ Update project dependencies"
+          title: "⬆️ Update project dependencies"
+          body: |
+            Automated dependency update.
+
+            ## Security Audit
+            ```
+            ${{ steps.audit.outputs.AUDIT }}
+            ```
+
+            ## Outdated Packages
+            ```
+            ${{ steps.outdated.outputs.OUTDATED }}
+            ```
+          branch: deps/update
+          delete-branch: true
+          labels: dependencies

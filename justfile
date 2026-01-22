@@ -67,6 +67,7 @@ quick-tools:
   uv run ruff check --select I001 --fix -q
   uv run black -q .
   uv run ruff check
+  uv run --exact --all-extras --no-default-groups --group typing --group test -- ty check
 
 # Format code and files
 format:
