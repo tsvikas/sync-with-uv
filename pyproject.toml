@@ -61,7 +61,7 @@ dev = [
   ## used in the justfile
   "rust-just ~=1.0",
   "pre-commit ~=4.0",
-  "black ~=25.9",
+  "black ~=26.1",
   "ruff ~=0.14.0",
   ## can be used for debug
   "icecream >=2",
