@@ -78,12 +78,10 @@ def repo_with_precommit(tmp_path: Path) -> Path:
 
 
 THIS_REPO_HOOKS = (
-    textwrap.dedent(
-        """\
+    textwrap.dedent("""\
         - repo: local
           hooks:
-        """
-    )
+        """)
     + textwrap.indent(
         Path(__file__).parents[1].joinpath(".pre-commit-hooks.yaml").read_text(), "  "
     )
@@ -112,14 +110,12 @@ def test_precommit_hook(repo_with_precommit: Path) -> None:
     updated_config_path = repo_dir / ".pre-commit-config.yaml"
     updated_config = updated_config_path.read_text()
     expected_config = textwrap.indent(
-        textwrap.dedent(
-            """\
+        textwrap.dedent("""\
           - repo: https://github.com/astral-sh/ruff-pre-commit
             rev: v0.1.0
             hooks:
               - id: ruff
-        """
-        ),
+        """),
         "  ",
     )
     assert expected_config in updated_config
@@ -135,15 +131,13 @@ def test_precommit_hook_with_line_ending_fix(
 ) -> None:
     repo_dir = repo_with_precommit
 
-    mixed_lines_ending_hook = textwrap.dedent(
-        f"""\
+    mixed_lines_ending_hook = textwrap.dedent(f"""\
           - repo: https://github.com/pre-commit/pre-commit-hooks\r
             rev: v6.0.0
             hooks:
               - id: mixed-line-ending
                 args: [--fix={line_ending}]
-        """
-    )
+        """)
     # add mixed-line-ending
     with repo_dir.joinpath(".pre-commit-config.yaml").open("a", newline="") as f:
         f.write(textwrap.indent(mixed_lines_ending_hook, "  "))
