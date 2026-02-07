@@ -1,8 +1,8 @@
 - id: sync-with-uv
   name: Sync pre-commit hooks with uv.lock
-  description: Syncs the versions in .pre-commit-config.yaml with those in uv.lock
+  description: Syncs the versions in .pre-commit-config.yaml or prek.toml with those in uv.lock
   entry: sync-with-uv
   language: python
   language_version: python3
-  files: '^(uv\.lock|\.pre-commit-config\.yaml|pyproject\.toml)$'
+  files: '^(uv\.lock|\.pre-commit-config\.yaml|prek\.toml|pyproject\.toml)$'
   pass_filenames: false

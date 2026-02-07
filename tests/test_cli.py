@@ -346,8 +346,7 @@ def test_cli_missing_precommit_config(
     with pytest.raises(SystemExit) as exc_info:
         app(["-p", str(nonexistent_precommit), "-u", str(uv_lock_file)])
 
-    # cyclopts validates file existence at CLI level, returning exit code 1
-    assert exc_info.value.code == 1
+    assert exc_info.value.code == 123
     captured = capsys.readouterr()
     assert "does not exist" in captured.err
 
