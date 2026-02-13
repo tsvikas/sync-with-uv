@@ -40,8 +40,8 @@ def get_colored_diff(diff_lines: list[str]) -> list[str]:
     return output_lines
 
 
+# Config filenames tried in order when no explicit path is given.
 _DEFAULT_CONFIGS = (".pre-commit-config.yaml", "prek.toml")
-"""Config filenames tried in order when no explicit path is given."""
 
 
 def _resolve_config(explicit: Path | None) -> Path:
@@ -51,13 +51,13 @@ def _resolve_config(explicit: Path | None) -> Path:
     in order, returning the first that exists.
 
     Raises:
-        FileNotFoundError: If no config file can be found.
+        ValueError: If no config file can be found.
     """
     if explicit is not None:
         resolved = explicit.resolve()
         if not resolved.is_file():
             msg = f'"{explicit}" does not exist.'
-            raise FileNotFoundError(msg)
+            raise ValueError(msg)
         return resolved
     for name in _DEFAULT_CONFIGS:
         candidate = Path(name)
@@ -65,7 +65,7 @@ def _resolve_config(explicit: Path | None) -> Path:
             return candidate.resolve()
     tried = " or ".join(f'"{n}"' for n in _DEFAULT_CONFIGS)
     msg = f"{tried} does not exist."
-    raise FileNotFoundError(msg)
+    raise ValueError(msg)
 
 
 @app.default()
@@ -118,6 +118,10 @@ def process_precommit(  # noqa: PLR0913
     """
     try:
         config_path = _resolve_config(precommit_filename)
+    except ValueError as e:
+        print("Error:", e, file=sys.stderr)
+        return 1
+    try:
         user_repo_mappings, user_version_mappings = load_user_mappings()
         uv_data = load_uv_lock(uv_lock_filename)
         # note that the next line can be simplified in Python>=3.13 using

@@ -123,6 +123,6 @@ def test_cli_no_config_file(
 
     with pytest.raises(SystemExit) as exc_info:
         app(["-u", str(uv_lock)])
-    assert exc_info.value.code == 123
+    assert exc_info.value.code == 1
     captured = capsys.readouterr()
     assert "does not exist" in captured.err

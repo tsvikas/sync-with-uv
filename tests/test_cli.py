@@ -36,8 +36,7 @@ def test_process_precommit_cli_check(
     assert exc_info.value.code == 1
     captured = capsys.readouterr()
     assert captured.err == (
-        "All done!\n"
-        "2 package would be changed, 2 packages would be left unchanged.\n"
+        "All done!\n2 package would be changed, 2 packages would be left unchanged.\n"
     )
     assert captured.out == ""
 
@@ -346,7 +345,7 @@ def test_cli_missing_precommit_config(
     with pytest.raises(SystemExit) as exc_info:
         app(["-p", str(nonexistent_precommit), "-u", str(uv_lock_file)])
 
-    assert exc_info.value.code == 123
+    assert exc_info.value.code == 1
     captured = capsys.readouterr()
     assert "does not exist" in captured.err
 
