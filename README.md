@@ -63,7 +63,7 @@ sync-with-uv --diff
 sync-with-uv -p custom-precommit.yaml -u custom-lock.toml
 ```
 
-Note: If you use the tools with a custom file location, remeber to also change the `files` setting in `.pre-commit-config.toml`.
+Note: If you use the tools with a custom file location, remember to also change the `files` setting in `.pre-commit-config.toml`.
 
 ## Advanced Configuration
 
