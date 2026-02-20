@@ -6,7 +6,7 @@ import tomli
 
 from sync_with_uv.sync_with_uv import (
     load_uv_lock,
-    process_precommit_text,
+    process_config_text,
 )
 
 
@@ -145,7 +145,7 @@ def test_process_precommit_text(
 ) -> None:
     precommit_text = sample_precommit_config.read_text()
     uv_data = load_uv_lock(sample_uv_lock)
-    result, changes = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
     assert result == FIXED_PRECOMMIT_CONTENT
     assert changes == {
         "black": ("23.9.1", "23.11.0"),
@@ -160,7 +160,7 @@ def test_process_precommit_text_empty() -> None:
     precommit_text = ""
     uv_data = {"black": "23.11.0"}
 
-    result, changes = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
     assert result == ""
     assert changes == {}
 
@@ -176,7 +176,7 @@ def test_process_precommit_text_no_changes_needed() -> None:
         """)
     uv_data = {"black": "23.11.0"}
 
-    result, changes = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
     # Should be identical
     assert result == precommit_text
     assert changes == {"black": True}
@@ -230,7 +230,7 @@ def test_process_precommit_text_complex() -> None:
         "repo": "3.2.1",
     }
 
-    result, changes = process_precommit_text(precommit_text, uv_data)
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
 
     # Check that versions were updated
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in result
@@ -275,8 +275,12 @@ def test_process_precommit_text_with_user_mappings() -> None:
 
     user_version_mappings = {"https://github.com/example/custom-tool": "v${version}"}
 
-    result, changes = process_precommit_text(
-        precommit_text, uv_data, user_repo_mappings, user_version_mappings
+    result, changes = process_config_text(
+        precommit_text,
+        uv_data,
+        config_format="yaml",
+        user_repo_mappings=user_repo_mappings,
+        user_version_mappings=user_version_mappings,
     )
 
     # Check that user mappings were applied
@@ -314,7 +318,9 @@ def test_process_precommit_text_preserves_line_endings_no_version_change(
     # Package exists in uv.lock but version is already correct
     uv_data = {"black": "23.11.0"}
 
-    result, _changes = process_precommit_text(precommit_text, uv_data)
+    result, _changes = process_config_text(
+        precommit_text, uv_data, config_format="yaml"
+    )
 
     # Result should be identical to input when version is already correct
     assert result == precommit_text
@@ -345,7 +351,9 @@ def test_process_precommit_text_preserves_line_endings(
     # Package exists in uv.lock but version is already correct
     uv_data = {"black": "24.0.0"}
 
-    result, _changes = process_precommit_text(precommit_text, uv_data)
+    result, _changes = process_config_text(
+        precommit_text, uv_data, config_format="yaml"
+    )
 
     # Result should be identical to input when version is already correct
     assert result == precommit_text.replace("23.11.0", "24.0.0")

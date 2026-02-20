@@ -3,14 +3,14 @@
 import difflib
 import sys
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 import cyclopts.types
 from colorama import Fore, Style
 from cyclopts import App, Parameter
 
 from .repo_data import load_user_mappings
-from .sync_with_uv import load_uv_lock, process_precommit_text, process_prek_toml_text
+from .sync_with_uv import load_uv_lock, process_config_text
 
 app = App(name="sync-with-uv")
 app.register_install_completion_command()
@@ -68,6 +68,15 @@ def _resolve_config(explicit: Path | None) -> Path:
     raise ValueError(msg)
 
 
+def _resolve_config_format(filename: Path) -> Literal["yaml", "toml"]:
+    if filename.suffix in (".yaml", ".yml"):
+        return "yaml"
+    if filename.suffix in (".toml",):
+        return "toml"
+    msg = "precommit_filename must be a YAML or a TOML"
+    raise ValueError(msg)
+
+
 @app.default()
 def process_precommit(  # noqa: PLR0913
     *,
@@ -118,6 +127,7 @@ def process_precommit(  # noqa: PLR0913
     """
     try:
         config_path = _resolve_config(precommit_filename)
+        config_format = _resolve_config_format(config_path)
     except ValueError as e:
         print("Error:", e, file=sys.stderr)
         return 1
@@ -127,13 +137,12 @@ def process_precommit(  # noqa: PLR0913
         # note that the next line can be simplified in Python>=3.13 using
         # read_text with newline=""
         config_text = config_path.read_bytes().decode(encoding="utf-8")
-        process_fn = (
-            process_prek_toml_text
-            if config_path.suffix == ".toml"
-            else process_precommit_text
-        )
-        fixed_text, changes = process_fn(
-            config_text, uv_data, user_repo_mappings, user_version_mappings
+        fixed_text, changes = process_config_text(
+            config_text,
+            uv_data,
+            config_format=config_format,
+            user_repo_mappings=user_repo_mappings,
+            user_version_mappings=user_version_mappings,
         )
         # report the results / change files
         if verbose:
