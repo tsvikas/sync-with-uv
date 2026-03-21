@@ -1,3 +1,4 @@
+import functools
 import textwrap
 from pathlib import Path
 
@@ -5,8 +6,10 @@ import pytest
 
 from sync_with_uv.sync_with_uv import (
     load_uv_lock,
-    process_prek_toml_text,
+    process_config_text,
 )
+
+process_prek_toml_text = functools.partial(process_config_text, config_format="toml")
 
 
 @pytest.fixture
@@ -127,7 +130,7 @@ FIXED_PREK_CONTENT = textwrap.dedent("""\
 def test_process_prek_toml_text(sample_prek_config: Path, sample_uv_lock: Path) -> None:
     prek_text = sample_prek_config.read_text()
     uv_data = load_uv_lock(sample_uv_lock)
-    result, changes = process_prek_toml_text(prek_text, uv_data)
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == FIXED_PREK_CONTENT
     assert changes == {
         "ruff": ("v0.14.0", "v0.15.0"),
@@ -139,7 +142,7 @@ def test_process_prek_toml_text(sample_prek_config: Path, sample_uv_lock: Path) 
 
 def test_process_prek_toml_text_empty() -> None:
     """Test processing an empty prek.toml."""
-    result, changes = process_prek_toml_text("", {"ruff": "0.15.0"})
+    result, changes = process_config_text("", {"ruff": "0.15.0"}, config_format="toml")
     assert result == ""
     assert changes == {}
 
@@ -153,7 +156,7 @@ def test_process_prek_toml_text_no_changes_needed() -> None:
         hooks = [{ id = "ruff" }]
         """)
     uv_data = {"ruff": "0.15.0"}
-    result, changes = process_prek_toml_text(prek_text, uv_data)
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == prek_text
     assert changes == {"ruff": True}
 
@@ -167,7 +170,7 @@ def test_process_prek_toml_text_single_quotes() -> None:
         hooks = [{ id = 'ruff' }]
         """)
     uv_data = {"ruff": "0.15.0"}
-    result, changes = process_prek_toml_text(prek_text, uv_data)
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert "rev = 'v0.15.0'" in result
     assert changes == {"ruff": ("v0.14.0", "v0.15.0")}
 
@@ -188,7 +191,7 @@ def test_process_prek_toml_text_builtin_and_local_skipped() -> None:
         language = "system"
         """)
     uv_data = {"ruff": "0.15.0"}
-    result, changes = process_prek_toml_text(prek_text, uv_data)
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == prek_text
     assert changes == {}
 
@@ -211,7 +214,10 @@ def test_process_prek_toml_text_with_user_mappings() -> None:
     user_version_mappings = {"https://github.com/example/custom-tool": "v${version}"}
 
     result, changes = process_prek_toml_text(
-        prek_text, uv_data, user_repo_mappings, user_version_mappings
+        prek_text,
+        uv_data,
+        user_repo_mappings=user_repo_mappings,
+        user_version_mappings=user_version_mappings,
     )
     assert 'rev = "v2.1.0"' in result
     assert 'rev = "v0.15.0"' in result
@@ -237,5 +243,5 @@ def test_process_prek_toml_text_preserves_line_endings(line_ending: str) -> None
         ]
     )
     uv_data = {"ruff": "0.15.0"}
-    result, _changes = process_prek_toml_text(prek_text, uv_data)
+    result, _changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == prek_text.replace("v0.14.0", "v0.15.0")
