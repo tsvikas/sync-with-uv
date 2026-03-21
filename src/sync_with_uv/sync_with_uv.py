@@ -94,7 +94,11 @@ def process_config_text(
                     else "${version}"
                 )
             target_version = version_template.replace("${version}", uv_data[package])
-            line_fixed = line.replace(current_version, target_version)
+            line_fixed = (
+                line[: repo_rev.start("repo_rev")]
+                + target_version
+                + line[repo_rev.end("repo_rev") :]
+            )
             new_lines.append(line_fixed)
             changes[package] = current_version == target_version or (
                 current_version,
