@@ -89,7 +89,9 @@ def process_config_text(
             current_version = repo_rev.group("repo_rev")
             if version_template is None:
                 version_template = (
-                    "v${version}" if current_version[0] == "v" else "${version}"
+                    "v${version}"
+                    if current_version and current_version[0] == "v"
+                    else "${version}"
                 )
             target_version = version_template.replace("${version}", uv_data[package])
             line_fixed = line.replace(current_version, target_version)
