@@ -71,7 +71,7 @@ def _resolve_config(explicit: Path | None) -> Path:
 def _resolve_config_format(filename: Path) -> Literal["yaml", "toml"]:
     if filename.suffix in (".yaml", ".yml"):
         return "yaml"
-    if filename.suffix in (".toml",):
+    if filename.suffix == ".toml":
         return "toml"
     msg = "precommit_filename must be a YAML or a TOML"
     raise ValueError(msg)
