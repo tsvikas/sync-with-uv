@@ -62,7 +62,7 @@ dev = [
   "rust-just ~=1.0",
   "pre-commit ~=4.0",
   "black ~=26.1",
-  "ruff ~=0.14.0",
+  "ruff ~=0.15.0",
   ## can be used for debug
   "icecream >=2",
   "snoop >=0.3",
@@ -76,7 +76,7 @@ test = [
   "pytest-xdist[psutil] ~=3.0",
   ## reporting
   "pytest-clarity ~=1.0",
-  "pytest-github-actions-annotate-failures ~=0.3.0",
+  "pytest-github-actions-annotate-failures ~=0.4.0",
   ## extras
   "pytest-benchmark ~=5.0",
   "pytest-cov ~=7.0",
