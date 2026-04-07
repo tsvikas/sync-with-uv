@@ -12,7 +12,7 @@ repos:
   # Sync Python and pre-commit package versions
   # pyproject.toml -> uv.lock
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.2
+    rev: 0.11.3
     hooks:
       - id: uv-lock
   # uv.lock -> .pre-commit-config.yaml
@@ -101,7 +101,7 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.44.0
+    rev: v1.45.0
     hooks:
       - id: typos
   - repo: local
@@ -169,7 +169,7 @@ repos:
 
   # pyproject.toml
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.03.29
+    rev: 2026.04.03
     hooks:
       - id: validate-pyproject
 
@@ -188,7 +188,7 @@ repos:
       - id: check-github-workflows
       - id: check-readthedocs
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.11
+    rev: v1.7.12
     hooks:
       - id: actionlint
 
