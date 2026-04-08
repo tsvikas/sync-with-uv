@@ -84,6 +84,13 @@ repos:
       # UTF-8 encoding
       - id: text-unicode-replacement-char
 
+  # Security
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
   # All files
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 3.6.1
@@ -148,7 +155,7 @@ repos:
         args: [--select, I001, --fix]
       - id: ruff-check
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v1.20.0
     hooks:
       - id: mypy
         name: mypy (without imports)
@@ -191,6 +198,10 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
+  - repo: https://github.com/woodruffw/zizmor-pre-commit
+    rev: v1.23.1
+    hooks:
+      - id: zizmor
 
   # Shell scripts
   - repo: https://github.com/shellcheck-py/shellcheck-py

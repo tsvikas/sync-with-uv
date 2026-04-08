@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 env:
   # Many color libraries just need this variable to be set to any value.
@@ -19,11 +18,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      issues: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
         with:
           python-version: '3.14'
           enable-cache: false
@@ -42,7 +43,7 @@ jobs:
         run: uv run --no-sync pytest
       - name: Create failure issue
         if: failure()
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             // Check for existing test failure issues
@@ -92,11 +93,13 @@ jobs:
   pip-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      issues: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
       - name: Export packages
         run: >-
           uv export
@@ -106,13 +109,13 @@ jobs:
           -o requirements.txt
           --no-emit-local
           --locked
-      - uses: pypa/gh-action-pip-audit@v1.1.0
+      - uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
         with:
           inputs: requirements.txt
           require-hashes: true
       - name: Create failure issue
         if: failure()
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             // Check for existing audit failure issues
