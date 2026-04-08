@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: false
-      - uses: hynek/build-and-inspect-python-package@e6f4945c542cb46284a23bdb29121f4593636894 # v2
+      - uses: hynek/build-and-inspect-python-package@fe0a0fb1925ca263d076ca4f2c13e93a6e92a33e # v2
 
   publish-to-testpypi:
     if: github.event_name == 'push'
