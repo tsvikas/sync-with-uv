@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### New Features
+
+- **`prek.toml` support**:
+  Sync hook versions in `prek.toml` configs, in addition to `.pre-commit-config.yaml` (#35)
+
+### Documentation
+
+- Document that custom file locations require updating the `files` setting in `.pre-commit-config.yaml` (#36)
+
 ## [0.5.0] - 2025-11-18
 
 ### Breaking Changes
