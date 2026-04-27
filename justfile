@@ -37,10 +37,7 @@ deps-list-outdated:
 # Update all dependencies
 deps-update: && deps-list-outdated
   uv sync --upgrade
-  uv run -- \
-    pre-commit autoupdate -j \
-    "$( (uname -s | grep -q Linux && nproc) || (uname -s | grep -q Darwin && sysctl -n hw.ncpu) || echo 1 )" \
-    | grep -v 'appears to be a mutable reference'
+  uv run pre-commit autoupdate -j 0 | grep -v 'appears to be a mutable reference'
   uvx sync-with-uv
   uvx sync-pre-commit-deps --yaml-mapping 2 --yaml-sequence 4 --yaml-offset 2 .pre-commit-config.yaml || { \
     echo "Note: '.pre-commit-config.yaml' changed, and might lost its formatting." \
