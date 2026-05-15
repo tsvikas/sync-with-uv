@@ -50,7 +50,7 @@ Ready to get started? Follow the development setup below.
 - **Lint code**: `uv run just lint` (runs all the linting tools)
 - **Format and lint code**: `uv run just quick-tools` (runs quick formatting and linting tools)
 - **Run tests**: `uv run just test` (runs `pytest`)
-- **Run pre-commit tests**: `uv run pre-commit run`. This also runs on each commit.
+- **Run pre-commit tests**: `uv run prek run`. This also runs on each commit.
 - **Run all checks**: `uv run just format lint test`
 
 ### Running Individual Tools
@@ -62,7 +62,7 @@ uv run black
 uv run ruff check
 uv run mypy
 uv run pytest
-uv run pre-commit run
+uv run prek run
 ```
 
 [how-to-contribute]: https://opensource.guide/how-to-contribute/

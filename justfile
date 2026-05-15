@@ -25,7 +25,7 @@ init: && prepare
 
 # Setup the project after cloning
 prepare:
-  uv run pre-commit install --install-hooks
+  uv run prek install --install-hooks
 
 
 ### dependencies ###
@@ -37,7 +37,7 @@ deps-list-outdated:
 # Update all dependencies
 deps-update: && deps-list-outdated
   uv sync --upgrade
-  uv run pre-commit autoupdate -j 0 | grep -v 'appears to be a mutable reference'
+  uv run prek auto-update
   uvx sync-with-uv
   uvx sync-pre-commit-deps --yaml-mapping 2 --yaml-sequence 4 --yaml-offset 2 .pre-commit-config.yaml || { \
     echo "Note: '.pre-commit-config.yaml' changed, and might lost its formatting." \
@@ -74,15 +74,15 @@ quick-tools:
 format:
   uv run ruff check --select I001 --fix
   uv run black .
-  uv run pre-commit run --all-files blacken-docs
-  uv run pre-commit run --all-files mdformat
+  uv run prek run --all-files blacken-docs
+  uv run prek run --all-files mdformat
 
 # Run linters
 lint:
   uv run ruff check
   uv run --exact --all-extras --no-default-groups --group typing --group test -- dmypy run
   uv run --exact --all-extras --all-groups --with deptry -- deptry src/
-  uv run --exact pre-commit run --all-files
+  uv run --exact prek run --all-files
 
 # Run Pylint (slow, not used in other tasks)
 pylint:
