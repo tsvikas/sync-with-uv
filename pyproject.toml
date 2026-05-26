@@ -60,7 +60,7 @@ sync-with-uv = "sync_with_uv.cli:app"
 dev = [
   ## used in the justfile
   "rust-just ~=1.0",
-  "prek ~=0.3.0",
+  "prek ~=0.4.0",
   "black ~=26.1",
   "ruff ~=0.15.0",
   ## can be used for debug
@@ -104,7 +104,7 @@ typing = [
 
 
 [tool.uv]
-required-version = ">=0.9.17"
+required-version = ">=0.10.12"
 default-groups = ["dev", "test", "typing"]
 # Minimum age guard: only consider package versions released at least 24h ago,
 # as a lightweight supply-chain defense against just-published malicious releases.
