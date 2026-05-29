@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: false
-      - uses: psf/black@d2490e24dad33b8f68c77602ee29160de0fea24b # stable
+      - uses: psf/black@87928e6d6761a4a6d22250e1fee5601b3998086e # stable
         with:
           jupyter: false
           use_pyproject: true
@@ -157,12 +157,12 @@ jobs:
           --junitxml=junit.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && steps.run_tests.conclusion != 'skipped' }}
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}  # zizmor: ignore[secrets-outside-env]
           report_type: test_results
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}  # zizmor: ignore[secrets-outside-env]
 
