@@ -12,7 +12,7 @@ repos:
   # Sync Python and pre-commit package versions
   # pyproject.toml -> uv.lock
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.16
+    rev: 0.11.28
     hooks:
       - id: uv-lock
   # uv.lock -> .pre-commit-config.yaml
@@ -98,7 +98,7 @@ repos:
       - id: editorconfig-checker
         exclude_types: [jupyter]
   - repo: https://github.com/google/keep-sorted
-    rev: v0.8.0
+    rev: v0.9.1
     hooks:
       - id: keep-sorted
 
@@ -108,7 +108,7 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.46.3
+    rev: v1.48.0
     hooks:
       - id: typos
   - repo: local
@@ -148,7 +148,7 @@ repos:
       - id: blacken-docs
         additional_dependencies: [black==26.5.1]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.14
+    rev: v0.15.20
     hooks:
       - id: ruff-check
         alias: ruff-isort
@@ -177,7 +177,7 @@ repos:
 
   # pyproject.toml
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.05.24
+    rev: 2026.07.08
     hooks:
       - id: validate-pyproject
 
@@ -189,7 +189,7 @@ repos:
 
   # GitHub files
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.2
+    rev: 0.37.4
     hooks:
       - id: check-dependabot
       - id: check-github-actions
@@ -200,7 +200,7 @@ repos:
     hooks:
       - id: actionlint
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.25.2
+    rev: v1.26.1
     hooks:
       - id: zizmor
 
