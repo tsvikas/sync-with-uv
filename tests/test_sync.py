@@ -147,12 +147,13 @@ def test_process_precommit_text(
     uv_data = load_uv_lock(sample_uv_lock)
     result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
     assert result == FIXED_PRECOMMIT_CONTENT
-    assert changes == {
+    assert changes.repos == {
         "black": ("23.9.1", "23.11.0"),
         "ruff": ("v0.0.292", "v0.1.5"),
         "unchanged-package": True,
         "another-package": False,
     }
+    assert changes.lines == {}
 
 
 def test_process_precommit_text_empty() -> None:
@@ -162,7 +163,8 @@ def test_process_precommit_text_empty() -> None:
 
     result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
     assert result == ""
-    assert changes == {}
+    assert changes.repos == {}
+    assert changes.lines == {}
 
 
 def test_process_precommit_text_no_changes_needed() -> None:
@@ -179,7 +181,8 @@ def test_process_precommit_text_no_changes_needed() -> None:
     result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
     # Should be identical
     assert result == precommit_text
-    assert changes == {"black": True}
+    assert changes.repos == {"black": True}
+    assert changes.lines == {}
 
 
 def test_process_precommit_text_complex() -> None:
@@ -242,7 +245,7 @@ def test_process_precommit_text_complex() -> None:
     assert "pre-commit-hooks\n  rev: v4.4.0" in result
     assert "/non/url/repo\n  rev: v3" in result
 
-    assert changes == {
+    assert changes.repos == {
         "pre-commit-hooks": False,
         "black": ("23.9.1", "23.11.0"),
         "ruff": ("v0.0.292", "v0.1.5"),
@@ -250,6 +253,8 @@ def test_process_precommit_text_complex() -> None:
         "repo": ("v2", "v3.2.1"),
         "/non/url/repo": False,
     }
+    # the `- types-PyYAML` line has no pragma, so it is not synced
+    assert changes.lines == {}
 
 
 def test_process_precommit_text_with_user_mappings() -> None:
@@ -287,10 +292,11 @@ def test_process_precommit_text_with_user_mappings() -> None:
     assert "custom-tool\n  rev: v2.1.0" in result
     assert "black-pre-commit-mirror\n  rev: 23.11.0" in result
 
-    assert changes == {
+    assert changes.repos == {
         "custom-tool": ("v1.0.0", "v2.1.0"),
         "black": ("23.9.1", "23.11.0"),
     }
+    assert changes.lines == {}
 
 
 @pytest.mark.parametrize(
@@ -357,3 +363,192 @@ def test_process_precommit_text_preserves_line_endings(
 
     # Result should be identical to input when version is already correct
     assert result == precommit_text.replace("23.11.0", "24.0.0")
+
+
+def test_sync_additional_dependencies_pragma() -> None:
+    """Pragma-annotated additional_dependencies are pinned to the uv.lock version."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: https://github.com/pre-commit/mirrors-mypy
+          rev: v1.5.1
+          hooks:
+            - id: mypy
+              additional_dependencies:
+                - pydantic==2.0.0  # sync-with-uv
+                - types-PyYAML>=6.0  # sync-with-uv
+                - rich>=10  # not synced, no pragma
+        """)
+    uv_data = {
+        "mypy": "1.5.1",
+        "pydantic": "2.5.0",
+        "types-pyyaml": "6.0.1",
+        "rich": "13.0.0",
+    }
+
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
+
+    assert "- pydantic==2.5.0  # sync-with-uv" in result
+    # operator is normalized to == and original name casing is preserved
+    assert "- types-PyYAML==6.0.1  # sync-with-uv" in result
+    # lines without a pragma are never touched
+    assert "- rich>=10  # not synced, no pragma" in result
+    # the rev is a per-package repo change; the deps are per-line changes
+    assert changes.repos == {"mypy": True}
+    assert changes.lines == {
+        7: ("pydantic", "==2.0.0", "==2.5.0"),
+        8: ("types-pyyaml", ">=6.0", "==6.0.1"),
+    }
+
+
+def test_sync_additional_dependencies_bare_adds_specifier() -> None:
+    """A pragma dependency without a specifier gets an exact pin added."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: mypy
+              additional_dependencies:
+                - pydantic  # sync-with-uv
+                - attrs[speedups]  # sync-with-uv
+                - types-PyYAML ; python_version < "3.11"  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0", "attrs": "23.2.0", "types-pyyaml": "6.0.1"}
+
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
+
+    assert "- pydantic==2.5.0  # sync-with-uv" in result
+    # extras are preserved when the pin is inserted
+    assert "- attrs[speedups]==23.2.0  # sync-with-uv" in result
+    # the pin is inserted before an environment marker
+    assert '- types-PyYAML==6.0.1 ; python_version < "3.11"  # sync-with-uv' in result
+    # a bare dependency reports an empty old specifier
+    assert changes.repos == {}
+    assert changes.lines == {
+        6: ("pydantic", "", "==2.5.0"),
+        7: ("attrs", "", "==23.2.0"),
+        8: ("types-pyyaml", "", "==6.0.1"),
+    }
+
+
+def test_sync_additional_dependencies_no_dependency_errors() -> None:
+    """A pragma on a line with no dependency to sync is an error."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: mypy  # sync-with-uv
+              additional_dependencies:
+                # sync-with-uv
+                - pydantic==2.0.0  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    with pytest.raises(ValueError, match="no dependency to sync") as exc_info:
+        process_config_text(precommit_text, uv_data, config_format="yaml")
+    message = str(exc_info.value)
+    # both the hook id line and the stray comment line are reported
+    assert "line 4: no dependency to sync" in message
+    assert "line 6: no dependency to sync" in message
+
+
+def test_sync_additional_dependencies_multiple_on_line_errors() -> None:
+    """More than one dependency on a pragma line is an error, not a partial sync."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: mypy
+              additional_dependencies:
+                - pydantic==2.0.0, attrs==1.0  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0", "attrs": "23.2.0"}
+
+    with pytest.raises(ValueError, match="more than one dependency") as exc_info:
+        process_config_text(precommit_text, uv_data, config_format="yaml")
+    assert "line 6" in str(exc_info.value)
+
+
+def test_sync_additional_dependencies_extras_and_marker() -> None:
+    """Extras and environment markers are preserved when pinning."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: https://github.com/pre-commit/mirrors-mypy
+          rev: v1.5.1
+          hooks:
+            - id: mypy
+              additional_dependencies:
+                - pydantic[email]>=1.0,<3.0  # sync-with-uv
+                - attrs==22.0.0; python_version < "3.11"  # sync-with-uv
+        """)
+    uv_data = {"mypy": "1.5.1", "pydantic": "2.5.0", "attrs": "23.2.0"}
+
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
+
+    assert "- pydantic[email]==2.5.0  # sync-with-uv" in result
+    assert '- attrs==23.2.0; python_version < "3.11"  # sync-with-uv' in result
+    assert changes.repos == {"mypy": True}
+    assert changes.lines == {
+        7: ("pydantic", ">=1.0,<3.0", "==2.5.0"),
+        8: ("attrs", "==22.0.0", "==23.2.0"),
+    }
+
+
+def test_sync_additional_dependencies_not_in_lock_errors() -> None:
+    """A pragma dependency missing from uv.lock is an error (explicit opt-in)."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: something
+              additional_dependencies:
+                - some-tool==1.0.0  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    with pytest.raises(ValueError, match=r"'some-tool' is not in uv\.lock") as exc_info:
+        process_config_text(precommit_text, uv_data, config_format="yaml")
+    # the error points at the offending line
+    assert "line 6" in str(exc_info.value)
+
+
+def test_sync_additional_dependencies_reports_all_errors() -> None:
+    """All invalid pragma dependencies are collected before raising."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: something
+              additional_dependencies:
+                - typo-pkg>=1.0  # sync-with-uv
+                # sync-with-uv
+                - pydantic==2.5.0  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    with pytest.raises(
+        ValueError, match="invalid '# sync-with-uv' dependencies"
+    ) as exc_info:
+        process_config_text(precommit_text, uv_data, config_format="yaml")
+    message = str(exc_info.value)
+    assert "line 6: 'typo-pkg' is not in uv.lock" in message
+    assert "line 7: no dependency to sync" in message
+
+
+def test_sync_additional_dependencies_already_pinned() -> None:
+    """A dependency already at the locked version is reported as unchanged."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: something
+              additional_dependencies:
+                - pydantic==2.5.0  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
+
+    assert result == precommit_text
+    # an already-correct line is recorded with matching old/new specifiers
+    assert changes.repos == {}
+    assert changes.lines == {6: ("pydantic", "==2.5.0", "==2.5.0")}
