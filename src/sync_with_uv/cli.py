@@ -172,14 +172,14 @@ def _print_changes(changes: Changes) -> None:
         else:
             print(f"{package}: not managed in uv", file=sys.stderr)
     for line_number, dep in sorted(changes.lines.items()):
-        old_spec = dep.old_spec or "(unpinned)"
-        if dep.old_spec == dep.new_spec:
-            print(f"line {line_number}: {dep.package} unchanged", file=sys.stderr)
-        else:
+        if dep.changed:
+            old_spec = dep.old_spec or "(unpinned)"
             print(
                 f"line {line_number}: {dep.package} {old_spec} -> {dep.new_spec}",
                 file=sys.stderr,
             )
+        else:
+            print(f"line {line_number}: {dep.package} unchanged", file=sys.stderr)
     print(file=sys.stderr)
 
 
@@ -217,7 +217,7 @@ def _print_summary(changes: Changes, *, dry_mode: bool) -> None:
         file=sys.stderr,
     )
     if changes.lines:
-        n_changed = sum(d.old_spec != d.new_spec for d in changes.lines.values())
+        n_changed = sum(d.changed for d in changes.lines.values())
         n_unchanged = len(changes.lines) - n_changed
         print(
             f"{n_changed} {_plural(n_changed, 'dependency', 'dependencies')} "

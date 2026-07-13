@@ -451,21 +451,70 @@ def test_sync_additional_dependencies_no_dependency_errors() -> None:
     assert "line 6: no dependency to sync" in message
 
 
-def test_sync_additional_dependencies_multiple_on_line_errors() -> None:
+@pytest.mark.parametrize(
+    "dep_line",
+    [
+        "- pydantic==2.0.0, attrs==1.0  # sync-with-uv",  # comma-separated
+        "- pydantic==2.0.0 attrs==1.0  # sync-with-uv",  # space-separated
+    ],
+    ids=["comma", "space"],
+)
+def test_sync_additional_dependencies_multiple_on_line_errors(dep_line: str) -> None:
     """More than one dependency on a pragma line is an error, not a partial sync."""
-    precommit_text = textwrap.dedent("""\
+    precommit_text = textwrap.dedent(f"""\
         repos:
         - repo: local
           hooks:
             - id: mypy
               additional_dependencies:
-                - pydantic==2.0.0, attrs==1.0  # sync-with-uv
+                {dep_line}
         """)
     uv_data = {"pydantic": "2.5.0", "attrs": "23.2.0"}
 
     with pytest.raises(ValueError, match="more than one dependency") as exc_info:
         process_config_text(precommit_text, uv_data, config_format="yaml")
     assert "line 6" in str(exc_info.value)
+
+
+def test_sync_additional_dependencies_marker_comma_not_confused_for_second_dep() -> (
+    None
+):
+    """A comma inside an environment marker is not mistaken for a second dependency."""
+    precommit_text = textwrap.dedent("""\
+        repos:
+        - repo: local
+          hooks:
+            - id: mypy
+              additional_dependencies:
+                - pydantic>=1.0; extra == "a,b"  # sync-with-uv
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
+
+    assert '- pydantic==2.5.0; extra == "a,b"  # sync-with-uv' in result
+    assert changes.lines == {6: ("pydantic", ">=1.0", "==2.5.0")}
+
+
+@pytest.mark.parametrize("line_ending", ["\n", "\r\n", "\r"], ids=["LF", "CRLF", "CR"])
+def test_sync_additional_dependencies_preserves_line_endings(line_ending: str) -> None:
+    """Dependency syncing preserves the original line endings (issue #24 area)."""
+    precommit_text = line_ending.join(
+        [
+            "      additional_dependencies:",
+            "        - pydantic>=2.0  # sync-with-uv",
+            "        - attrs  # sync-with-uv",
+        ]
+    )
+    uv_data = {"pydantic": "2.5.0", "attrs": "23.2.0"}
+
+    result, _changes = process_config_text(
+        precommit_text, uv_data, config_format="yaml"
+    )
+
+    assert result == precommit_text.replace("pydantic>=2.0", "pydantic==2.5.0").replace(
+        "- attrs  ", "- attrs==23.2.0  "
+    )
 
 
 def test_sync_additional_dependencies_extras_and_marker() -> None:
