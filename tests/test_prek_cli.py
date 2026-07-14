@@ -46,7 +46,7 @@ def test_cli_prek_toml_write(
         app(["-p", str(sample_prek_config), "-u", str(sample_uv_lock)])
     assert exc_info.value.code == 0
     captured = capsys.readouterr()
-    assert "3 package changed" in captured.err
+    assert "3 packages changed" in captured.err
 
     content = sample_prek_config.read_text()
     assert 'rev = "v0.15.0"' in content  # ruff updated

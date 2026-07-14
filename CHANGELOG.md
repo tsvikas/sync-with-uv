@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - **`prek.toml` support**:
   Sync hook versions in `prek.toml` configs, in addition to `.pre-commit-config.yaml` (#35)
 
+### Bug Fixes
+
+- Pluralize the summary counts by number, so a count of 1 reads "1 package" and other counts read "N packages"
+
 ### Documentation
 
 - Document that custom file locations require updating the `files` setting in `.pre-commit-config.yaml` (#36)

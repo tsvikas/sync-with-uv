@@ -190,6 +190,11 @@ def _print_diff(
     print("\n".join(diff_lines))
 
 
+def _plural(count: int, singular: str, plural: str) -> str:
+    """Return *singular* when count is exactly 1, otherwise *plural*."""
+    return singular if count == 1 else plural
+
+
 def _print_summary(
     changes: dict[str, bool | tuple[str, str]], *, dry_mode: bool
 ) -> None:
@@ -202,7 +207,9 @@ def _print_summary(
             n_unchanged += 1
     would_be = "would be " if dry_mode else ""
     print(
-        f"{n_changed} package {would_be}changed, "
-        f"{n_unchanged} packages {would_be}left unchanged.",
+        f"{n_changed} {_plural(n_changed, 'package', 'packages')} "
+        f"{would_be}changed, "
+        f"{n_unchanged} {_plural(n_unchanged, 'package', 'packages')} "
+        f"{would_be}left unchanged.",
         file=sys.stderr,
     )
