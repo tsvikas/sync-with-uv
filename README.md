@@ -65,6 +65,55 @@ sync-with-uv -p custom-precommit.yaml -u custom-lock.toml
 
 Note: If you use the tools with a custom file location, remember to also change the `files` setting in `.pre-commit-config.toml`.
 
+## Syncing additional dependencies
+
+Besides the `rev` of each hook, the tool can also sync version pins inside
+`additional_dependencies` (or any other dependency line).
+Because these lists can contain arbitrary packages,
+syncing is strictly opt-in per line:
+a dependency is only touched if its line carries a `# sync-with-uv` pragma comment.
+
+```yaml
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.5.1
+  hooks:
+    - id: mypy
+      additional_dependencies:
+        - pydantic==2.0.0  # sync-with-uv
+        - types-requests>=2.0  # sync-with-uv
+        - httpx  # sync-with-uv
+        - some-other-lib==1.0.0  # left alone, no pragma
+```
+
+For every annotated line, the dependency is pinned to an exact version
+(`==`) from `uv.lock`, adding a specifier when the dependency has none,
+so the example above becomes `pydantic==<locked>`, `types-requests==<locked>`,
+and `httpx==<locked>`.
+The package name, extras (like `pydantic[email]`), environment markers
+(like `; python_version < "3.11"`), quoting, and the comment itself are preserved.
+
+Because the pragma is an explicit request to sync a line,
+the tool errors (exit code 123) when an annotated line cannot be synced,
+so mistakes surface instead of being silently ignored. This happens when:
+
+- the package is not present in `uv.lock`
+  (usually a typo or a forgotten `uv add`),
+- the line has no dependency to sync
+  (the pragma landed on a comment or a non-dependency line), or
+- the line has more than one dependency
+  (only one dependency per pragma line is supported).
+
+All offending lines are reported together, with their line numbers,
+and the config file is left unchanged until they are fixed.
+
+Notes:
+
+- The package name is matched against `uv.lock` after
+  [PEP 503](https://peps.python.org/pep-0503/) normalization,
+  so `types-PyYAML` syncs with the `types-pyyaml` package.
+- The same pragma works in `prek.toml`:
+  `"pydantic>=2.0",  # sync-with-uv`.
+
 ## Advanced Configuration
 
 Most users don't need this section -

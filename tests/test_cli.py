@@ -394,3 +394,72 @@ def test_cli_preserves_line_endings_when_writing(
         precommit_content_bytes.replace(b"23.11.0", b"24.0.0")
         == precommit_file.read_bytes()
     )
+
+
+def test_cli_reports_dependency_line_changes(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The CLI reports per-line dependency pins separately from per-package revs."""
+    uv_lock_file = tmp_path / "uv.lock"
+    uv_lock_file.write_text(textwrap.dedent("""\
+            [[package]]
+            name = "mypy"
+            version = "1.8.0"
+            [[package]]
+            name = "pydantic"
+            version = "2.5.0"
+            """))
+    precommit_file = tmp_path / ".pre-commit-config.yaml"
+    precommit_file.write_text(textwrap.dedent("""\
+            repos:
+            - repo: https://github.com/pre-commit/mirrors-mypy
+              rev: v1.5.1
+              hooks:
+                - id: mypy
+                  additional_dependencies:
+                    - pydantic>=2.0  # sync-with-uv
+                    - pydantic  # sync-with-uv
+            """))
+
+    with pytest.raises(SystemExit) as exc_info:
+        app(["-p", str(precommit_file), "-u", str(uv_lock_file), "-v"])
+    assert exc_info.value.code == 0
+    err = capsys.readouterr().err
+    # the rev is a per-package change; the two pydantic deps are per-line changes
+    # (reported separately even though they are the same package)
+    assert "mypy: v1.5.1 -> v1.8.0" in err
+    assert "line 7: pydantic >=2.0 -> ==2.5.0" in err
+    assert "line 8: pydantic (unpinned) -> ==2.5.0" in err
+    assert "1 package changed, 0 packages left unchanged." in err
+    assert "2 dependencies changed, 0 dependencies left unchanged." in err
+
+    content = precommit_file.read_text()
+    assert content.count("- pydantic==2.5.0  # sync-with-uv\n") == 2
+
+
+def test_cli_reports_unchanged_dependency_line(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A pragma dependency already at the locked version is reported as unchanged."""
+    uv_lock_file = tmp_path / "uv.lock"
+    uv_lock_file.write_text(textwrap.dedent("""\
+            [[package]]
+            name = "pydantic"
+            version = "2.5.0"
+            """))
+    precommit_file = tmp_path / ".pre-commit-config.yaml"
+    precommit_file.write_text(textwrap.dedent("""\
+            repos:
+            - repo: local
+              hooks:
+                - id: mypy
+                  additional_dependencies:
+                    - pydantic==2.5.0  # sync-with-uv
+            """))
+
+    with pytest.raises(SystemExit) as exc_info:
+        app(["-p", str(precommit_file), "-u", str(uv_lock_file), "-v"])
+    assert exc_info.value.code == 0
+    err = capsys.readouterr().err
+    assert "line 6: pydantic unchanged" in err
+    assert "0 dependencies changed, 1 dependency left unchanged." in err

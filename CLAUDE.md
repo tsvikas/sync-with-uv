@@ -53,6 +53,7 @@ This tool synchronizes pre-commit hook versions with those in uv.lock to ensure 
 src/sync_with_uv/
 ├── cli.py              # Cyclopts-based CLI interface with diff/check/write modes
 ├── sync_with_uv.py     # Core logic for parsing uv.lock and updating configs
+├── dependency_line.py  # Parsing/pinning of `# sync-with-uv` dependency lines
 ├── repo_data.py        # Mapping tables for GitHub repo URLs to package names
 ├── __init__.py         # Package initialization
 ├── __main__.py         # Module entry point (python -m sync_with_uv)
@@ -63,6 +64,7 @@ src/sync_with_uv/
 ### Key Functions
 
 - `load_uv_lock()`: Parses uv.lock TOML and extracts package versions
-- `process_precommit_text()`: Regex-based parsing and updating of .pre-commit-config.yaml
+- `process_config_text()`: Regex-based parsing and updating of .pre-commit-config.yaml / prek.toml
+- `sync_dependency_line()`: Pins a `# sync-with-uv`-annotated dependency line to its uv.lock version
 - `repo_to_package()`: Maps GitHub URLs to Python package names
 - `repo_to_version_template()`: Handles version prefix patterns (v-prefixed vs plain versions)

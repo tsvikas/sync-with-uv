@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### New Features
 
+- **Sync `additional_dependencies`**:
+  Pin dependencies in `additional_dependencies` (or any dependency line)
+  to the `uv.lock` version. Opt-in per line via a `# sync-with-uv` pragma comment;
+  any specifier (`==`, `>=`, `~=`, ...) is rewritten to an exact `==` pin, and a
+  pin is added to a bare dependency that has none.
+  Since the pragma is an explicit request, the tool errors if an annotated line's
+  package is missing from `uv.lock`, or the line has no dependency to sync.
 - **`prek.toml` support**:
   Sync hook versions in `prek.toml` configs, in addition to `.pre-commit-config.yaml` (#35)
 

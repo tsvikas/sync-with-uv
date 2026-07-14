@@ -132,19 +132,21 @@ def test_process_prek_toml_text(sample_prek_config: Path, sample_uv_lock: Path) 
     uv_data = load_uv_lock(sample_uv_lock)
     result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == FIXED_PREK_CONTENT
-    assert changes == {
+    assert changes.repos == {
         "ruff": ("v0.14.0", "v0.15.0"),
         "gitleaks": ("v8.30.0", "v8.31.0"),
         "typos": ("v1.43.3", "v1.44.0"),
         "unknown-tool": False,
     }
+    assert changes.lines == {}
 
 
 def test_process_prek_toml_text_empty() -> None:
     """Test processing an empty prek.toml."""
     result, changes = process_config_text("", {"ruff": "0.15.0"}, config_format="toml")
     assert result == ""
-    assert changes == {}
+    assert changes.repos == {}
+    assert changes.lines == {}
 
 
 def test_process_prek_toml_text_no_changes_needed() -> None:
@@ -158,7 +160,8 @@ def test_process_prek_toml_text_no_changes_needed() -> None:
     uv_data = {"ruff": "0.15.0"}
     result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == prek_text
-    assert changes == {"ruff": True}
+    assert changes.repos == {"ruff": True}
+    assert changes.lines == {}
 
 
 def test_process_prek_toml_text_single_quotes() -> None:
@@ -172,7 +175,8 @@ def test_process_prek_toml_text_single_quotes() -> None:
     uv_data = {"ruff": "0.15.0"}
     result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert "rev = 'v0.15.0'" in result
-    assert changes == {"ruff": ("v0.14.0", "v0.15.0")}
+    assert changes.repos == {"ruff": ("v0.14.0", "v0.15.0")}
+    assert changes.lines == {}
 
 
 def test_process_prek_toml_text_builtin_and_local_skipped() -> None:
@@ -193,7 +197,8 @@ def test_process_prek_toml_text_builtin_and_local_skipped() -> None:
     uv_data = {"ruff": "0.15.0"}
     result, changes = process_config_text(prek_text, uv_data, config_format="toml")
     assert result == prek_text
-    assert changes == {}
+    assert changes.repos == {}
+    assert changes.lines == {}
 
 
 def test_process_prek_toml_text_with_user_mappings() -> None:
@@ -221,10 +226,123 @@ def test_process_prek_toml_text_with_user_mappings() -> None:
     )
     assert 'rev = "v2.1.0"' in result
     assert 'rev = "v0.15.0"' in result
-    assert changes == {
+    assert changes.repos == {
         "custom-tool": ("v1.0.0", "v2.1.0"),
         "ruff": ("v0.14.0", "v0.15.0"),
     }
+    assert changes.lines == {}
+
+
+def test_sync_additional_dependencies_pragma_toml() -> None:
+    """Pragma-annotated dependencies in a multi-line TOML array are pinned."""
+    prek_text = textwrap.dedent("""\
+        [[repos]]
+        repo = "https://github.com/pre-commit/mirrors-mypy"
+        rev = "v1.5.1"
+
+        [[repos.hooks]]
+        id = "mypy"
+        additional_dependencies = [
+          "pydantic>=2.0",  # sync-with-uv
+          'types-PyYAML==6.0.0',  # sync-with-uv
+          "rich>=10",
+        ]
+        """)
+    uv_data = {"mypy": "1.5.1", "pydantic": "2.5.0", "types-pyyaml": "6.0.1"}
+
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
+
+    assert '  "pydantic==2.5.0",  # sync-with-uv' in result
+    assert "  'types-PyYAML==6.0.1',  # sync-with-uv" in result
+    # lines without a pragma are never touched
+    assert '  "rich>=10",' in result
+    assert changes.repos == {"mypy": True}
+    assert changes.lines == {
+        8: ("pydantic", ">=2.0", "==2.5.0"),
+        9: ("types-pyyaml", "==6.0.0", "==6.0.1"),
+    }
+
+
+def test_sync_additional_dependencies_toml_bare_adds_specifier() -> None:
+    """A bare pragma dependency in prek.toml gets an exact pin added."""
+    prek_text = textwrap.dedent("""\
+        [[repos.hooks]]
+        id = "mypy"
+        additional_dependencies = [
+          "pydantic",  # sync-with-uv
+          'attrs>=1',  # sync-with-uv
+        ]
+        """)
+    uv_data = {"pydantic": "2.5.0", "attrs": "23.2.0"}
+
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
+
+    assert '  "pydantic==2.5.0",  # sync-with-uv' in result
+    assert "  'attrs==23.2.0',  # sync-with-uv" in result
+    assert changes.repos == {}
+    assert changes.lines == {
+        4: ("pydantic", "", "==2.5.0"),
+        5: ("attrs", ">=1", "==23.2.0"),
+    }
+
+
+def test_sync_additional_dependencies_toml_bare_adds_specifier_with_marker() -> None:
+    """A bare pragma dependency with a marker in prek.toml pins before the marker."""
+    prek_text = textwrap.dedent("""\
+        [[repos.hooks]]
+        id = "mypy"
+        additional_dependencies = [
+          'types-PyYAML ; python_version < "3.11"',  # sync-with-uv
+        ]
+        """)
+    uv_data = {"types-pyyaml": "6.0.1"}
+
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
+
+    assert (
+        "  'types-PyYAML==6.0.1 ; python_version < \"3.11\"',  # sync-with-uv" in result
+    )
+    assert changes.repos == {}
+    assert changes.lines == {
+        4: ("types-pyyaml", "", "==6.0.1"),
+    }
+
+
+def test_sync_additional_dependencies_toml_errors() -> None:
+    """Invalid pragma dependencies in prek.toml are reported as errors."""
+    prek_text = textwrap.dedent("""\
+        [[repos.hooks]]
+        id = "mypy"
+        additional_dependencies = [
+          # sync-with-uv
+          "not-locked==1.0.0",  # sync-with-uv
+        ]
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    with pytest.raises(
+        ValueError, match="invalid '# sync-with-uv' dependencies"
+    ) as exc_info:
+        process_config_text(prek_text, uv_data, config_format="toml")
+    message = str(exc_info.value)
+    assert "line 4: no dependency to sync" in message
+    assert "line 5: 'not-locked' is not in uv.lock" in message
+
+
+def test_sync_additional_dependencies_toml_multiple_on_line_errors() -> None:
+    """More than one dependency on a pragma line is rejected in prek.toml too."""
+    prek_text = textwrap.dedent("""\
+        [[repos.hooks]]
+        id = "mypy"
+        additional_dependencies = [
+          "pydantic==2.0", "attrs>=1",  # sync-with-uv
+        ]
+        """)
+    uv_data = {"pydantic": "2.5.0", "attrs": "23.2.0"}
+
+    with pytest.raises(ValueError, match="more than one dependency") as exc_info:
+        process_config_text(prek_text, uv_data, config_format="toml")
+    assert "line 4" in str(exc_info.value)
 
 
 @pytest.mark.parametrize(

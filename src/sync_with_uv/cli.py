@@ -10,7 +10,7 @@ from colorama import Fore, Style
 from cyclopts import App, Parameter
 
 from .repo_data import load_user_mappings
-from .sync_with_uv import load_uv_lock, process_config_text
+from .sync_with_uv import Changes, load_uv_lock, process_config_text
 
 app = App(name="sync-with-uv")
 app.register_install_completion_command()
@@ -146,7 +146,7 @@ def process_precommit(  # noqa: PLR0913
         )
         # report the results / change files
         if verbose:
-            _print_packages(changes)
+            _print_changes(changes)
         # output a diff to to stdout
         if diff:
             _print_diff(config_text, fixed_text, config_path, color=color)
@@ -163,14 +163,23 @@ def process_precommit(  # noqa: PLR0913
         return 123
 
 
-def _print_packages(changes: dict[str, bool | tuple[str, str]]) -> None:
-    for package, change in changes.items():
+def _print_changes(changes: Changes) -> None:
+    for package, change in changes.repos.items():
         if isinstance(change, tuple):
             print(f"{package}: {change[0]} -> {change[1]}", file=sys.stderr)
         elif change:
             print(f"{package}: unchanged", file=sys.stderr)
         else:
             print(f"{package}: not managed in uv", file=sys.stderr)
+    for line_number, dep in sorted(changes.lines.items()):
+        if dep.changed:
+            old_spec = dep.old_spec or "(unpinned)"
+            print(
+                f"line {line_number}: {dep.package} {old_spec} -> {dep.new_spec}",
+                file=sys.stderr,
+            )
+        else:
+            print(f"line {line_number}: {dep.package} unchanged", file=sys.stderr)
     print(file=sys.stderr)
 
 
@@ -195,21 +204,25 @@ def _plural(count: int, singular: str, plural: str) -> str:
     return singular if count == 1 else plural
 
 
-def _print_summary(
-    changes: dict[str, bool | tuple[str, str]], *, dry_mode: bool
-) -> None:
+def _print_summary(changes: Changes, *, dry_mode: bool) -> None:
     print("All done!", file=sys.stderr)
-    n_changed = n_unchanged = 0
-    for change in changes.values():
-        if isinstance(change, tuple):
-            n_changed += 1
-        else:
-            n_unchanged += 1
     would_be = "would be " if dry_mode else ""
+    n_pkg_changed = sum(isinstance(c, tuple) for c in changes.repos.values())
+    n_pkg_unchanged = len(changes.repos) - n_pkg_changed
     print(
-        f"{n_changed} {_plural(n_changed, 'package', 'packages')} "
+        f"{n_pkg_changed} {_plural(n_pkg_changed, 'package', 'packages')} "
         f"{would_be}changed, "
-        f"{n_unchanged} {_plural(n_unchanged, 'package', 'packages')} "
+        f"{n_pkg_unchanged} {_plural(n_pkg_unchanged, 'package', 'packages')} "
         f"{would_be}left unchanged.",
         file=sys.stderr,
     )
+    if changes.lines:
+        n_changed = sum(d.changed for d in changes.lines.values())
+        n_unchanged = len(changes.lines) - n_changed
+        print(
+            f"{n_changed} {_plural(n_changed, 'dependency', 'dependencies')} "
+            f"{would_be}changed, "
+            f"{n_unchanged} {_plural(n_unchanged, 'dependency', 'dependencies')} "
+            f"{would_be}left unchanged.",
+            file=sys.stderr,
+        )
