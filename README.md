@@ -19,11 +19,11 @@
 [PEP 735](https://peps.python.org/pep-0735/) introduces dependency groups in `pyproject.toml`,
 allowing tools like black, ruff, and mypy to be managed centrally.
 However, when these tools are also used in pre-commit hooks,
-keeping versions in sync between `uv.lock` and `.pre-commit-config.yaml` can be tedious.
+keeping versions in sync between `uv.lock` and `.pre-commit-config.yaml`/`prek.toml` can be tedious.
 
-This package automatically updates the versions of dependencies in `.pre-commit-config.yaml` to match their versions in `uv.lock`,
+This package automatically updates the versions of dependencies in `.pre-commit-config.yaml`/`prek.toml` to match their versions in `uv.lock`,
 ensuring everything stays aligned and is managed from a single source.
-Any tool not specified in `uv.lock` remains managed by `.pre-commit-config.yaml`.
+Any tool not specified in `uv.lock` remains managed by `.pre-commit-config.yaml`/`prek.toml`.
 
 Simply add this pre-commit hook to your setup and enjoy consistent dependency management.
 
@@ -40,7 +40,16 @@ Simply add these lines to your `.pre-commit-config.yaml` file:
     - id: sync-with-uv
 ```
 
-**Note:** Place this hook **after** hooks that modify `uv.lock` (like `uv-lock`), and **before** hooks that read versions from `.pre-commit-config.yaml` (like `sync-pre-commit-deps`).
+or to your `prek.toml`:
+
+```toml
+[[repos]]
+repo = "https://github.com/tsvikas/sync-with-uv"
+rev = "main"  # replace with the latest version
+hooks = [{ id = "sync-with-uv" }]
+```
+
+**Note:** Place this hook **after** hooks that modify `uv.lock` (like `uv-lock`), and **before** hooks that read versions from `.pre-commit-config.yaml`/`prek.toml` (like `sync-pre-commit-deps`).
 
 That's it! The hook will automatically sync versions for any tools present in both your pre-commit config and `uv.lock`.
 
@@ -53,17 +62,17 @@ For manual usage or CI/CD integration, install and run directly:
 ```bash
 pipx install sync-with-uv
 
-# Update .pre-commit-config.yaml
+# Update .pre-commit-config.yaml / prek.toml
 sync-with-uv
 
 # Preview changes only
 sync-with-uv --diff
 
 # Custom file paths
-sync-with-uv -p custom-precommit.yaml -u custom-lock.toml
+sync-with-uv -u custom-lock.toml
+sync-with-uv -p custom-precommit.yaml
+sync-with-uv -p custom-prek.toml
 ```
-
-Note: If you use the tools with a custom file location, remember to also change the `files` setting in `.pre-commit-config.toml`.
 
 ## Syncing additional dependencies
 
@@ -101,7 +110,7 @@ as well as commonly used mirrors for those tools.
 ### Mapping from repo URL to package name
 
 By default, the tool assumes the last part of a repo URL is the package name.
-For example, if `repo: https://github.com/my-org/my-awesome-linter` is in `.pre-commit-config.yaml`,
+For example, if `repo: https://github.com/my-org/my-awesome-linter` is in `.pre-commit-config.yaml`/`prek.toml`,
 the tool will sync with the version of `my-awesome-linter` in `uv.lock`.
 
 The tool skips any repo without a corresponding package in `uv.lock`.
@@ -121,7 +130,7 @@ Use an empty value to disable syncing for a specific repo.
 
 ### Mapping from repo URL to version tag format
 
-For each repo in `.pre-commit-config.yaml` with a linked package,
+For each repo in `.pre-commit-config.yaml`/`prek.toml` with a linked package,
 the tool updates the `rev` field with the version from `uv.lock`, optionally preserving a leading `v`.
 The tool preserves the original formatting and any comments on the `rev` line.
 For example, if the `uv.lock` version is `1.2.3`,
