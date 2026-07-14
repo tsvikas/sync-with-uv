@@ -286,6 +286,28 @@ def test_sync_additional_dependencies_toml_bare_adds_specifier() -> None:
     }
 
 
+def test_sync_additional_dependencies_toml_bare_adds_specifier_with_marker() -> None:
+    """A bare pragma dependency with a marker in prek.toml pins before the marker."""
+    prek_text = textwrap.dedent("""\
+        [[repos.hooks]]
+        id = "mypy"
+        additional_dependencies = [
+          'types-PyYAML ; python_version < "3.11"',  # sync-with-uv
+        ]
+        """)
+    uv_data = {"types-pyyaml": "6.0.1"}
+
+    result, changes = process_config_text(prek_text, uv_data, config_format="toml")
+
+    assert (
+        "  'types-PyYAML==6.0.1 ; python_version < \"3.11\"',  # sync-with-uv" in result
+    )
+    assert changes.repos == {}
+    assert changes.lines == {
+        4: ("types-pyyaml", "", "==6.0.1"),
+    }
+
+
 def test_sync_additional_dependencies_toml_errors() -> None:
     """Invalid pragma dependencies in prek.toml are reported as errors."""
     prek_text = textwrap.dedent("""\
