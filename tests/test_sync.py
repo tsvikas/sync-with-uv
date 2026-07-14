@@ -601,3 +601,27 @@ def test_sync_additional_dependencies_already_pinned() -> None:
     # an already-correct line is recorded with matching old/new specifiers
     assert changes.repos == {}
     assert changes.lines == {6: ("pydantic", "==2.5.0", "==2.5.0")}
+
+
+@pytest.mark.parametrize(
+    "comment",
+    ["# sync-with-uv-experimental", "# sync-with-uvx", "# sync-with-uv2"],
+)
+def test_sync_additional_dependencies_pragma_lookalike_ignored(comment: str) -> None:
+    """A comment that only looks like the pragma does not trigger syncing."""
+    precommit_text = textwrap.dedent(f"""\
+        repos:
+        - repo: local
+          hooks:
+            - id: mypy
+              additional_dependencies:
+                - pydantic>=2.0  {comment}
+        """)
+    uv_data = {"pydantic": "2.5.0"}
+
+    result, changes = process_config_text(precommit_text, uv_data, config_format="yaml")
+
+    # the line is left untouched and produces no change and no error
+    assert result == precommit_text
+    assert changes.repos == {}
+    assert changes.lines == {}

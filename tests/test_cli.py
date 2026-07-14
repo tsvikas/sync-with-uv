@@ -435,3 +435,31 @@ def test_cli_reports_dependency_line_changes(
 
     content = precommit_file.read_text()
     assert content.count("- pydantic==2.5.0  # sync-with-uv\n") == 2
+
+
+def test_cli_reports_unchanged_dependency_line(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A pragma dependency already at the locked version is reported as unchanged."""
+    uv_lock_file = tmp_path / "uv.lock"
+    uv_lock_file.write_text(textwrap.dedent("""\
+            [[package]]
+            name = "pydantic"
+            version = "2.5.0"
+            """))
+    precommit_file = tmp_path / ".pre-commit-config.yaml"
+    precommit_file.write_text(textwrap.dedent("""\
+            repos:
+            - repo: local
+              hooks:
+                - id: mypy
+                  additional_dependencies:
+                    - pydantic==2.5.0  # sync-with-uv
+            """))
+
+    with pytest.raises(SystemExit) as exc_info:
+        app(["-p", str(precommit_file), "-u", str(uv_lock_file), "-v"])
+    assert exc_info.value.code == 0
+    err = capsys.readouterr().err
+    assert "line 6: pydantic unchanged" in err
+    assert "0 dependencies changed, 1 dependency left unchanged." in err
