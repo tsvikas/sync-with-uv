@@ -61,7 +61,7 @@ To add a tool to your uv dependencies, use `uv add --group dev tool-name` (the t
 For manual usage or CI/CD integration, install and run directly:
 
 ```bash
-pipx install sync-with-uv
+uv tool install sync-with-uv
 
 # Update .pre-commit-config.yaml / prek.toml
 sync-with-uv
