@@ -3,9 +3,10 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: quarterly
     cooldown:
       default-days: 7
     groups:
-      github-actions:
+      actions-version-updates:
+        applies-to: version-updates # keep security PRs standalone + fast
         patterns: ['*']

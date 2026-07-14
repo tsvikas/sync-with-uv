@@ -1,5 +1,8 @@
 # exclude those files from pre-commit checks
-exclude: "^$|^\\.copier-answers\\.yml$|^tests/test_\\w*/output/"
+exclude: "^$\
+  |^\\.copier-answers\\.yml$\
+  |^tests/test_\\w*/output/\
+  "
 
 # pre-commit.ci config
 ci:
@@ -156,7 +159,7 @@ repos:
         args: [--select, I001, --fix]
       - id: ruff-check
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+    rev: v2.2.0
     hooks:
       - id: mypy
         name: mypy (without imports)
@@ -199,7 +202,7 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
-  - repo: https://github.com/woodruffw/zizmor-pre-commit
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: v1.27.0
     hooks:
       - id: zizmor
