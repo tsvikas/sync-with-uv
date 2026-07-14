@@ -49,7 +49,8 @@ rev = "main"  # replace with the latest version
 hooks = [{ id = "sync-with-uv" }]
 ```
 
-**Note:** Place this hook **after** hooks that modify `uv.lock` (like `uv-lock`), and **before** hooks that read versions from `.pre-commit-config.yaml`/`prek.toml` (like `sync-pre-commit-deps`).
+> [!NOTE]
+> Place this hook **after** hooks that modify `uv.lock` (like `uv-lock`), and **before** hooks that read versions from `.pre-commit-config.yaml`/`prek.toml` (like `sync-pre-commit-deps`).
 
 That's it! The hook will automatically sync versions for any tools present in both your pre-commit config and `uv.lock`.
 
@@ -103,11 +104,14 @@ the tool errors (exit code 123) when an annotated line cannot be synced.
 
 ## Advanced Configuration
 
-Most users don't need this section -
-the tool works out of the box with popular tools like black, ruff, and mypy,
+The tool works out of the box with popular tools like black, ruff, and mypy,
 as well as commonly used mirrors for those tools.
+Most users don't need the settings below.
 
 ### Mapping from repo URL to package name
+
+<details>
+<summary>Details and example</summary>
 
 By default, the tool assumes the last part of a repo URL is the package name.
 For example, if `repo: https://github.com/my-org/my-awesome-linter` is in `.pre-commit-config.yaml`/`prek.toml`,
@@ -128,7 +132,12 @@ Use an empty value to disable syncing for a specific repo.
 "https://github.com/my-org/cool-tool" = ""
 ```
 
+</details>
+
 ### Mapping from repo URL to version tag format
+
+<details>
+<summary>Details and example</summary>
 
 For each repo in `.pre-commit-config.yaml`/`prek.toml` with a linked package,
 the tool updates the `rev` field with the version from `uv.lock`, optionally preserving a leading `v`.
@@ -146,6 +155,8 @@ using `${version}` as a placeholder for the package version.
 # for example, this project uses `version_1.2.3` format for tags
 "https://github.com/my-org/my-awesome-linter" = "version_${version}"
 ```
+
+</details>
 
 ## Contributing
 
