@@ -36,7 +36,7 @@ def test_process_precommit_cli_check(
     assert exc_info.value.code == 1
     captured = capsys.readouterr()
     assert captured.err == (
-        "All done!\n2 package would be changed, 2 packages would be left unchanged.\n"
+        "All done!\n2 packages would be changed, 2 packages would be left unchanged.\n"
     )
     assert captured.out == ""
 
@@ -100,7 +100,7 @@ def test_process_precommit_cli_check_v(
         "another-package: not managed in uv\n"
         "\n"
         "All done!\n"
-        "2 package would be changed, 2 packages would be left unchanged.\n"
+        "2 packages would be changed, 2 packages would be left unchanged.\n"
     )
     assert captured.out == ""
 
@@ -132,7 +132,7 @@ def test_process_precommit_cli_diff(
     assert exc_info.value.code == 0
     captured = capsys.readouterr()
     assert (
-        "All done!\n2 package would be changed, 2 packages would be left unchanged."
+        "All done!\n2 packages would be changed, 2 packages would be left unchanged."
         in captured.err
     )
     assert "-  rev: 23.9.1  # a comment" in captured.out
@@ -166,7 +166,7 @@ def test_process_precommit_cli_with_write(
     assert exc_info.value.code == 0
     captured = capsys.readouterr()
     assert captured.err == (
-        "All done!\n2 package changed, 2 packages left unchanged.\n"
+        "All done!\n2 packages changed, 2 packages left unchanged.\n"
     )
     assert captured.out == ""
 
@@ -240,7 +240,8 @@ def test_process_precommit_cli_check_no_changes_needed(
     captured = capsys.readouterr()
     assert "All done!" in captured.err
     assert (
-        "0 package would be changed, 2 packages would be left unchanged" in captured.err
+        "0 packages would be changed, 2 packages would be left unchanged"
+        in captured.err
     )
     assert captured.out == ""
 
