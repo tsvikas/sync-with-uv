@@ -8,16 +8,12 @@ One source of truth for black, ruff, mypy, and the rest.
        alt="Versions resolved in uv.lock flow into .pre-commit-config.yaml: ruff rev v0.1.9 becomes v0.14.2, black rev 23.9.1 becomes 25.9.0">
 </p>
 
-<p align="center">
-
 [![Tests][tests-badge]][tests-link]
 [![codecov][codecov-badge]][codecov-link]
 [![PyPI version][pypi-version-badge]][pypi-link]
 [![Total downloads][pepy-badge]][pepy-link]
 [![Made Using tsvikas/python-template][template-badge]][template-link]
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
-
-</p>
 
 ## Overview
 
