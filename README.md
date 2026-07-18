@@ -1,5 +1,8 @@
 # sync-with-uv
 
+**Pin pre-commit hooks to the versions already resolved in your `uv.lock`.**
+One source of truth for black, ruff, mypy, and the rest.
+
 [![Tests][tests-badge]][tests-link]
 [![uv][uv-badge]][uv-link]
 [![Ruff][ruff-badge]][ruff-link]
@@ -13,6 +16,11 @@
 [![Made Using tsvikas/python-template][template-badge]][template-link]
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 [![PRs Welcome][prs-welcome-badge]][prs-welcome-link]
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tsvikas/sync-with-uv/main/assets/readme/sync-flow.png" width="440"
+       alt="Versions resolved in uv.lock flow into .pre-commit-config.yaml: ruff rev v0.1.9 becomes v0.14.2, black rev 23.9.1 becomes 25.9.0">
+</p>
 
 ## Overview
 
