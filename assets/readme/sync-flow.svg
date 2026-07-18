@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="400" height="600" viewBox="0 0 400 600"
+     role="img" aria-labelledby="flow-title flow-desc">
+  <title id="flow-title">How sync-with-uv updates a pre-commit config</title>
+  <desc id="flow-desc">The versions resolved in uv.lock (ruff 0.14.2, black 25.9.0, mypy 1.18.2) flow into .pre-commit-config.yaml, where rev v0.1.9 becomes v0.14.2 for ruff and 23.9.1 becomes 25.9.0 for black. The leading v is preserved per repository.</desc>
+
+  <defs>
+    <clipPath id="config-clip">
+      <rect x="24" y="316" width="352" height="252" rx="10"/>
+    </clipPath>
+    <style>
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    </style>
+  </defs>
+
+  <rect width="400" height="600" rx="16" fill="#0d1117"/>
+  <rect x="0.5" y="0.5" width="399" height="599" rx="15.5" fill="none" stroke="#21262d"/>
+
+  <g id="lock-source" class="mono">
+    <rect x="24" y="32" width="352" height="190" rx="10" fill="#161b22" stroke="#30363d"/>
+    <text x="44" y="64" font-size="16" font-weight="700" fill="#a371f7">uv.lock</text>
+    <path d="M 24 80 L 376 80" stroke="#30363d" stroke-width="1"/>
+
+    <g font-size="16">
+      <text x="44" y="118" fill="#7d8590">ruff</text>
+      <text x="200" y="118" fill="#adbac7">0.14.2</text>
+      <text x="44" y="152" fill="#7d8590">black</text>
+      <text x="200" y="152" fill="#adbac7">25.9.0</text>
+      <text x="44" y="186" fill="#7d8590">mypy</text>
+      <text x="200" y="186" fill="#adbac7">1.18.2</text>
+    </g>
+  </g>
+
+  <g id="flow-arrow">
+    <path d="M 200 246 L 200 292" stroke="#484f58" stroke-width="1.5"/>
+    <path d="M 194 284 L 200 292 L 206 284" fill="none" stroke="#484f58" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="mono" x="216" y="274" font-size="12" fill="#7d8590">sync</text>
+  </g>
+
+  <g id="config-target" class="mono">
+    <rect x="24" y="316" width="352" height="252" rx="10" fill="#161b22" stroke="#30363d"/>
+    <text x="44" y="348" font-size="14" fill="#7d8590">.pre-commit-config.yaml</text>
+    <path d="M 24 364 L 376 364" stroke="#30363d" stroke-width="1"/>
+
+    <g font-size="14" clip-path="url(#config-clip)">
+      <text x="64" y="396" fill="#7d8590">repo: astral-sh/ruff-pre-commit</text>
+
+      <rect x="25" y="404" width="350" height="28" fill="#f85149" fill-opacity="0.10"/>
+      <text x="44" y="423" fill="#f85149">-</text>
+      <text x="64" y="423" fill="#ffa198">rev: v0.1.9</text>
+
+      <rect x="25" y="432" width="350" height="28" fill="#3fb950" fill-opacity="0.12"/>
+      <text x="44" y="451" fill="#3fb950">+</text>
+      <text x="64" y="451" fill="#7ee787">rev: v0.14.2</text>
+
+      <text x="64" y="492" fill="#7d8590">repo: psf/black</text>
+
+      <rect x="25" y="500" width="350" height="28" fill="#f85149" fill-opacity="0.10"/>
+      <text x="44" y="519" fill="#f85149">-</text>
+      <text x="64" y="519" fill="#ffa198">rev: 23.9.1</text>
+
+      <rect x="25" y="528" width="350" height="28" fill="#3fb950" fill-opacity="0.12"/>
+      <text x="44" y="547" fill="#3fb950">+</text>
+      <text x="64" y="547" fill="#7ee787">rev: 25.9.0</text>
+    </g>
+  </g>
+</svg>
