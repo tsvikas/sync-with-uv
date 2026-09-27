@@ -1,7 +1,11 @@
+# Needs "Allow GitHub Actions to create and approve pull requests" enabled in
+# Settings > Actions > General, or creating the pull request fails.
 name: Update Dependencies
 
 on:
   workflow_dispatch:
+
+permissions: {}
 
 jobs:
   update-deps:
@@ -9,35 +13,104 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: write  # to dispatch the tests
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@f98e06938123ccabd21905ea5d0069192241f9f1 # v8.3.1
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         with:
           cache-suffix: deps-update
       - name: Sync dependencies
         run: uv sync
       - name: Update dependencies
         run: uv run just deps-update
+      - name: List the updates, for the commit message
+        id: updates
+        # Compare against HEAD, since `uv sync --upgrade` does not print what it bumped
+        shell: python
+        run: |
+          import os, re, subprocess, tomllib
+
+          def at_head(path):
+              cmd = ["git", "show", f"HEAD:{path}"]
+              return subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
+
+          # Both map a name to {key: version}. A lock can hold one package at several
+          # versions, one per resolution fork, keyed by the fork's markers.
+          def packages(text):
+              versions = {}
+              for p in tomllib.loads(text).get("package", []):
+                  if "version" in p:
+                      fork = tuple(p.get("resolution-markers", []))
+                      versions.setdefault(p["name"], {})[fork] = p["version"]
+              return versions
+
+          def hook_revs(text):
+              pairs = re.findall(r"- repo: https://github.com/(\S+)\n\s+rev: (\S+)", text)
+              return {repo: {(): rev.strip("'\"")} for repo, rev in pairs}
+
+          def vkey(version):
+              return tuple(int(n) for n in re.findall(r"\d+", version))
+
+          def bumps(old, new):
+              pairs = [(old[k], new[k]) for k in new if k in old]
+              # Forks whose markers changed, e.g. one fork split in two: pair each new
+              # version with the newest old one below it, and any old version left over
+              # with the oldest new one above it.
+              lo = sorted({v for k, v in old.items() if k not in new}, key=vkey)
+              ln = sorted({v for k, v in new.items() if k not in old}, key=vkey)
+              if lo and ln:
+                  for b in ln:
+                      below = [a for a in lo if vkey(a) <= vkey(b)]
+                      pairs.append((below[-1] if below else lo[0], b))
+                  for a in lo:
+                      if a not in {p[0] for p in pairs}:
+                          above = [b for b in ln if vkey(b) >= vkey(a)]
+                          pairs.append((a, above[0] if above else ln[-1]))
+              pairs = sorted(set(pairs), key=lambda p: (vkey(p[0]), vkey(p[1])))
+              return [f"{a} → {b}" for a, b in pairs if a != b]
+
+          lines = []
+          for path, parse in [("uv.lock", packages), (".pre-commit-config.yaml", hook_revs)]:
+              old = parse(at_head(path))
+              with open(path, encoding="utf-8") as f:
+                  new = parse(f.read())
+              for name in sorted(new.keys() & old.keys()):
+                  if changes := bumps(old[name], new[name]):
+                      lines.append(f"- {name} {', '.join(changes)}")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("updates<<EOF\n" + "\n".join(lines) + "\nEOF\n")
       - name: Run security audit
         id: audit
+        # Here and below: findings must not stop the PR, and without pipefail the
+        # pipeline exits with sed's status. sed strips the colors, which the PR body
+        # would show as raw escape codes.
         run: |
-          echo 'AUDIT<<EOF' >> "$GITHUB_OUTPUT"
-          uv run just deps-audit 2>&1 || true
-          echo 'EOF' >> "$GITHUB_OUTPUT"
+          {
+            echo 'AUDIT<<EOF'
+            uv run -q just deps-audit 2>&1 | sed 's/\x1b\[[0-9;]*m//g'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
       - name: Check outdated packages
         id: outdated
         run: |
-          echo 'OUTDATED<<EOF' >> "$GITHUB_OUTPUT"
-          uv run just deps-list-outdated 2>&1 || true
-          echo 'EOF' >> "$GITHUB_OUTPUT"
+          {
+            echo 'OUTDATED<<EOF'
+            uv run -q just deps-list-outdated 2>&1 | sed 's/\x1b\[[0-9;]*m//g'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
+        id: cpr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "⬆️ Update project dependencies"
+          # A squash merge may take its message from this commit's body.
+          commit-message: |
+            ⬆️ Update project dependencies
+
+            ${{ steps.updates.outputs.updates }}
           title: "⬆️ Update project dependencies"
           body: |
             Automated dependency update.
@@ -54,3 +127,10 @@ jobs:
           branch: deps/update
           delete-branch: true
           labels: dependencies
+      - name: Run tests on the pull request
+        # A pull request opened with GITHUB_TOKEN gets `pull_request` runs held for
+        # approval, but `workflow_dispatch` runs right away, on the PR head.
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref deps/update

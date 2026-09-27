@@ -2,8 +2,10 @@
 
 import difflib
 import sys
+import traceback
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, NoReturn
 
 import cyclopts.types
 from colorama import Fore, Style
@@ -77,6 +79,7 @@ def _resolve_config_format(filename: Path) -> Literal["yaml", "toml"]:
     raise ValueError(msg)
 
 
+# --- Commands -------------------------------------------------------------------------
 @app.default()
 def process_precommit(  # noqa: PLR0913
     *,
@@ -101,29 +104,31 @@ def process_precommit(  # noqa: PLR0913
     When no config file is specified, tries .pre-commit-config.yaml first,
     then prek.toml.
 
-    Parameters
-    ----------
-    precommit_filename:
-        Path to .pre-commit-config.yaml or prek.toml file to update.
-        Auto-detected if not specified.
-    uv_lock_filename
-        Path to uv.lock file containing package versions
-    check
-        Don't write the file back, just return the status.
-        Return code 0 means nothing would change.
-        Return code 1 means some package versions would be updated.
-        Return code 123 means there was an internal error.
-    diff
-        Don't write the file back,
-        just output a diff to indicate what changes would be made.
-    color
-        Enable colored diff output. Only applies when --diff is given.
-    quiet
-        Stop emitting all non-critical output.
-        Error messages will still be emitted.
-    verbose
-        Show detailed information about all packages,
-        including those that were not changed.
+    Args:
+        precommit_filename: Path to .pre-commit-config.yaml or prek.toml file to
+            update. Auto-detected if not specified.
+        uv_lock_filename: Path to uv.lock file containing package versions.
+        check: Don't write the file back, just return the status.
+            Exit code 1 means some package versions would be updated.
+        diff: Don't write the file back,
+            just output a diff to indicate what changes would be made.
+        color: Enable colored diff output. Only applies when --diff is given.
+        quiet: Stop emitting all non-critical output.
+            Error messages will still be emitted.
+        verbose: Show detailed information about all packages,
+            including those that were not changed.
+
+    Returns:
+        The process exit code.
+
+    Exit Codes:
+        0: Success. With --check, nothing would change.
+        1: With --check, some package versions would be updated.
+            Also returned when the config file is missing or not YAML/TOML.
+        2: Invalid usage, including a missing uv.lock file.
+        123: An error occurred while processing the files.
+        64-78: Reserved, an internal failure.
+        129-159: Reserved, terminated by signal N, as 128 + N.
     """
     try:
         config_path = _resolve_config(precommit_filename)
@@ -226,3 +231,49 @@ def _print_summary(changes: Changes, *, dry_mode: bool) -> None:
             f"{would_be}left unchanged.",
             file=sys.stderr,
         )
+
+
+# --- Entry point ----------------------------------------------------------------------
+# Maps the commands above onto exit codes, and is what `[project.scripts]` and
+# `__main__` both call.
+
+# Cyclopts itself exits 2 on invalid usage. These are sysexits(3) codes.
+# `os.EX_*` holds the same values but only exists on Unix, so they are inlined
+# to keep the CLI importable on Windows.
+EX_NOINPUT = 66
+EX_UNAVAILABLE = 69
+EX_SOFTWARE = 70
+EX_NOPERM = 77
+
+
+def _fail(exc: Exception, code: int) -> NoReturn:
+    """Report `exc` on stderr and exit with `code`."""
+    print(f"error: {exc}", file=sys.stderr)
+    sys.exit(code)
+
+
+def main(tokens: Sequence[str] | None = None) -> None:
+    """Run the CLI, reporting failures and mapping them onto exit codes.
+
+    Args:
+        tokens: The command line to parse. Defaults to `sys.argv[1:]`.
+    """
+    try:
+        # `tokens` is a parameter so that tests can pass a command line here.
+        # Under pytest, a bare `app()` warns, since it would parse pytest's own
+        # argv, and a test that does so passes while testing nothing.
+        app(tokens)
+    # Nothing reports the errors below, so without `_fail` the CLI would exit on
+    # a bare code and no output. Match on the exception rather than on
+    # `type(exc)`, so that subclasses such as ConnectionRefusedError still land
+    # on the right code. Specific OSError subclasses must precede any bare
+    # `except OSError`, which would otherwise swallow them.
+    except FileNotFoundError as exc:
+        _fail(exc, EX_NOINPUT)
+    except PermissionError as exc:
+        _fail(exc, EX_NOPERM)
+    except ConnectionError as exc:
+        _fail(exc, EX_UNAVAILABLE)
+    except Exception:  # noqa: BLE001
+        traceback.print_exc()
+        sys.exit(EX_SOFTWARE)

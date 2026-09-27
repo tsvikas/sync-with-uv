@@ -21,7 +21,6 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -39,9 +38,9 @@ urls.Issues = "https://github.com/tsvikas/sync-with-uv/issues"
 # urls.Funding = "https://github.com/sponsors/tsvikas"
 # Discussions = "https://github.com/tsvikas/sync-with-uv/discussions"
 
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
-  "cyclopts >=4",
+  "cyclopts >=5",
   "tomli >=2",
   "colorama >=0.4.6"
 ]
@@ -50,7 +49,7 @@ dependencies = [
 # optional_name = ["some_package >=1.0"]
 
 [project.scripts]
-sync-with-uv = "sync_with_uv.cli:app"
+sync-with-uv = "sync_with_uv.cli:main"
 
 [project.gui-scripts]
 # sync-with-uv = "sync_with_uv.gui:app.run"
@@ -60,9 +59,9 @@ sync-with-uv = "sync_with_uv.cli:app"
 dev = [
   ## used in the justfile
   "rust-just ~=1.0",
-  "prek ~=0.4.0",
+  "prek ~=0.5.0",
   "black ~=26.1",
-  "ruff ~=0.15.0",
+  "ruff ~=0.16.0",
   ## can be used for debug
   "icecream >=2",
   ## can be used for REPL
@@ -96,7 +95,7 @@ docs = [
   "mkdocs-section-index ~=0.3.0",
 ]
 typing = [
-  "mypy ~=2.2.0",
+  "mypy ~=2.3.0",
   "ty ~=0.0",
   # add "*-stubs" and "types-*" packages here (">=0")
   "types-colorama >=0",
@@ -171,8 +170,8 @@ files = ["src", "tests"]
 mypy_path = "stubs"
 fixed_format_cache = true
 # set the platform
-python_version = "3.10"
-# enable checks [last updated: mypy 2.2]
+python_version = "3.11"
+# enable checks [last updated: mypy 2.3]
 strict = true
 strict_equality_for_none = true
 disallow_any_unimported = true
@@ -218,6 +217,8 @@ ignore = [
   # needed only in large codebases
   "TD002",    # flake8-todos/missing-todo-author
   "TD003",    # flake8-todos/missing-todo-link
+  # needed only with a per-file copyright policy
+  "CPY001",   # flake8-copyright/missing-copyright-notice
   # incompatible with other rules
   "COM812",   # flake8-commas/missing-trailing-comma (incompatible with black)
   # disagree:
@@ -232,7 +233,11 @@ ignore = [
   #"S101",     # flake8-bandit/assert
   #"FIX00",    # flake8-fixme/line-contains-*
   #"ERA001",   # eradicate/commented-out-code
-  #"PLR091",   # PyLint-Refactor/too-many-*
+  #"PLR0911",  # PyLint-Refactor/too-many-return-statements
+  #"PLR0912",  # PyLint-Refactor/too-many-branches
+  #"PLR0913",  # PyLint-Refactor/too-many-arguments
+  #"PLR0915",  # PyLint-Refactor/too-many-statements
+  #"PLR0917",  # PyLint-Refactor/too-many-positional-arguments
   #"TRY003",   # tryceratops/raise-vanilla-args
 ]
 # objects that should be treated equivalently to a logging.Logger object.
@@ -275,7 +280,12 @@ flake8-comprehensions.allow-dict-calls-with-keyword-arguments = true
 ]
 
 
+[tool.typos.default.extend-identifiers]
+# a ruff rule code, not a misspelling of "copy"
+CPY001 = "CPY001"
+
+
 [tool.pylint]
-py-version = "3.10"
+py-version = "3.11"
 ignore-paths = [".*/_version.py"]
 reports.output-format = "colorized"

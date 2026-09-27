@@ -3,6 +3,6 @@
 use `python -m sync_with_uv` to run the cli
 """
 
-from .cli import app
+from .cli import main
 
-app()
+main()

@@ -161,7 +161,7 @@ using `${version}` as a placeholder for the package version.
 ## Contributing
 
 Interested in contributing?
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guideline.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 [codecov-badge]: https://codecov.io/gh/tsvikas/sync-with-uv/graph/badge.svg
 [codecov-link]: https://codecov.io/gh/tsvikas/sync-with-uv

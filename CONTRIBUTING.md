@@ -44,6 +44,10 @@ Ready to get started? Follow the development setup below.
 
 ## Development Workflow
 
+### Code Style
+
+Docstrings use [Google style][google-style].
+
 ### Code Quality Tools
 
 - **Format code**: `uv run just format` (runs all the formatting tools)
@@ -65,6 +69,7 @@ uv run pytest
 uv run prek run
 ```
 
+[google-style]: https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings
 [how-to-contribute]: https://opensource.guide/how-to-contribute/
 [install-git]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 [install-just]: https://just.systems/man/en/
