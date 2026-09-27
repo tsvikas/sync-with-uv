@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.29.1
+_commit: v0.30.0-12-g7c91a6d
 _src_path: gh:tsvikas/python-template
 audit_in_ci: false
 cli_framework: cyclopts
@@ -14,7 +14,7 @@ license: MIT
 package_description: Sync '.pre-commit-config.yaml' from 'uv.lock'.
 package_name: sync_with_uv
 project_name: sync-with-uv
-python_min: 10
+python_min: 11
 user_email: tsvikas@gmail.com
 user_name: Tsvika Shapira
 year: 2025

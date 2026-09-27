@@ -37,9 +37,8 @@ deps-list-outdated:
 # Update all dependencies
 deps-update: && deps-list-outdated
   uv sync --upgrade
-  uv run prek auto-update
+  uv run prek update
   uvx sync-with-uv
-  just _sync-blacken-docs
   uvx sync-pre-commit-deps --yaml-mapping 2 --yaml-sequence 4 --yaml-offset 2 .pre-commit-config.yaml || { \
     echo "Note: '.pre-commit-config.yaml' changed, and might lost its formatting." \
     && exit 1; \
@@ -48,13 +47,6 @@ deps-update: && deps-list-outdated
 # Audit dependencies
 deps-audit:
   uv audit --locked
-
-# Sync blacken-docs' black additional_dependency with the version in uv.lock
-_sync-blacken-docs:
-  @black_ver=$(awk -F'"' '/^\[\[package\]\]/{p=0} /^name = "black"$/{p=1} p && /^version =/{print $2; exit}' uv.lock); \
-    if [ -n "$black_ver" ] && grep -q 'id: blacken-docs' .pre-commit-config.yaml; then \
-      sed -i -E "/id: blacken-docs/,/^  - repo:/ s/(black==)(<[^>]*>|[0-9][0-9a-z.+-]*)/\1$black_ver/" .pre-commit-config.yaml; \
-    fi
 
 
 ### code quality ###
