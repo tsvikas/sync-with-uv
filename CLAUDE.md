@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Format code: `just format` (black, ruff isort, blacken-docs, mdformat)
 - Quick format/lint: `just quick-tools` (fast ruff + black).
   Note: run `just format quick-tools` to prevent linting errors about formatting.
-- Lint: `just lint` (ruff, dmypy, deptry, pip-audit, pre-commit)
+- Lint: `just lint` (ruff, dmypy, deptry, prek hooks)
   Note: this takes more time.
 - Run tests: `just test` (pytest)
 
@@ -25,16 +25,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Type check: `uv run dmypy run` (daemon mypy) or `uv run mypy`
 - Run tests: `uv run pytest`
 - Single test: `uv run pytest tests/test_cli.py::test_function_name -v`
-- Single hook: `uv run pre-commit run hook-name`
+- Single hook: `uv run prek run hook-name`
 
 ### Project Setup
 
 - After clone: `just prepare` (installs pre-commit hooks)
-- Update deps: `just update-deps` (sync, autoupdate hooks, sync versions)
+- Update deps: `just deps-update` (sync, update hooks, sync versions)
 
 ## Code Style Guidelines
 
-- **Python Version**: Supports Python >=3.10
+- **Python Version**: Supports Python >=3.11
 - **Imports**: Standard library first, then third-party, then local (enforced by ruff)
 - **Type Hints**: Strict mypy typing with complete type coverage (e.g., `dict[str, str]`, `str | None`)
 - **Formatting**: Black formatting style with ruff for import sorting and linting
