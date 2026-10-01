@@ -1714,7 +1714,6 @@ source = { editable = "." }
 dependencies = [
     { name = "colorama" },
     { name = "cyclopts" },
-    { name = "tomli" },
 ]
 
 [package.dev-dependencies]
@@ -1756,7 +1755,6 @@ typing = [
 requires-dist = [
     { name = "colorama", specifier = ">=0.4.6" },
     { name = "cyclopts", specifier = ">=5" },
-    { name = "tomli", specifier = ">=2" },
 ]
 
 [package.metadata.requires-dev]

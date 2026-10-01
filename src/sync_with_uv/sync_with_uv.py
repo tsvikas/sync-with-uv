@@ -1,10 +1,9 @@
 """sync-with-uv: Sync '.pre-commit-config.yaml' or 'prek.toml' from 'uv.lock'."""
 
 import re
+import tomllib
 from pathlib import Path
 from typing import Literal, NamedTuple
-
-import tomli
 
 from sync_with_uv.dependency_line import DepLineChange, sync_dependency_line
 from sync_with_uv.repo_data import repo_to_package, repo_to_version_template
@@ -33,7 +32,7 @@ def load_uv_lock(filename: Path) -> dict[str, str]:
         Mapping of package names to their versions.
     """
     with filename.open("rb") as f:
-        toml_data = tomli.load(f)
+        toml_data = tomllib.load(f)
     return (
         {
             package["name"]: package["version"]

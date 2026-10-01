@@ -1,8 +1,8 @@
 import textwrap
+import tomllib
 from pathlib import Path
 
 import pytest
-import tomli
 
 from sync_with_uv.sync_with_uv import (
     load_uv_lock,
@@ -56,7 +56,7 @@ def test_load_uv_lock_malformed(tmp_path: Path) -> None:
     uv_lock_file = tmp_path / "malformed.lock"
     uv_lock_file.write_text("This is not valid TOML")
 
-    with pytest.raises(tomli.TOMLDecodeError):
+    with pytest.raises(tomllib.TOMLDecodeError):
         load_uv_lock(uv_lock_file)
 
 

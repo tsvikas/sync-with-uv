@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - Require Python 3.11 or newer.
 - Invalid usage now exits with code 2 (was 1), including a missing `--uv-lock` file.
 
+### Improvements
+
+- Drop the `tomli` dependency in favor of the standard library's `tomllib`.
+
 ## [0.6.0] - 2026-07-14
 
 ### New Features

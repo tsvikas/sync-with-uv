@@ -1,10 +1,9 @@
 """Maps repo urls to package names and version templates."""
 
+import tomllib
 from collections import ChainMap
 from pathlib import Path
 from urllib.parse import urlparse
-
-import tomli
 
 REPO_TO_PACKAGE = {
     # keep-sorted start case=no
@@ -72,7 +71,7 @@ def load_user_mappings(
         return {}, {}
 
     with pyproject_path.open("rb") as f:
-        toml_data = tomli.load(f)
+        toml_data = tomllib.load(f)
 
     tool_config = toml_data.get("tool", {}).get("sync-with-uv", {})
     user_repo_to_package = tool_config.get("repo-to-package", {})
