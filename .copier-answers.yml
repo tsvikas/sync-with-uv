@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.30.0-12-g7c91a6d
+_commit: v0.31.0
 _src_path: gh:tsvikas/python-template
 audit_in_ci: false
 cli_framework: cyclopts
