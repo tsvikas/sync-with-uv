@@ -38,7 +38,7 @@ def _check_precommit_available() -> bool:
 def repo_with_precommit(tmp_path: Path) -> Path:
     if not _check_precommit_available():
         pytest.skip("pre-commit is not available or not working")
-    ruff = ("v0.0.200", "0.1.0")
+    old_rev, locked_version = "v0.0.200", "0.1.0"
     repo_dir = tmp_path / "repo"
     repo_dir.mkdir()
     subprocess.run([GIT_BIN, "init"], cwd=repo_dir, check=True)
@@ -57,19 +57,18 @@ def repo_with_precommit(tmp_path: Path) -> Path:
     except subprocess.CalledProcessError as e:
         # pre-commit install might crash on prerelease Python versions (SIGSEGV)
         pytest.skip(f"pre-commit install failed: {e}")
-    if ruff:
-        repo_dir.joinpath("dummy_module.py").write_text('print("Hello, world!")\n')
-        with repo_dir.joinpath("pyproject.toml").open("a") as f:
-            f.write('[tool.ruff]\ntarget-version = "py311"\n')
-        with repo_dir.joinpath("uv.lock").open("a") as f:
-            f.write(f'[[package]]\nname = "ruff"\nversion = "{ruff[1]}"\n')
-        with repo_dir.joinpath(".pre-commit-config.yaml").open("a") as f:
-            f.write(
-                "  - repo: https://github.com/astral-sh/ruff-pre-commit\n"
-                f"    rev: {ruff[0]}\n"
-                "    hooks:\n"
-                "      - id: ruff\n"
-            )
+    repo_dir.joinpath("dummy_module.py").write_text('print("Hello, world!")\n')
+    with repo_dir.joinpath("pyproject.toml").open("a") as f:
+        f.write('[tool.ruff]\ntarget-version = "py311"\n')
+    with repo_dir.joinpath("uv.lock").open("a") as f:
+        f.write(f'[[package]]\nname = "ruff"\nversion = "{locked_version}"\n')
+    with repo_dir.joinpath(".pre-commit-config.yaml").open("a") as f:
+        f.write(
+            "  - repo: https://github.com/astral-sh/ruff-pre-commit\n"
+            f"    rev: {old_rev}\n"
+            "    hooks:\n"
+            "      - id: ruff\n"
+        )
     # stage and commit without sync-with-uv
     subprocess.run([GIT_BIN, "add", "."], cwd=repo_dir, check=True)
     subprocess.run([GIT_BIN, "commit", "-m", "old hooks"], cwd=repo_dir, check=True)
