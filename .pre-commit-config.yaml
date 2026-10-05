@@ -150,7 +150,7 @@ repos:
 
   # Python files
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 26.10.0
+    rev: 26.5.1
     hooks:
       - id: black
   - repo: https://github.com/adamchainz/blacken-docs
@@ -160,7 +160,7 @@ repos:
         additional_dependencies:
           - black==26.5.1  # sync-with-uv
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.10
+    rev: v0.16.9
     hooks:
       - id: ruff-check
         alias: ruff-isort
@@ -169,7 +169,7 @@ repos:
       - id: ruff-check
         types_or: [python, pyi, jupyter, pyproject]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.4.0
+    rev: v2.3.1
     hooks:
       - id: mypy
         name: mypy (without imports)
