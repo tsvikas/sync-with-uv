@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -1711,6 +1711,7 @@ wheels = [
 [[package]]
 name = "sync-with-uv"
 source = { editable = "." }
+default-groups = ["dev", "test", "typing"]
 dependencies = [
     { name = "colorama" },
     { name = "cyclopts" },
@@ -1909,7 +1910,7 @@ wheels = [
 
 [[package]]
 name = "virtualenv"
-version = "21.14.1"
+version = "21.14.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "distlib" },
@@ -1918,9 +1919,9 @@ dependencies = [
     { name = "platformdirs" },
     { name = "python-discovery" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/50/67/b5d37693e5e666b68100db8fe34f00db28279330db55f739a3c799ff2449/virtualenv-21.14.1.tar.gz", hash = "sha256:719b189804e66678017d9f63bbfc590c44f6b96ab4829513806394f9b375929c", size = 5462838, upload-time = "2026-09-29T23:33:33.991Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/70/aa/bff50daee0488e16d611258a9b6c5a1d0c9e128f8ca424e9f4e1c0444ef2/virtualenv-21.14.13.tar.gz", hash = "sha256:de5307ba4b9a0001d9c8ea02832d38f63ca432880f416c1bface61c4323fd905", size = 5570301, upload-time = "2026-10-22T20:10:16.952Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/85/a8/22be2d14ef0d7b1e9e7dc1d839a85073fc20917be1747d6f1347d1cfc8c3/virtualenv-21.14.1-py3-none-any.whl", hash = "sha256:6fd04089fc0dc33549e7abdff70fc3b63d4e15799f2dbf3281f80d13b9fce522", size = 5486534, upload-time = "2026-09-29T23:33:32.333Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/a9/c10d8a44a29fb94a18b43fdf11f38caca53ae7c9406f11a72b1cb8f624f1/virtualenv-21.14.13-py3-none-any.whl", hash = "sha256:5fbb04138a4861580b78ba9110d529a26bc48fcc93c8ec36bc0202eeed96a788", size = 5557094, upload-time = "2026-10-22T20:10:15.096Z" },
 ]
 
 [[package]]
