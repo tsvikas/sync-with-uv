@@ -112,7 +112,11 @@ def process_config_text(
         "toml": re.compile(r"""^\s*repo\s*=\s*(['"])(?P<repo_url>[^'"]*)\1.*$"""),
     }[config_format]
     repo_rev_re = {
-        "yaml": re.compile(r"^\s*rev\s*:\s*(?P<repo_rev>\S*).*$"),
+        # Keep YAML quote delimiters outside the revision span, as for TOML.
+        "yaml": re.compile(
+            r"""^\s*rev\s*:\s*(?P<quote>['"]?)(?P<repo_rev>\S*?)"""
+            r"(?P=quote)(?=\s|$).*$"
+        ),
         "toml": re.compile(r"""^\s*rev\s*=\s*(['"])(?P<repo_rev>[^'"]*)\1.*$"""),
     }[config_format]
     skip_repos = {
