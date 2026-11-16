@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
 
 - Drop the `tomli` dependency in favor of the standard library's `tomllib`.
 
+### Bug Fixes
+
+- Preserve quotes around YAML `rev` values, so a quoted revision that already matches `uv.lock` is left unchanged and keeps its `v` prefix
+
 ## [0.6.0] - 2026-07-14
 
 ### New Features
